@@ -1,0 +1,21 @@
+[user]
+        name = Keith Batten
+        email = kbatten@gmail.com
+[color]
+        diff = auto
+        status = auto
+        branch = auto
+        interactive = auto
+[branch]
+       autosetuprebase = always
+[branch "master"]
+        rebase = true
+[core]
+       logAllRefUpdates = true
+       excludesfile = ~/.gitignore
+       pager = less -r
+[branch]
+       autosetupmerge = always
+       autosetuprebase = always
+[merge]
+        tool = tkdiff

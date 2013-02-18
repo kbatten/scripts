@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# set up a python dev environment
+
+
+function pip_install {
+    local package=${1}
+
+    echo " ${package}"
+    sudo pip install "${package}" &> /dev/null
+}
+
+
+# global variables should all match setup_dev
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+# includes
+source "${SCRIPTPATH}/setup_dev"
+
+
+if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
+    echo "setting up..."
+
+    echo "*packages"
+    package_install python-pip
+    package_install python-dev
+    package_install python-pygame
+    package_install python-opencv
+    package_install python-scipy
+
+
+    echo "*pip packages"
+    pip_install virtualenv
+    pip_install requests
+    pip_install Flask
+    pip_install sh
+
+
+    echo "*other"
+    fetch_and_install "https://github.com/pyinstaller/pyinstaller/tarball/develop" "pyinstaller-dev.tar.gz" "pyinstaller-dev" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
+    set_variable "PYTHONDONTWRITEBYTECODE" "true"
+    file_install "dev_python/runv" ~/bin
+fi

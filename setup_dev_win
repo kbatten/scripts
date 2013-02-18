@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# set up a windows dev environment
+
+
+function winetricks_install() {
+    local trick=${@}
+
+    Xvfb :100 -ac -screen 1 1024x768x24 &> /dev/null &
+    local pid=${!}
+    sleep 1
+
+    echo " ${trick}"
+    DISPLAY=":100.0" winetricks -q ${trick} &> /dev/null
+
+    kill ${pid}
+}
+
+
+# global variables should all match setup_dev
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOWNLOADDIR="${HOME}/download"
+
+
+# includes
+source "${SCRIPTPATH}/setup_dev"
+
+
+if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
+    echo "setting up..."
+
+    mkdir ${DOWNLOADDIR} &> /dev/null
+
+
+    echo "*packages"
+    package_update
+    package_install git
+    package_install xvfb
+    package_install ttf-mscorefonts-installer
+    package_install wine1.4
+    package_install wine1.4-dev
+
+
+    echo "*winetricks"
+    winetricks_install vcrun2008
+
+
+    echo "*other"
+    fetch_and_install "http://www.autoitscript.com/cgi-bin/getfile.pl?autoit3/autoit-v3-setup.exe" "" "" "/S"
+    fetch_and_install "http://l.autohotkey.net/AutoHotkey_L_Install.exe" "" "" "/S"
+
+    echo " autoit-win"
+    echo '#!/bin/bash
+Xvfb :101 -ac -screen 1 1024x768x24 &> /dev/null &
+trap "kill ${!}" EXIT
+sleep 1
+DISPLAY=:101.0 wine "C:\\Program Files\\AutoIt3\\Aut2Exe\Aut2exe.exe" /in "${1}" /out "${1/%.au3/.exe}" /nopack 2> /dev/null' > ~/bin/autoit-win
+    chmod 755 ~/bin/autoit-win
+
+    echo " autohotkey-win"
+    echo '#!/bin/bash
+Xvfb :101 -ac -screen 1 1024x768x24 &> /dev/null &
+trap "kill ${!}" EXIT
+sleep 1
+DISPLAY=:101.0 wine "C:\\Program Files\\AutoHotkey\\Compiler\\Ahk2Exe.exe" /in "${1}" 2> /dev/null' > ~/bin/autohotkey-win
+    chmod 755 ~/bin/autohotkey-win
+fi

@@ -1,0 +1,283 @@
+#!/bin/bash
+
+# set up a base dev environment on centos or ubuntu
+
+
+function add_alias {
+    local alias=${1}
+    local cmd=${2}
+
+    echo " alias ${alias}='${cmd}'"
+    if grep "^alias ${alias}=" ~/.bashrc &> /dev/null ; then
+	sed -i "s/^alias ${alias}=.*/alias ${alias}='${cmd}'/" ~/.bashrc
+    else
+	echo "alias ${alias}='${cmd}'" >> ~/.bashrc
+    fi
+}
+
+function set_editor {
+    local editor=${1}
+
+    echo " editor=${editor}"
+    if grep "^export EDITOR=" ~/.bashrc &> /dev/null ; then
+	sed -i "s/^export EDITOR=.*/export EDITOR='${editor}'/" ~/.bashrc
+    else
+	echo "export EDITOR='${editor}'" >> ~/.bashrc
+    fi
+}
+
+function set_variable {
+    local variable=${1}
+    local value=${2}
+
+    echo " ${variable}=${value}"
+    if grep "^export ${variable}=" ~/.bashrc &> /dev/null ; then
+	sed -i "s/^export ${variable}=.*/export ${variable}='${value}'/" ~/.bashrc
+    else
+	echo "export ${variable}='${value}'" >> ~/.bashrc
+    fi
+}
+
+function add_path {
+    local path=${1}
+
+    echo " PATH=${path}"
+    if grep "^PATH=" ~/.bashrc &> /dev/null ; then
+	if ! grep -e "^PATH=.*:${path}" -e "^PATH=${path}:.*$" -e "^PATH=.*:${path}:.*$" -e "^PATH=${path}$" ~/.bashrc &> /dev/null ; then
+	    path=$(echo ${path} | sed 's/\//\\\//g')
+	    sed -i "s/^PATH=/PATH=${path}\:/" ~/.bashrc
+	fi
+    else
+	echo "PATH=${path}:${PATH}" >> ~/.bashrc
+    fi
+}
+
+function get_os {
+    local info="$(cat /etc/redhat-release 2> /dev/null ; cat /etc/lsb-release 2> /dev/null ; uname -a)"
+
+    if echo "${info}" | grep -i -e centos -e "red hat" &> /dev/null ; then
+        echo 'centos'
+    elif echo "${info}" | grep -i -e ubuntu &> /dev/null ; then
+        echo 'ubuntu'
+    fi
+}
+
+function package_update {
+    local os=$(get_os)
+
+    echo " update"
+    if [[ ${os} == 'centos' ]] ; then
+        sudo yum update &> /dev/null
+    elif [[ ${os} == 'ubuntu' ]] ; then
+        sudo apt-get update &> /dev/null
+    fi
+}
+
+function package_install {
+    local package=${1}
+    local os=$(get_os)
+
+    echo " ${package}"
+    if [[ ${os} == 'centos' ]] ; then
+        sudo yum -y install ${package} &> /dev/null
+    elif [[ ${os} == 'ubuntu' ]] ; then
+        if [[ "${package}" == "ttf-mscorefonts-installer" ]] ; then
+            sudo debconf-set-selections <<< "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true"
+        fi
+        sudo apt-get -y install ${package} &> /dev/null
+    fi
+}
+
+function file_install {
+    local file=${1}
+    local dest=~/
+    if [[ -n ${2} ]] ; then
+        dest=${2}
+    fi
+
+    local result=0
+
+    echo " ${file}"
+    if [[ -f "${SCRIPTPATH}/${file}" ]] ; then
+        cp -f "${SCRIPTPATH}/${file}" "${dest}" &> /dev/null
+        popd &> /dev/null
+    elif which git &> /dev/null ; then
+        echo "  downloading..."
+        local tmpdir=$(mktemp -d --tmpdir sds.XXXXXXXXXX)
+        pushd . &> /dev/null
+        cd "${tmpdir}"
+        git clone -n git@github.com:kbatten/scripts.git --depth 1 &> /dev/null
+        cd scripts &> /dev/null
+        git checkout HEAD "${file}" &> /dev/null
+        cp -f "${file}" "${dest}" &> /dev/null
+        result=${?}
+        popd &> /dev/null
+        rm -rf "${tmpdir}"
+
+        if [[ ${result} -eq 0 ]] ; then
+            return
+        fi
+    else
+        echo "  failed to install ${file}"
+    fi
+}
+
+function _extension() {
+    echo "${1}" | sed 's/.*\.\(tar\.gz\|tgz\|tar\.bz2\|msi\|exe\|zip\)$/\1/'
+}
+
+function _dirname() {
+    local filename=${1}
+    local extension=$(_extension "${filename}")
+
+    echo "${filename%.${extension}}"
+}
+
+function extract() {
+    local filename=${1}
+    local directory=${2}
+    local extension=$(_extension "${filename}")
+
+    case "${extension}" in
+        "tar.gz" | "tgz" | "tar.bz2")
+            echo "  extracting..."
+            tar xf "${filename}" &> /dev/null
+            local directory_orig=$(basename $(tar tf "${filename}" | head -n1))
+            mv "${directory_orig}" "${directory}" &> /dev/null
+            ;;
+        "zip")
+            echo "  extracting..."
+
+            local tmpdir=$(mktemp -d --tmpdir sds.XXXXXXXXXX)
+            unzip -d "${tmpdir}" "${filename}" &> /dev/null
+            # if one directory in ${tmpdir}, move that to ${DOWNLOADDIR}/${directory}
+            # otherwise move ${tmpdir} ${DOWNLOADDIR}/${directory}
+            files=$(ls -A "${tmpdir}")
+            files_count=$(echo "${files}" | wc -l)
+            if [[ ${files_count} -eq 1 && -d "${tmpdir}/${files}" ]] ; then
+                mv "${tmpdir}/${files}" "${directory}" &> /dev/null
+                rm -rf "${tmpdir}" &> /dev/null
+            else
+                mv "${tmpdir}" "${directory}" &> /dev/null
+            fi
+    esac
+}
+
+function fetch_and_install() {
+    local url=${1}
+    local filename=${2}
+    local directory=${3}
+    local installer=${4}
+
+    if [[ -z "${filename}" ]] ; then
+        filename=$(basename "${url}")
+    fi
+    if [[ -z "${directory}" ]] ; then
+        directory=$(_dirname "${filename}")
+    fi
+
+    echo " ${filename}"
+
+    pushd . &> /dev/null
+
+    cd "${DOWNLOADDIR}"
+    if [[ ! -e "${directory}" ]] ; then
+        if [[ ! -e "${filename}" ]] ; then
+            echo "  downloading..."
+            wget "${url}" -O "${filename}" &> /dev/null
+        fi
+        extract "${filename}" "${directory}"
+    fi
+    if [[ "$(_extension "${filename}")" == "msi" ]] ; then
+        msiexec /q /i "${filename}" &> /dev/null
+    elif [[ "$(_extension "${filename}")" == "exe" ]] ; then
+        local auto=$(find ~/src/scripts -name "${filename/%.exe/-auto.exe}" | head -n1)
+        Xvfb :100 -ac -screen 1 1024x768x24 &> /dev/null &
+        local pid=${!}
+        sleep 1
+        if [[ -n "${auto}" ]] ; then
+            DISPLAY=":100.0" wine "${auto}" &> /dev/null
+        else
+            DISPLAY=":100.0" wine "${filename}" "${installer}" &> /dev/null
+        fi
+        kill ${pid}
+    else
+        mkdir "${HOME}/opt" &> /dev/null
+        cp -r "${directory}" "${HOME}/opt/" &> /dev/null
+        cd "${HOME}/opt/${directory}" &> /dev/null
+        eval "${installer}" &> /dev/null
+    fi
+
+    popd . &> /dev/null
+}
+
+
+# global variables should all match setup_dev
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOWNLOADDIR="${HOME}/download"
+
+
+if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
+    echo "setting up..."
+
+    mkdir "${DOWNLOADDIR}" &> /dev/null
+
+    echo "*aliases"
+    add_alias 'll' 'ls -alF'
+    add_alias 'mv' 'mv -i'
+    add_alias 'cp' 'cp -i'
+    add_alias 'rm' 'rm -i'
+    add_path "${HOME}/bin"
+
+
+    echo "*bin"
+    mkdir ~/bin &> /dev/null
+
+
+    echo "*packages"
+    package_update
+    package_install emacs23-nox
+    package_install git
+    package_install make
+    package_install unzip
+
+
+    echo "*editor"
+    set_editor "emacs"
+
+
+    echo "*ssh"
+    mkdir ~/.ssh &> /dev/null
+    chmod 755 ~/.ssh &> /dev/null
+
+    echo " authorized_keys"
+    echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCoY01cjjXaQGQaaNQ41uOtju80G3GI3PVjWpGMTnsQeC03uZXXS2eM+ZcMJydPYphudnky0bWUPh/C/8j4dAumR81aHJps/GK/HgqkIeWdMs+XpRoQDstdsvpkOpDBn8ksk0Ta3+XDCPNuLmt3rYJ1DteXLHKQQaBxMHBhnoOpjL3DO9qB/AE6iNysmZtIOHqI1aerswvd5wAUpmM0L0oQWzn5l4S9eOxtJvnXlSgb70tBWuqziakgTHcxR8+ZubQ134IX4hvT2aB/jZYuvjnSqWhoPu4ViHg8gNP6eAnxUocsWGRiYmIHOAPwbcpO9pWjCT12DQjjbMT6Id0+A45p kwb-20110313' >> ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+
+    echo " known_hosts"
+    echo '|1|XRoeCbfTejudmolcNxwTJIx5dLk=|aKEkM2TJsmAezEZ6uGFdkFYpZTA= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+|1|8Yf6DQK+qZKE/oBPJo+h0MN5bAg=|0XQcNMTa/TQ8VW8Dw7gSGUtBl6w= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==' >> ~/.ssh/known_hosts
+    chmod 644 ~/.ssh/known_hosts
+
+
+    echo "*config files"
+    file_install "dev/.emacs"
+    file_install "dev/.gitconfig"
+    file_install "dev/.gitignore"
+    file_install "dev/.screenrc"
+    file_install "dev/.vimrc"
+
+
+    echo "*source"
+    mkdir ~/src &> /dev/null
+    pushd . &> /dev/null
+    echo " scripts"
+    echo "  downloading..."
+    cd ~/src &> /dev/null
+    git clone git@github.com:kbatten/scripts &> /dev/null
+    popd &> /dev/null
+
+
+    echo "*other"
+    fetch_and_install "https://github.com/AGWA/git-crypt/archive/master.zip" "git-crypt-dev.zip" "git-crypt-dev" "make ; ln -sfT \$(pwd)/git-crypt ${HOME}/bin/git-crypt"
+fi

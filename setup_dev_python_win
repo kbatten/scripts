@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# set up a python windows dev environment
+
+
+function pip_install_win {
+    local package=${1}
+
+    echo " ${package}"
+    wine "C:\Python27\Scripts\pip.exe" install "${package}" &> /dev/null
+}
+
+function easy_install_win {
+    local package=${1}
+
+    echo " $package"
+    wine "C:\Python27\Scripts\easy_install.exe" "${package}" &> /dev/null
+}
+
+
+# global variables should all match setup_dev
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOWNLOADDIR="${HOME}/download"
+
+
+# includes
+source "${SCRIPTPATH}/setup_dev_python"
+source "${SCRIPTPATH}/setup_dev_win"
+
+
+if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
+    echo "setting up..."
+
+    mkdir ${DOWNLOADDIR} &> /dev/null
+
+
+    echo "*packages"
+    package_update
+    package_install git
+    package_install python-pip
+    package_install xvfb
+    package_install ttf-mscorefonts-installer
+    package_install wine1.4
+    package_install wine1.4-dev
+
+
+    echo "*winetricks"
+    winetricks_install vcrun2008
+
+
+    echo "*pip"
+    pip_install virtualenv
+
+
+    echo "*other"
+    fetch_and_install "http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi"
+    fetch_and_install "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20218/pywin32-218.win32-py2.7.exe"
+    fetch_and_install "http://pypi.python.org/packages/2.7/s/setuptools/setuptools-0.6c11.win32-py2.7.exe"
+
+    echo " pyinstaller-win"
+    fetch_and_install "https://github.com/pyinstaller/pyinstaller/tarball/develop" "pyinstaller-dev.tar.gz" "pyinstaller-dev" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
+    echo '#!/bin/bash
+pyinstaller_dir=$(dirname "$(readlink ~/bin/pyinstaller)")
+PYTHONPATH=${PYTHONPATH}:"${pyinstaller_dir}"
+wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -c -F "${@}"' > ~/bin/pyinstaller-win
+    chmod 755 ~/bin/pyinstaller-win
+
+
+    echo "*easy_install"
+    easy_install_win pip
+
+
+    echo "*pip"
+    pip_install_win ntfsutils
+    pip_install_win speech
+fi

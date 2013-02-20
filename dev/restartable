@@ -1,0 +1,15 @@
+#!/bin/bash
+f=$1
+
+
+$f &
+pid=$!
+while inotifywait -e close_write $f; do
+    kill $pid
+    wait
+    sleep 1
+    $f &
+    pid=$!
+done
+kill $pid
+wait

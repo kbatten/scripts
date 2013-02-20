@@ -240,6 +240,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     package_install git
     package_install make
     package_install unzip
+    package_install inotify-tools
 
 
     echo "*editor"
@@ -280,4 +281,5 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
 
     echo "*other"
     fetch_and_install "https://github.com/AGWA/git-crypt/archive/master.zip" "git-crypt-dev.zip" "git-crypt-dev" "make ; ln -sfT \$(pwd)/git-crypt ${HOME}/bin/git-crypt"
+    file_install "dev/restartable" ~/bin
 fi

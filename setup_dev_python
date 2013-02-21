@@ -28,6 +28,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     package_install python-pygame
     package_install python-opencv
     package_install python-scipy
+    package_install python-imaging
 
 
     echo "*pip packages"

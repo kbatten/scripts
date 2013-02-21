@@ -192,15 +192,11 @@ function fetch_and_install() {
         msiexec /q /i "${filename}" &> /dev/null
     elif [[ "$(_extension "${filename}")" == "exe" ]] ; then
         local auto=$(find ~/src/scripts -name "${filename/%.exe/-auto.exe}" | head -n1)
-        Xvfb :100 -ac -screen 1 1024x768x24 &> /dev/null &
-        local pid=${!}
-        sleep 1
         if [[ -n "${auto}" ]] ; then
-            DISPLAY=":100.0" wine "${auto}" &> /dev/null
+            xvfb-run wine "${auto}" &> /dev/null
         else
-            DISPLAY=":100.0" wine "${filename}" "${installer}" &> /dev/null
+            xvfb-run wine "${filename}" "${installer}" &> /dev/null
         fi
-        kill ${pid}
     else
         mkdir "${HOME}/opt" &> /dev/null
         cp -r "${directory}" "${HOME}/opt/" &> /dev/null

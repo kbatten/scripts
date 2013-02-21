@@ -6,14 +6,8 @@
 function winetricks_install() {
     local trick=${@}
 
-    Xvfb :100 -ac -screen 1 1024x768x24 &> /dev/null &
-    local pid=${!}
-    sleep 1
-
     echo " ${trick}"
-    DISPLAY=":100.0" winetricks -q ${trick} &> /dev/null
-
-    kill ${pid}
+    xvfb-run winetricks -q ${trick} &> /dev/null
 }
 
 

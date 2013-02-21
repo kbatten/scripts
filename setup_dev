@@ -194,8 +194,10 @@ function fetch_and_install() {
         local auto=$(find ~/src/scripts -name "${filename/%.exe/-auto.exe}" | head -n1)
         if [[ -n "${auto}" ]] ; then
             xvfb-run wine "${auto}" &> /dev/null
+            sleep 1
         else
             xvfb-run wine "${filename}" "${installer}" &> /dev/null
+            sleep 1
         fi
     else
         mkdir "${HOME}/opt" &> /dev/null

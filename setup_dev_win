@@ -8,6 +8,7 @@ function winetricks_install() {
 
     echo " ${trick}"
     xvfb-run winetricks -q ${trick} &> /dev/null
+    sleep 1
 }
 
 
@@ -45,17 +46,11 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
 
     echo " autoit-win"
     echo '#!/bin/bash
-Xvfb :101 -ac -screen 1 1024x768x24 &> /dev/null &
-trap "kill ${!}" EXIT
-sleep 1
-DISPLAY=:101.0 wine "C:\\Program Files\\AutoIt3\\Aut2Exe\Aut2exe.exe" /in "${1}" /out "${1/%.au3/.exe}" /nopack 2> /dev/null' > ~/bin/autoit-win
+xvfb-run wine "C:\\Program Files\\AutoIt3\\Aut2Exe\Aut2exe.exe" /in "${1}" /out "${1/%.au3/.exe}" /nopack 2> /dev/null' > ~/bin/autoit-win
     chmod 755 ~/bin/autoit-win
 
     echo " autohotkey-win"
     echo '#!/bin/bash
-Xvfb :101 -ac -screen 1 1024x768x24 &> /dev/null &
-trap "kill ${!}" EXIT
-sleep 1
-DISPLAY=:101.0 wine "C:\\Program Files\\AutoHotkey\\Compiler\\Ahk2Exe.exe" /in "${1}" 2> /dev/null' > ~/bin/autohotkey-win
+xvfb-run wine "C:\\Program Files\\AutoHotkey\\Compiler\\Ahk2Exe.exe" /in "${1}" 2> /dev/null' > ~/bin/autohotkey-win
     chmod 755 ~/bin/autohotkey-win
 fi

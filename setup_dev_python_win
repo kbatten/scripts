@@ -14,7 +14,7 @@ function easy_install_win {
     local package=${1}
 
     echo " $package"
-    wine "C:\Python27\Scripts\easy_install.exe" "${package}" &> /dev/null
+    PYTHONDONTWRITEBYTECODE= wine "C:\Python27\Scripts\easy_install.exe" "${package}" &> /dev/null
 }
 
 
@@ -69,6 +69,7 @@ wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -c -F "${@}"
 
     echo "*easy_install"
     easy_install_win pip
+    easy_install_win numpy
 
 
     echo "*pip"

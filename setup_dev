@@ -260,11 +260,11 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
 
 
     echo "*config files"
-    file_install "dev/.emacs"
-    file_install "dev/.gitconfig"
-    file_install "dev/.gitignore"
-    file_install "dev/.screenrc"
-    file_install "dev/.vimrc"
+    file_install "dotfiles/.emacs"
+    file_install "dotfiles/.gitconfig"
+    file_install "dotfiles/.gitignore"
+    file_install "dotfiles/.screenrc"
+    file_install "dotfiles/.vimrc"
 
 
     echo "*source"

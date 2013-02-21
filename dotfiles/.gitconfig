@@ -19,3 +19,6 @@
        autosetuprebase = always
 [merge]
         tool = tkdiff
+
+[remote "origin"]
+        fetch = +refs/pull/*/head:refs/remotes/origin/pr/*

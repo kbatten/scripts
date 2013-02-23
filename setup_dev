@@ -123,7 +123,7 @@ function file_install {
 }
 
 function _extension() {
-    echo "${1}" | sed 's/.*\.\(tar\.gz\|tgz\|tar\.bz2\|msi\|exe\|zip\)$/\1/'
+    echo "${1}" | sed 's/.*\.\(tar\.gz\|tgz\|tar\.bz2\|msi\|exe\|zip\|7z\)$/\1/'
 }
 
 function _dirname() {
@@ -147,7 +147,6 @@ function extract() {
             ;;
         "zip")
             echo "  extracting..."
-
             local tmpdir=$(mktemp -d --tmpdir sds.XXXXXXXXXX)
             unzip -d "${tmpdir}" "${filename}" &> /dev/null
             # if one directory in ${tmpdir}, move that to ${DOWNLOADDIR}/${directory}
@@ -160,6 +159,23 @@ function extract() {
             else
                 mv "${tmpdir}" "${directory}" &> /dev/null
             fi
+            ;;
+        "7z")
+            echo "  extracting..."
+            local tmpdir=$(mktemp -d --tmpdir sds.XXXXXXXXXX)
+            7zr x -o"${tmpdir}" "${filename}" &> /dev/null
+            echo "tmpdir=${tmpdir}"
+            # if one directory in ${tmpdir}, move that to ${DOWNLOADDIR}/${directory}
+            # otherwise move ${tmpdir} ${DOWNLOADDIR}/${directory}
+            files=$(ls -A "${tmpdir}")
+            files_count=$(echo "${files}" | wc -l)
+            if [[ ${files_count} -eq 1 && -d "${tmpdir}/${files}" ]] ; then
+                mv "${tmpdir}/${files}" "${directory}" &> /dev/null
+                rm -rf "${tmpdir}" &> /dev/null
+            else
+                mv "${tmpdir}" "${directory}" &> /dev/null
+            fi
+            ;;
     esac
 }
 
@@ -168,12 +184,16 @@ function fetch_and_install() {
     local filename=${2}
     local directory=${3}
     local installer=${4}
+    local finaldir=${5}
 
     if [[ -z "${filename}" ]] ; then
         filename=$(basename "${url}")
     fi
     if [[ -z "${directory}" ]] ; then
         directory=$(_dirname "${filename}")
+    fi
+    if [[ -z "${finaldir}" ]] ; then
+        finaldir="${HOME}/opt/${directory}"
     fi
 
     echo " ${filename}"
@@ -200,9 +220,11 @@ function fetch_and_install() {
             sleep 1
         fi
     else
-        mkdir "${HOME}/opt" &> /dev/null
-        cp -r "${directory}" "${HOME}/opt/" &> /dev/null
-        cd "${HOME}/opt/${directory}" &> /dev/null
+        if [[ ! -e "${finaldir}" ]] ; then
+            mkdir -p "${finaldir}" &> /dev/null
+            cp -r "${directory}"/* "${finaldir}" &> /dev/null
+        fi
+        cd "${finaldir}/${directory}" &> /dev/null
         eval "${installer}" &> /dev/null
     fi
 

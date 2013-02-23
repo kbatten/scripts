@@ -20,5 +20,5 @@
 [merge]
         tool = tkdiff
 
-[remote "origin"]
+[remote "pr"]
         fetch = +refs/pull/*/head:refs/remotes/origin/pr/*

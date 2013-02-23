@@ -57,6 +57,16 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     fetch_and_install "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20218/pywin32-218.win32-py2.7.exe"
     fetch_and_install "http://pypi.python.org/packages/2.7/s/setuptools/setuptools-0.6c11.win32-py2.7.exe"
     fetch_and_install "http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe"
+
+    # fix bug in 1.1.7 _imagingft.pyd
+    f=$(mktemp)
+    head -c 387025 ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd > ${f}
+    echo -n "!--" >> ${f}
+    tail -c +387029 ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd | head -c 246 >> ${f}
+    echo -n "--" >> ${f}
+    tail -c +387277 ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd >> ${f}
+    \mv ${f} ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd
+
     fetch_and_install "http://downloads.sourceforge.net/project/scipy/scipy/0.12.0b1/scipy-0.12.0b1-win32-superpack-python2.7.exe"
 
     echo " pyinstaller-win"

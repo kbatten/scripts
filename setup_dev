@@ -224,7 +224,7 @@ function fetch_and_install() {
             mkdir -p "${finaldir}" &> /dev/null
             cp -r "${directory}"/* "${finaldir}" &> /dev/null
         fi
-        cd "${finaldir}/${directory}" &> /dev/null
+        cd "${finaldir}" #&> /dev/null
         eval "${installer}" &> /dev/null
     fi
 

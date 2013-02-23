@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+IFS='
+'
+for d in $(ls) ; do
+    echo -n "$d "
+    du -ch "$d" | tail -n1 | awk '{print $1}'
+done

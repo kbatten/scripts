@@ -302,4 +302,5 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     echo "*other"
     fetch_and_install "https://github.com/AGWA/git-crypt/archive/master.zip" "git-crypt-dev.zip" "git-crypt-dev" "make ; ln -sfT \$(pwd)/git-crypt ${HOME}/bin/git-crypt"
     file_install "dev/restartable" ~/bin
+    file_install "dev/profile_dirs" ~/bin
 fi

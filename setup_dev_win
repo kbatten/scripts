@@ -53,4 +53,6 @@ xvfb-run wine "C:\\Program Files\\AutoIt3\\Aut2Exe\Aut2exe.exe" /in "${1}" /out 
     echo '#!/bin/bash
 xvfb-run wine "C:\\Program Files\\AutoHotkey\\Compiler\\Ahk2Exe.exe" /in "${1}" 2> /dev/null' > ~/bin/autohotkey-win
     chmod 755 ~/bin/autohotkey-win
+
+    file_install "dev/xvfb-grab" ~/bin
 fi

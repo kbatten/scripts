@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm -f ~/tmp/image.xwd ~/tmp/image.png
+xwd -display :99 -root -out ~/tmp/image.xwd
+convert ~/tmp/image.xwd ~/tmp/image.png
+cd ~/tmp
+python -m SimpleHTTPServer

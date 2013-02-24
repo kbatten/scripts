@@ -5,5 +5,5 @@ IFS='
 '
 for d in $(ls) ; do
     echo -n "$d "
-    du -ch "$d" | tail -n1 | awk '{print $1}'
+    du -ch "$d" 2> /dev/null | tail -n1 | awk '{print $1}'
 done

@@ -224,8 +224,11 @@ function fetch_and_install() {
             mkdir -p "${finaldir}" &> /dev/null
             cp -r "${directory}"/* "${finaldir}" &> /dev/null
         fi
-        cd "${finaldir}" #&> /dev/null
-        eval "${installer}" &> /dev/null
+        cd "${finaldir}" &> /dev/null
+        if [[ -n "${installer}" ]] ; then
+            echo "  installing..."
+            eval "${installer}" &> /dev/null
+        fi
     fi
 
     popd . &> /dev/null

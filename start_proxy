@@ -2,10 +2,9 @@
 
 #set -x
 
-ID=""
-HOST="user@host"
+source ${HOME}/.proxy
 
 # socks5 proxy
-ssh $ID -D 8000 $HOST -N &
+ssh ${PROXYID} -D 8000 ${PROXYHOST} -N &
 sleep 5
 curl --socks5-hostname localhost:8000 ifconfig.me/ip

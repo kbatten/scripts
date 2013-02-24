@@ -235,6 +235,13 @@ function fetch_and_install() {
     popd . &> /dev/null
 }
 
+function pip_install {
+    local package=${1}
+
+    echo " ${package}"
+    sudo pip install "${package}" &> /dev/null
+}
+
 
 # global variables should all match setup_dev
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

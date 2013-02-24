@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# set up a wrangler prod environment
+
+
+# global variables should all match setup_dev
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOWNLOADDIR="${HOME}/download"
+
+
+# includes
+source "${SCRIPTPATH}/setup_dev"
+
+
+if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
+    echo "setting up..."
+
+    mkdir "${DOWNLOADDIR}" &> /dev/null
+
+    echo "*packages"
+    package_install g++
+    package_install erlang-base erlang-dev erlang-eunit erlang-nox
+    package_install libmozjs185-dev libicu-dev libcurl4-gnutls-dev libtool
+    package_install maven2
+    package_install default-jdk
+    package_install python-pip
+    package_install python-imaging
+
+
+    echo "*pip packages"
+    pip_install requests
+    pip_install couchdb
+
+
+    echo "*other"
+    # couchdb
+    fetch_and_install "http://apache.mirrors.pair.com/couchdb/1.2.1/apache-couchdb-1.2.1.tar.gz" "" "" "./configure && make && sudo make install"
+    sudo adduser --disabled-login --disabled-password --no-create-home -gecos "" couchdb &> /dev/null
+    sudo chown -R couchdb:couchdb /usr/local/var/log/couchdb &> /dev/null
+    sudo chown -R couchdb:couchdb /usr/local/var/lib/couchdb &> /dev/null
+    sudo chown -R couchdb:couchdb /usr/local/var/run/couchdb &> /dev/null
+    sudo ln -s /usr/local/etc/logrotate.d/couchdb /etc/logrotate.d/couchdb &> /dev/null
+    sudo ln -s /usr/local/etc/init.d/couchdb /etc/init.d &> /dev/null
+    sudo update-rc.d couchdb defaults &> /dev/null
+    sudo sed -i 's/^;bind_address = 127.0.0.1$/bind_address = 0.0.0.0/' /usr/local/etc/couchdb/local.ini &> /dev/null
+
+    # couchdb-lucene
+    sudo chown -R ${USER} ${HOME}/opt/couchdb-lucene &> /dev/null
+    fetch_and_install "https://github.com/rnewson/couchdb-lucene/archive/master.zip" "couchdb-lucene.zip" "couchdb-lucene" "mvn ; cd target ; unzip  -u couchdb-lucene-*.zip"
+    sudo chown -R couchdb:couchdb ${HOME}/opt/couchdb-lucene &> /dev/null
+    sudo sed -i 's/^;_google = {couch_httpd_proxy, handle_proxy_req, <<"http:\/\/www.google.com">>}$/_fti = {couch_httpd_proxy, handle_proxy_req, <<"http:\/\/127.0.0.1:5985">>}/' /usr/local/etc/couchdb/local.ini &> /dev/null
+    tmpdir=$(mktemp -d)
+    file_install "prod_wrangler/couchdb-lucene" "${tmpdir}"
+    sudo \mv "${tmpdir}/couchdb-lucene" /etc/init.d/
+
+    sudo mkdir -p /usr/local/var/log/couchdb-lucene &> /dev/null
+    sudo chown -R couchdb:couchdb /usr/local/var/log/couchdb-lucene &> /dev/null
+    sudo mkdir -p /usr/local/var/run/couchdb-lucene &> /dev/null
+    sudo chown -R couchdb:couchdb /usr/local/var/run/couchdb-lucene &> /dev/null
+    echo "#!/bin/bash
+if [[ -f /usr/local/var/run/couchdb-lucene/couchdb-lucene.pid ]] ; then
+    pid=\$(ps -ef | grep com.github.rnewson.couchdb.lucene.Main | grep -v grep | awk '{print \$2}')
+    if [[ \"\$(cat /usr/local/var/run/couchdb-lucene/couchdb-lucene.pid)\" -eq \"\$pid\" ]] ; then
+        echo \"already started\"
+        exit 1
+    fi
+fi
+$(ls -d ${HOME}/opt/couchdb-lucene/target/couchdb-lucene-*-SNAPSHOT)/bin/run &> /usr/local/var/log/couchdb-lucene/couchdb-lucene.log &
+sleep 1
+pid=\$(echo \$(ps -ef | grep com.github.rnewson.couchdb.lucene.Main | grep -v grep | awk '{print \$2}'))
+if [[ -n \"\$pid\" ]] ; then
+    echo \$pid > /usr/local/var/run/couchdb-lucene/couchdb-lucene.pid
+fi
+" > "${tmpdir}"/couchdb-lucene
+    chmod 755 "${tmpdir}"/couchdb-lucene
+    sudo \mv "${tmpdir}"/couchdb-lucene /usr/local/bin/
+
+    echo "/usr/local/var/log/couchdb-lucene/*.log {
+       weekly
+       rotate 10
+       copytruncate
+       delaycompress
+       compress
+       notifempty
+       missingok
+}" > "${tmpdir}"/couchdb-lucene
+    sudo \mv "${tmpdir}"/couchdb-lucene /etc/logrotate.d/couchdb-lucene
+
+
+    rm -rf "${tmpdir}"
+    sudo update-rc.d couchdb-lucene defaults &> /dev/null
+fi

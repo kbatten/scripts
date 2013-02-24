@@ -74,18 +74,19 @@ function package_update {
 }
 
 function package_install {
-    local package=${1}
     local os=$(get_os)
 
-    echo " ${package}"
-    if [[ ${os} == 'centos' ]] ; then
-        sudo yum -y install ${package} &> /dev/null
-    elif [[ ${os} == 'ubuntu' ]] ; then
-        if [[ "${package}" == "ttf-mscorefonts-installer" ]] ; then
-            sudo debconf-set-selections <<< "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true"
+    for package in $@ ; do
+        echo " ${package}"
+        if [[ ${os} == 'centos' ]] ; then
+            sudo yum -y install ${package} &> /dev/null
+        elif [[ ${os} == 'ubuntu' ]] ; then
+            if [[ "${package}" == "ttf-mscorefonts-installer" ]] ; then
+                sudo debconf-set-selections <<< "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true"
+            fi
+            sudo apt-get -y install ${package} &> /dev/null
         fi
-        sudo apt-get -y install ${package} &> /dev/null
-    fi
+    done
 }
 
 function file_install {

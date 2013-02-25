@@ -87,4 +87,11 @@ wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -c -F "${@}"
     echo "*pip"
     pip_install_win ntfsutils
     pip_install_win speech
+    pip_install_win PyOpenGL PyOpenGL_accelerate
+
+
+    echo "*other"
+    echo " freeglut"
+    fetch_and_install "http://files.transmissionzero.co.uk/software/development/GLUT/freeglut-MSVC.zip"
+    \cp ${HOME}/opt/freeglut-MSVC/bin/freeglut.dll ~/.wine/drive_c/Python27/Lib/site-packages/OpenGL/DLLS/ &> /dev/null
 fi

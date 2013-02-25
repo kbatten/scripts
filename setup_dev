@@ -236,10 +236,10 @@ function fetch_and_install() {
 }
 
 function pip_install {
-    local package=${1}
-
-    echo " ${package}"
-    sudo pip install "${package}" &> /dev/null
+    for package in $@ ; do
+        echo " ${package}"
+        sudo pip install "${package}" &> /dev/null
+    done
 }
 
 

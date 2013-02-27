@@ -17,3 +17,6 @@
   (delete-trailing-whitespace)
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
+
+;; Goto-line short-cut key
+(global-set-key [?\M-g] 'goto-line)

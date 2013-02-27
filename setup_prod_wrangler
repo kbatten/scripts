@@ -17,6 +17,10 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
 
     mkdir "${DOWNLOADDIR}" &> /dev/null
 
+    echo "*variables"
+    set_variable "socks_proxy" "80:localhost:8000"
+
+
     echo "*packages"
     package_install g++
     package_install erlang-base erlang-dev erlang-eunit erlang-nox

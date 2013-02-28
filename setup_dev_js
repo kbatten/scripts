@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# set up a javascript dev environment
+
+
+# global variables should all match setup_dev
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+#DOWNLOADDIR="${HOME}/download"
+
+
+# includes
+source "${SCRIPTPATH}/setup_dev"
+
+
+if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
+    echo "setting up..."
+
+
+    echo "*fetch and install"
+    fetch_and_install "http://nodejs.org/dist/v0.8.21/node-v0.8.21-linux-x86.tar.gz" "" "" "ln -sf \$(pwd)/bin/node ${HOME}/bin/ ; ln -sf \$(pwd)/bin/npm ${HOME}/bin/"
+
+
+    echo "*npm packages"
+    npm_install uglify-js@2
+
+
+    cleanup
+fi

@@ -201,6 +201,7 @@ function fetch_and_install() {
 
     pushd . &> /dev/null
 
+    mkdir "${DOWNLOADDIR}" &> /dev/null
     cd "${DOWNLOADDIR}"
     if [[ ! -e "${directory}" ]] ; then
         if [[ ! -e "${filename}" ]] ; then
@@ -242,16 +243,43 @@ function pip_install {
     done
 }
 
+function npm_install {
+    for package in $@ ; do
+        echo " ${package}" | tee -a "${LOGFILE}"
+        npm install "${package}" >> "${LOGFILE}" 2>&1
+        ln -sf $(find "${HOME}/opt/" -type f -name "uglify*" 2> /dev/null) "${HOME}/bin/" >> "${LOGFILE}" 2>&1
+        uglifyjs --version >> "${LOGFILE}" 2>&1
+        set_rvalue
+    done
+}
 
-# global variables should all match setup_dev
-SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DOWNLOADDIR="${HOME}/download"
+# sets global return value based on !?
+function set_rvalue {
+    if [[ $? -ne 0 ]] ; then
+        RETURNVALUE=1
+    fi
+}
+
+function cleanup {
+    if [[ ${RETURNVALUE} -eq 0 ]] ; then
+        rm -f "${LOGFILE}" &> /dev/null
+    else
+        echo
+        echo "log: ${LOGFILE}"
+    fi
+}
+
+
+# global variables
+export SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export DOWNLOADDIR="${HOME}/download"
+export LOGFILE=$(mktemp)
+export RETURNVALUE=0
 
 
 if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     echo "setting up..."
 
-    mkdir "${DOWNLOADDIR}" &> /dev/null
 
     echo "*aliases"
     add_alias 'll' 'ls -alF'

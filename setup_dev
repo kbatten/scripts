@@ -255,9 +255,16 @@ function npm_install {
 
 # sets global return value based on !?
 function set_rvalue {
-    if [[ $? -ne 0 ]] ; then
+    local rvalue=$?
+    local itemname=${1}
+
+    if [[ $rvalue -ne 0 ]] ; then
         RETURNVALUE=1
+        if [[ -n ${itemname} ]] ; then
+            RETURNITEMS=$(echo -e "${RETURNITEMS}\n${itemname}")
+        fi
     fi
+    return ${rvalue}
 }
 
 function cleanup {
@@ -266,6 +273,7 @@ function cleanup {
     else
         echo
         echo "log: ${LOGFILE}"
+        echo "${RETURNITEMS}"
     fi
 }
 
@@ -273,8 +281,11 @@ function cleanup {
 # global variables
 export SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export DOWNLOADDIR="${HOME}/download"
-export LOGFILE=$(mktemp)
+if [[ -z ${LOGFILE} ]] ; then
+    export LOGFILE=$(mktemp)
+fi
 export RETURNVALUE=0
+export RETURNITEMS=""
 
 
 if [[ "${BASH_SOURCE}" == "${0}" ]] ; then

@@ -4,10 +4,18 @@
 
 
 function pip_install_win {
-    local package=${1}
+    for package in $@ ; do
+        echo " ${package}" | tee -a "${LOGFILE}"
+        wine "C:\Python27\Scripts\pip.exe" install "${package}" >> "${LOGFILE}" 2>&1
 
-    echo " ${package}"
-    wine "C:\Python27\Scripts\pip.exe" install "${package}" &> /dev/null
+        local package_test=${package}
+        if [[ "${package}" == "PyOpenGL" || "${package}" == "PyOpenGL_accelerate" ]] ; then
+            local package_test="OpenGL"
+        fi
+
+        wine "C:\Python27\python.exe" -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1
+        set_rvalue "${package}"
+    done
 }
 
 function easy_install_win {
@@ -18,12 +26,8 @@ function easy_install_win {
 }
 
 
-# global variables should all match setup_dev
-SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DOWNLOADDIR="${HOME}/download"
-
-
 # includes
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${SCRIPTPATH}/setup_dev_python"
 source "${SCRIPTPATH}/setup_dev_win"
 
@@ -94,4 +98,6 @@ wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -c -F "${@}"
     echo " freeglut"
     fetch_and_install "http://files.transmissionzero.co.uk/software/development/GLUT/freeglut-MSVC.zip"
     \cp ${HOME}/opt/freeglut-MSVC/bin/freeglut.dll ~/.wine/drive_c/Python27/Lib/site-packages/OpenGL/DLLS/ &> /dev/null
+
+    cleanup
 fi

@@ -29,6 +29,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     package_install default-jdk
     package_install python-pip
     package_install python-imaging
+    package_install fail2ban
 
 
     echo "*pip packages"

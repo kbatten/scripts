@@ -19,6 +19,28 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     echo "*fetch and install"
     fetch_and_install "http://nodejs.org/dist/v0.8.21/node-v0.8.21-linux-x86.tar.gz" "" "" "ln -sf \$(pwd)/bin/node ${HOME}/bin/ ; ln -sf \$(pwd)/bin/npm ${HOME}/bin/"
 
+    fetch_and_install "https://github.com/douglascrockford/JSLint/archive/master.zip" "JSLint-dev.zip" "JSLint-dev"
+    fetch_and_install "https://github.com/FND/jslint-reporter/archive/master.zip" "jslint-reporter-dev.zip" "jslint-reporter-dev" "\cp ../JSLint-dev/* ."
+    echo '#!/bin/bash
+if [[ ${TERM} == "xterm-color" ]] ; then
+    node ~/opt/jslint-reporter-dev/wrapper.js ${@} | sed '\''s/\([0-9]\+\)/\x1B[31m\1\x1B[0m/'\''
+    exit ${PIPESTATUS#0}
+else
+    node ~/opt/jslint-reporter-dev/wrapper.js ${@}
+fi' > ~/bin/jslint
+    chmod 755 ~/bin/jslint
+    echo '#!/bin/bash
+# run jslint on all html and js files in the git project
+# stop on failure
+cd $(git rev-parse --show-toplevel)
+for file in $(find . -name "*.js" -o -name "*.html") ; do
+    pushd $(dirname ${file})
+    echo "************************ $file ************************"
+    jslint $(basename ${file}) || exit 1
+    popd
+done' > ~/bin/jslint-project
+    chmod 755 ~/bin/jslint-project
+
 
     echo "*npm packages"
     npm_install uglify-js@2

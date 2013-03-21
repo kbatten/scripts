@@ -1,0 +1,337 @@
+#!/bin/bash
+
+# set up a base environment on centos or ubuntu
+
+
+function add_alias {
+    local alias=${1}
+    local cmd=${2}
+
+    echo " alias ${alias}='${cmd}'"
+    if grep "^alias ${alias}=" ~/.bashrc &> /dev/null ; then
+	sed -i "s/^alias ${alias}=.*/alias ${alias}='${cmd}'/" ~/.bashrc
+    else
+	echo "alias ${alias}='${cmd}'" >> ~/.bashrc
+    fi
+}
+
+function set_editor {
+    local editor=${1}
+
+    echo " editor=${editor}"
+    if grep "^export EDITOR=" ~/.bashrc &> /dev/null ; then
+	sed -i "s/^export EDITOR=.*/export EDITOR='${editor}'/" ~/.bashrc
+    else
+	echo "export EDITOR='${editor}'" >> ~/.bashrc
+    fi
+}
+
+function set_variable {
+    local variable=${1}
+    local value=${2}
+
+    echo " ${variable}=${value}"
+    if grep "^export ${variable}=" ~/.bashrc &> /dev/null ; then
+	sed -i "s/^export ${variable}=.*/export ${variable}='${value}'/" ~/.bashrc
+    else
+	echo "export ${variable}='${value}'" >> ~/.bashrc
+    fi
+}
+
+function add_path {
+    local path=${1}
+
+    echo " PATH=${path}"
+    if grep "^PATH=" ~/.bashrc &> /dev/null ; then
+	if ! grep -e "^PATH=.*:${path}" -e "^PATH=${path}:.*$" -e "^PATH=.*:${path}:.*$" -e "^PATH=${path}$" ~/.bashrc &> /dev/null ; then
+	    path=$(echo ${path} | sed 's/\//\\\//g')
+	    sed -i "s/^PATH=/PATH=${path}\:/" ~/.bashrc
+	fi
+    else
+	echo "PATH=${path}:${PATH}" >> ~/.bashrc
+    fi
+}
+
+function get_os {
+    local info="$(cat /etc/redhat-release 2> /dev/null ; cat /etc/lsb-release 2> /dev/null ; uname -a)"
+
+    if echo "${info}" | grep -i -e centos -e "red hat" &> /dev/null ; then
+        echo 'centos'
+    elif echo "${info}" | grep -i -e ubuntu &> /dev/null ; then
+        echo 'ubuntu'
+    fi
+}
+
+function package_update {
+    local os=$(get_os)
+
+    echo " update"
+    if [[ ${os} == 'centos' ]] ; then
+        sudo yum update &> /dev/null
+    elif [[ ${os} == 'ubuntu' ]] ; then
+        sudo apt-get update &> /dev/null
+    fi
+}
+
+function package_install {
+    local os=$(get_os)
+
+    for package in $@ ; do
+        echo " ${package}"
+        if [[ ${os} == 'centos' ]] ; then
+            sudo yum -y install ${package} &> /dev/null
+        elif [[ ${os} == 'ubuntu' ]] ; then
+            if [[ "${package}" == "ttf-mscorefonts-installer" ]] ; then
+                sudo debconf-set-selections <<< "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true"
+            fi
+            sudo apt-get -y install ${package} &> /dev/null
+        fi
+    done
+}
+
+function file_install {
+    local file=${1}
+    local dest=~/
+    if [[ -n ${2} ]] ; then
+        dest=${2}
+    fi
+
+    local result=0
+
+    echo " ${file}"
+    if [[ -f "${SCRIPTPATH}/${file}" ]] ; then
+        cp -f "${SCRIPTPATH}/${file}" "${dest}" &> /dev/null
+        popd &> /dev/null
+    elif which git &> /dev/null ; then
+        echo "  downloading..."
+        local tmpdir=$(mktemp -d --tmpdir sds.XXXXXXXXXX)
+        pushd . &> /dev/null
+        cd "${tmpdir}"
+        git clone -n git@github.com:kbatten/scripts.git --depth 1 &> /dev/null
+        cd scripts &> /dev/null
+        git checkout HEAD "${file}" &> /dev/null
+        cp -f "${file}" "${dest}" &> /dev/null
+        result=${?}
+        popd &> /dev/null
+        rm -rf "${tmpdir}"
+
+        if [[ ${result} -eq 0 ]] ; then
+            return
+        fi
+    else
+        echo "  failed to install ${file}"
+    fi
+}
+
+function _extension() {
+    echo "${1}" | sed 's/.*\.\(tar\.gz\|tgz\|tar\.bz2\|msi\|exe\|zip\|7z\)$/\1/'
+}
+
+function _dirname() {
+    local filename=${1}
+    local extension=$(_extension "${filename}")
+
+    echo "${filename%.${extension}}"
+}
+
+function extract() {
+    local filename=${1}
+    local directory=${2}
+    local extension=$(_extension "${filename}")
+
+    case "${extension}" in
+        "tar.gz" | "tgz" | "tar.bz2")
+            echo "  extracting..."
+            tar xf "${filename}" &> /dev/null
+            local directory_orig=$(basename $(tar tf "${filename}" | head -n1))
+            mv "${directory_orig}" "${directory}" &> /dev/null
+            ;;
+        "zip")
+            echo "  extracting..."
+            local tmpdir=$(mktemp -d --tmpdir sds.XXXXXXXXXX)
+            unzip -d "${tmpdir}" "${filename}" &> /dev/null
+            # if one directory in ${tmpdir}, move that to ${DOWNLOADDIR}/${directory}
+            # otherwise move ${tmpdir} ${DOWNLOADDIR}/${directory}
+            files=$(ls -A "${tmpdir}")
+            files_count=$(echo "${files}" | wc -l)
+            if [[ ${files_count} -eq 1 && -d "${tmpdir}/${files}" ]] ; then
+                mv "${tmpdir}/${files}" "${directory}" &> /dev/null
+                rm -rf "${tmpdir}" &> /dev/null
+            else
+                mv "${tmpdir}" "${directory}" &> /dev/null
+            fi
+            ;;
+        "7z")
+            echo "  extracting..."
+            local tmpdir=$(mktemp -d --tmpdir sds.XXXXXXXXXX)
+            7zr x -o"${tmpdir}" "${filename}" &> /dev/null
+            echo "tmpdir=${tmpdir}"
+            # if one directory in ${tmpdir}, move that to ${DOWNLOADDIR}/${directory}
+            # otherwise move ${tmpdir} ${DOWNLOADDIR}/${directory}
+            files=$(ls -A "${tmpdir}")
+            files_count=$(echo "${files}" | wc -l)
+            if [[ ${files_count} -eq 1 && -d "${tmpdir}/${files}" ]] ; then
+                mv "${tmpdir}/${files}" "${directory}" &> /dev/null
+                rm -rf "${tmpdir}" &> /dev/null
+            else
+                mv "${tmpdir}" "${directory}" &> /dev/null
+            fi
+            ;;
+    esac
+}
+
+function fetch_and_install() {
+    local url=${1}
+    local filename=${2}
+    local directory=${3}
+    local installer=${4}
+    local finaldir=${5}
+
+    if [[ -z "${filename}" ]] ; then
+        filename=$(basename "${url}")
+    fi
+    if [[ -z "${directory}" ]] ; then
+        directory=$(_dirname "${filename}")
+    fi
+    if [[ -z "${finaldir}" ]] ; then
+        finaldir="${HOME}/opt/${directory}"
+    fi
+
+    echo " ${filename}"
+
+    pushd . &> /dev/null
+
+    mkdir "${DOWNLOADDIR}" &> /dev/null
+    cd "${DOWNLOADDIR}"
+    if [[ ! -e "${directory}" ]] ; then
+        if [[ ! -e "${filename}" ]] ; then
+            echo "  downloading..."
+            wget "${url}" -O "${filename}" &> /dev/null
+        fi
+        extract "${filename}" "${directory}"
+    fi
+    if [[ "$(_extension "${filename}")" == "msi" ]] ; then
+        msiexec /q /i "${filename}" &> /dev/null
+    elif [[ "$(_extension "${filename}")" == "exe" ]] ; then
+        local auto=$(find ~/src/scripts -name "${filename/%.exe/-auto.exe}" | head -n1)
+        if [[ -n "${auto}" ]] ; then
+            xvfb-run wine "${auto}" &> /dev/null
+            sleep 1
+        else
+            xvfb-run wine "${filename}" "${installer}" &> /dev/null
+            sleep 1
+        fi
+    else
+        if [[ ! -e "${finaldir}" ]] ; then
+            mkdir -p "${finaldir}" &> /dev/null
+            cp -r "${directory}"/* "${finaldir}" &> /dev/null
+        fi
+        cd "${finaldir}" &> /dev/null
+        if [[ -n "${installer}" ]] ; then
+            echo "  installing..."
+            eval "${installer}" &> /dev/null
+        fi
+    fi
+
+    popd . &> /dev/null
+}
+
+function pip_install {
+    for package in $@ ; do
+        echo " ${package}"
+        sudo pip install "${package}" &> /dev/null
+    done
+}
+
+function npm_install {
+    for package in $@ ; do
+        echo " ${package}" | tee -a "${LOGFILE}"
+        npm install "${package}" >> "${LOGFILE}" 2>&1
+        ln -sf $(find "${HOME}/opt/" -type f -name "uglify*" 2> /dev/null) "${HOME}/bin/" >> "${LOGFILE}" 2>&1
+        uglifyjs --version >> "${LOGFILE}" 2>&1
+        set_rvalue
+    done
+}
+
+# sets global return value based on !?
+function set_rvalue {
+    local rvalue=$?
+    local itemname=${1}
+
+    if [[ $rvalue -ne 0 ]] ; then
+        RETURNVALUE=1
+        if [[ -n ${itemname} ]] ; then
+            RETURNITEMS=$(echo -e "${RETURNITEMS}\n${itemname}")
+        fi
+    fi
+    return ${rvalue}
+}
+
+function cleanup {
+    if [[ ${RETURNVALUE} -eq 0 ]] ; then
+        rm -f "${LOGFILE}" &> /dev/null
+    else
+        echo
+        echo "log: ${LOGFILE}"
+        echo "${RETURNITEMS}"
+    fi
+}
+
+
+# global variables
+export SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export DOWNLOADDIR="${HOME}/download"
+if [[ -z ${LOGFILE} ]] ; then
+    export LOGFILE=$(mktemp)
+fi
+export RETURNVALUE=0
+export RETURNITEMS=""
+
+
+if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
+    echo "setting up..."
+
+
+    echo "*aliases"
+    add_alias 'll' 'ls -alF'
+    add_alias 'mv' 'mv -i'
+    add_alias 'cp' 'cp -i'
+    add_alias 'rm' 'rm -i'
+    add_path "${HOME}/bin"
+
+
+    echo "*bin"
+    mkdir ~/bin &> /dev/null
+
+
+    echo "*packages"
+    package_update
+    package_install emacs23-nox
+    package_install git
+    package_install fail2ban
+
+
+    echo "*editor"
+    set_editor "emacs"
+
+
+    echo "*config files"
+    file_install "dotfiles/.emacs"
+    file_install "dotfiles/.gitconfig"
+    file_install "dotfiles/.screenrc"
+    file_install "dotfiles/.vimrc"
+
+
+    echo "*source"
+    mkdir ~/src &> /dev/null
+    pushd . &> /dev/null
+    echo " scripts"
+    echo "  downloading..."
+    cd ~/src &> /dev/null
+    git clone git@github.com:kbatten/scripts &> /dev/null
+    popd &> /dev/null
+
+
+    echo "*other"
+    file_install "dev/profile_dirs" ~/bin
+fi

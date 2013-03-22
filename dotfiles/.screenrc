@@ -2,7 +2,7 @@
 defscrollback 30000
 
 # fix emacs scrollback
-termcapinfo xterm ti@:te@
+altscreen on
 
 # Change the xterm initialization string from is2=\E[!p\E[?3;4l\E[4l\E>
 # (This fixes the "Aborted because of window size change" konsole symptoms found

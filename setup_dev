@@ -100,7 +100,7 @@ function file_install {
 
     echo " ${file}"
     if [[ -f "${SCRIPTPATH}/${file}" ]] ; then
-        cp -f "${SCRIPTPATH}/${file}" "${dest}" &> /dev/null
+        cp -f "${SCRIPTPATH}/${file}" "${dest}" &> /dev/null || sudo cp -f "${SCRIPTPATH}/${file}" "${dest}" &> /dev/null
         popd &> /dev/null
     elif which git &> /dev/null ; then
         echo "  downloading..."
@@ -110,7 +110,7 @@ function file_install {
         git clone -n git@github.com:kbatten/scripts.git --depth 1 &> /dev/null
         cd scripts &> /dev/null
         git checkout HEAD "${file}" &> /dev/null
-        cp -f "${file}" "${dest}" &> /dev/null
+        cp -f "${file}" "${dest}" &> /dev/null || sudo cp -f "${file}" "${dest}" &> /dev/null
         result=${?}
         popd &> /dev/null
         rm -rf "${tmpdir}"

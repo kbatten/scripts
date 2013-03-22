@@ -51,4 +51,7 @@ else
 fi
 exit ${r}' > ~/bin/pylint-pep8
     chmod 755 ~/bin/pylint-pep8
+
+
+    cleanup
 fi

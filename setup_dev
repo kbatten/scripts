@@ -238,8 +238,16 @@ function fetch_and_install() {
 
 function pip_install {
     for package in $@ ; do
-        echo " ${package}"
+        echo " ${package}" | tee -a "${LOGFILE}"
         sudo pip install "${package}" &> /dev/null
+
+        local package_test=${package}
+        if [[ "${package}" == "Flask" ]] ; then
+            local package_test="flask"
+        fi
+
+        python -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1
+        set_rvalue "${package}"
     done
 }
 
@@ -354,4 +362,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     file_install "dev/restartable" ~/bin
     file_install "dev/profile_dirs" ~/bin
     file_install "start_proxy" ~/bin
+
+
+    cleanup
 fi

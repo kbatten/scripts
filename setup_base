@@ -334,4 +334,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
 
     echo "*other"
     file_install "dev/profile_dirs" ~/bin
+
+
+    cleanup
 fi

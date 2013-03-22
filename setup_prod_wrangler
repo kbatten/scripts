@@ -94,4 +94,7 @@ fi
 
     rm -rf "${tmpdir}"
     sudo update-rc.d couchdb-lucene defaults &> /dev/null
+
+
+    cleanup
 fi

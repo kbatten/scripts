@@ -55,4 +55,7 @@ xvfb-run wine "C:\\Program Files\\AutoHotkey\\Compiler\\Ahk2Exe.exe" /in "${1}" 
     chmod 755 ~/bin/autohotkey-win
 
     file_install "dev/xvfb-grab" ~/bin
+
+
+    cleanup
 fi

@@ -28,10 +28,27 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     pip_install requests
     pip_install Flask
     pip_install sh
+    pip_install pep8
+    pip_install pylint
 
 
     echo "*other"
     fetch_and_install "https://github.com/pyinstaller/pyinstaller/tarball/develop" "pyinstaller-dev.tar.gz" "pyinstaller-dev" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
     set_variable "PYTHONDONTWRITEBYTECODE" "true"
     file_install "dev_python/runv" ~/bin
+
+    echo '#!/bin/bash
+r=0
+if [[ ${TERM} == "xterm-color" ]] ; then
+    pylint -i n -s n -r n ${1} 2>&1 | grep -v "No config file found, using default configuration" | sed '"'"'s/\([0-9]\+\)/\x1B[31m\1\x1B[0m/'"'"'
+    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
+    pep8 ${1} 2>&1 | sed '"'"'s/\([0-9]\+\)/\x1B[31m\1\x1B[0m/'"'"'
+    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
+else
+    pylint -i n -s n -r n ${1} 2>&1 | grep -v "No config file found, using default configuration"
+    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
+    pep8 ${1} 2>&1 | r=1
+fi
+exit ${r}' > ~/bin/pylint-pep8
+    chmod 755 ~/bin/pylint-pep8
 fi

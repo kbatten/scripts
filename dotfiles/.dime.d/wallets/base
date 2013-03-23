@@ -1,1 +1,8 @@
 bash_variable EDITOR emacs
+
+dotfiles git://github.com/kbatten/scripts.git/dotfiles ${HOME}/
+
+package_update
+
+package_install emacs23-nox
+package_install git

@@ -12,3 +12,7 @@ termcapinfo xterm* 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
 
 # turn off visual bell
 vbell off
+
+# modify window title
+# http://code-and-hacks.blogspot.com/2010/04/setting-terminal-title-in-gnu-screen.html
+defhstatus "screen ^E (^Et) | $USER@^EH"

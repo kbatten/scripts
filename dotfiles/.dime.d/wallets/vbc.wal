@@ -1,6 +1,6 @@
+dotfiles /media/sf_Shared/vbc_files
+
 virtualbox
 vagrant
 chef
 berkshelf
-
-dotfiles /media/sf_Shared/vagrant_files

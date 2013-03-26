@@ -2,3 +2,5 @@ virtualbox
 vagrant
 chef
 berkshelf
+
+dotfiles /media/sf_Shared/vagrant_files

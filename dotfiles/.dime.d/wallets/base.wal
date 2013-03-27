@@ -1,6 +1,6 @@
 bash_variable EDITOR emacs
 
-dotfiles git://github.com/kbatten/scripts.git/dotfiles ${HOME}/
+dotfiles git://github.com/kbatten/scripts.git/dotfiles
 
 package_update
 

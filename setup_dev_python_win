@@ -92,6 +92,7 @@ wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -c -F "${@}"
     pip_install_win ntfsutils
     pip_install_win speech
     pip_install_win PyOpenGL PyOpenGL_accelerate
+    pip_install_win markdown
 
 
     echo "*other"

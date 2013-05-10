@@ -20,3 +20,8 @@
 
 ;; Goto-line short-cut key
 (global-set-key [?\M-g] 'goto-line)
+
+;; octave mode
+(autoload 'octave-mode "octave-mod" nil t)
+(setq auto-mode-alist
+      (cons '("\\.m$" . octave-mode) auto-mode-alist))

@@ -3,12 +3,12 @@
 # set up a python dev environment
 
 
-# global variables should all match setup_dev
+# global variables should all match setup_base
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
 # includes
-source "${SCRIPTPATH}/setup_dev"
+source "${SCRIPTPATH}/setup_base"
 
 
 if [[ "${BASH_SOURCE}" == "${0}" ]] ; then

@@ -3,13 +3,13 @@
 # set up a javascript dev environment
 
 
-# global variables should all match setup_dev
+# global variables should all match setup_base
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #DOWNLOADDIR="${HOME}/download"
 
 
 # includes
-source "${SCRIPTPATH}/setup_dev"
+source "${SCRIPTPATH}/setup_base"
 
 
 if [[ "${BASH_SOURCE}" == "${0}" ]] ; then

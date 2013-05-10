@@ -86,6 +86,17 @@ function package_install {
             if [[ "${package}" == "ttf-mscorefonts-installer" ]] ; then
                 sudo debconf-set-selections <<< "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true"
             fi
+            if [[ ${os} == 'ubuntu' ]] ; then
+                if [[ "${package}" == "wine" ]] ; then
+                    package="wine1.4"
+                fi
+            fi
+            if [[ ${os} == 'debian' ]] ; then
+                if [[ "${package}" == "wine" ]] ; then
+                    sudo dpkg --add-architecture i386 &> /dev/null
+                    package="wine-bin:i386"
+                fi
+            fi
             sudo apt-get -y install ${package} "${package}" >> "${LOGFILE}" 2>&1
             dpkg --get-selections | grep "^${package}\s" >> "${LOGFILE}" 2>&1
             set_rvalue "${package}"

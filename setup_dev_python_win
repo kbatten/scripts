@@ -44,7 +44,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     package_install python-pip
     package_install xvfb
     package_install ttf-mscorefonts-installer
-    package_install wine1.4
+    package_install wine
     package_install wine1.4-dev
     package_install p7zip
 

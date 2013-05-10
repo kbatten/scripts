@@ -59,6 +59,8 @@ function get_os {
         echo 'centos'
     elif echo "${info}" | grep -i -e ubuntu &> /dev/null ; then
         echo 'ubuntu'
+    elif echo "${info}" | grep -i -e debian &> /dev/null ; then
+        echo 'debian'
     fi
 }
 
@@ -68,7 +70,7 @@ function package_update {
     echo " update"
     if [[ ${os} == 'centos' ]] ; then
         sudo yum update &> /dev/null
-    elif [[ ${os} == 'ubuntu' ]] ; then
+    elif [[ ${os} == 'ubuntu' || ${os} == 'debian' ]] ; then
         sudo apt-get update &> /dev/null
     fi
 }
@@ -80,7 +82,7 @@ function package_install {
         echo " ${package}"
         if [[ ${os} == 'centos' ]] ; then
             sudo yum -y install ${package} &> /dev/null
-        elif [[ ${os} == 'ubuntu' ]] ; then
+        elif [[ ${os} == 'ubuntu' || ${os} == 'debian' ]] ; then
             if [[ "${package}" == "ttf-mscorefonts-installer" ]] ; then
                 sudo debconf-set-selections <<< "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true"
             fi

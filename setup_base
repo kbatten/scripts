@@ -79,14 +79,16 @@ function package_install {
     local os=$(get_os)
 
     for package in $@ ; do
-        echo " ${package}"
+        echo " ${package}" | tee -a "${LOGFILE}"
         if [[ ${os} == 'centos' ]] ; then
             sudo yum -y install ${package} &> /dev/null
         elif [[ ${os} == 'ubuntu' || ${os} == 'debian' ]] ; then
             if [[ "${package}" == "ttf-mscorefonts-installer" ]] ; then
                 sudo debconf-set-selections <<< "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true"
             fi
-            sudo apt-get -y install ${package} &> /dev/null
+            sudo apt-get -y install ${package} "${package}" >> "${LOGFILE}" 2>&1
+            dpkg --get-selections | grep "^${package}\s" >> "${LOGFILE}" 2>&1
+            set_rvalue "${package}"
         fi
     done
 }
@@ -241,7 +243,7 @@ function fetch_and_install() {
 function pip_install {
     for package in $@ ; do
         echo " ${package}" | tee -a "${LOGFILE}"
-        sudo pip install "${package}" &> /dev/null
+        sudo pip install "${package}" >> "${LOGFILE}" 2>&1
 
         local package_test=${package}
         if [[ "${package}" == "Flask" ]] ; then

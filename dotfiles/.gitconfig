@@ -24,3 +24,5 @@
         fetch = +refs/pull/*/head:refs/remotes/origin/pr/*
 [alias]
 	v = describe --tags --long --match v*
+[push]
+  default = simple

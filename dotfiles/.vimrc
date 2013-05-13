@@ -1,4 +1,4 @@
 if has("syntax")
   syntax on
-  colorscheme slate
+  colorscheme darkblue
 endif

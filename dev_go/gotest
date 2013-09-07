@@ -1,0 +1,33 @@
+#!/bin/bash
+
+
+# it seems that return values from go * doesn't indicate success/failure of tests
+result=0
+
+echo "==== fmt ====="
+go fmt
+(cd examples &> /dev/null && go fmt)
+echo
+
+echo "==== test ===="
+go test || result=$((result+1))
+echo
+
+echo "==== race ===="
+go test -race  || result=$((result+2))
+echo
+
+echo "==== vet ====="
+go vet || result=$((result+4))
+echo
+
+echo "==== lint ===="
+for f in $(find . -name "*.go") ; do golint $f ; done
+echo
+
+
+# github.com/remyoudompheng/go-misc/deadcode
+# github.com/kisielk/errcheck
+# gocov || go test -cover
+
+exit ${result}

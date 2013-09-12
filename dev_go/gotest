@@ -6,7 +6,7 @@ result=0
 
 echo "==== fmt ====="
 go fmt
-(cd examples &> /dev/null && go fmt)
+for d in $(\ls) ; do (cd $d && go fmt) ; done
 echo
 
 echo "==== test ===="
@@ -22,6 +22,7 @@ go vet || result=$((result+4))
 echo
 
 echo "==== lint ===="
+# go get github.com/golang/lint/golint
 for f in $(find . -name "*.go") ; do golint $f ; done
 echo
 

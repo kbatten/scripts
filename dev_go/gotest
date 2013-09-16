@@ -6,19 +6,21 @@ result=0
 
 echo "==== fmt ====="
 go fmt
-for d in $(\ls) ; do (cd $d && go fmt) ; done
+#for d in $(\ls) ; do pushd $d && go fmt ; popd &> /dev/null ; done
+for d in $(\ls) ; do (cd $d &> /dev/null && go fmt) ; done
 echo
 
 echo "==== test ===="
-go test || result=$((result+1))
+ls *test.go &> /dev/null && go test
 echo
 
 echo "==== race ===="
-go test -race  || result=$((result+2))
+ls *test.go &> /dev/null && go test -race
+for f in $(\ls *.go) ; do grep "^package main" $f && go run -race $f $@ ; done
 echo
 
 echo "==== vet ====="
-go vet || result=$((result+4))
+go vet
 echo
 
 echo "==== lint ===="
@@ -30,5 +32,11 @@ echo
 # github.com/remyoudompheng/go-misc/deadcode
 # github.com/kisielk/errcheck
 # gocov || go test -cover
+
+
+# TODO: tests and examples should be in package: foo_test
+# TODO: remove panics, add new type of error. or if panic is the right decision, document why it can heppen
+# TODO: add benchmarks
+
 
 exit ${result}

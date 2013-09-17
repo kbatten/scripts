@@ -2,11 +2,11 @@
 #have pyvirt &&
 _pyvirt()
 {
-	local cur prev
+	local cur create
 
 	COMPREPLY=()
 	cur=${COMP_WORDS[COMP_CWORD]}
-	prev=${COMP_WORDS[COMP_CWORD-1]}
+	create=$([[ ${COMP_WORDS[1]} && "yes" || "no" ]])
 
 	if [[ $COMP_CWORD == 1 ]] ; then
 		local dirs=$(\ls ~/.virtualenvs/ 2> /dev/null)
@@ -15,10 +15,15 @@ _pyvirt()
 		return 0
 	fi
 
-	if [[ ($COMP_CWORD == 2 && $prev == "-c") ]] ; then
+	if [[ $COMP_CWORD == 2 && $create == "yes" ]] ; then
 		return 0
 	fi
 
-	COMPREPLY=( $(compgen -c $cur) )
+	if [[ $COMP_CWORD == 2 || ($COMP_CWORD == 3 && $create == "yes") ]] ; then
+		COMPREPLY=( $(compgen -c $cur) )
+		return 0
+	fi
+
+	_filedir
 }
 complete -F _pyvirt pyvirt

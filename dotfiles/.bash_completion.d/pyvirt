@@ -1,0 +1,24 @@
+#
+#have pyvirt &&
+_pyvirt()
+{
+	local cur prev
+
+	COMPREPLY=()
+	cur=${COMP_WORDS[COMP_CWORD]}
+	prev=${COMP_WORDS[COMP_CWORD-1]}
+
+	if [[ $COMP_CWORD == 1 ]] ; then
+		local dirs=$(\ls ~/.virtualenvs/ 2> /dev/null)
+		local commands="-c"
+		COMPREPLY=( $(compgen -W "${commands} ${dirs}" -- $cur) )
+		return 0
+	fi
+
+	if [[ ($COMP_CWORD == 2 && $prev == "-c") ]] ; then
+		return 0
+	fi
+
+	COMPREPLY=( $(compgen -c $cur) )
+}
+complete -F _pyvirt pyvirt

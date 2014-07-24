@@ -6,20 +6,20 @@ _pyvirt()
 
 	COMPREPLY=()
 	cur=${COMP_WORDS[COMP_CWORD]}
-	create=$([[ ${COMP_WORDS[1]} && "yes" || "no" ]])
+	create=$([[ "${COMP_WORDS[1]}" == "-c" ]] && echo 1 || echo 0)
 
-	if [[ $COMP_CWORD == 1 ]] ; then
+	if [[ $COMP_CWORD -eq 1 ]] ; then
 		local dirs=$(\ls ~/.virtualenvs/ 2> /dev/null)
 		local commands="-c"
 		COMPREPLY=( $(compgen -W "${commands} ${dirs}" -- $cur) )
 		return 0
 	fi
 
-	if [[ $COMP_CWORD == 2 && $create == "yes" ]] ; then
+	if [[ $COMP_CWORD -eq 2 && $create -eq 1 ]] ; then
 		return 0
 	fi
 
-	if [[ $COMP_CWORD == 2 || ($COMP_CWORD == 3 && $create == "yes") ]] ; then
+	if [[ $COMP_CWORD -eq 2 || ($COMP_CWORD -eq 3 && $create -eq 1) ]] ; then
 		COMPREPLY=( $(compgen -c $cur) )
 		return 0
 	fi

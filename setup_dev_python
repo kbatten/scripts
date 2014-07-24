@@ -35,7 +35,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     echo "*other"
     fetch_and_install "https://github.com/pyinstaller/pyinstaller/tarball/develop" "pyinstaller-dev.tar.gz" "pyinstaller-dev" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
     set_variable "PYTHONDONTWRITEBYTECODE" "true"
-    file_install "dev_python/runv" ~/bin
+    file_install "dev_python/pyvirt" ~/bin
 
     echo '#!/bin/bash
 r=0

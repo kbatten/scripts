@@ -263,7 +263,9 @@ function pip_install {
 
         local package_test=${package}
         if [[ "${package}" == "Flask" ]] ; then
-            local package_test="flask"
+            package_test="flask"
+        elif [[ "${package}" == "Twisted" ]] ; then
+            package_test="twisted"
         fi
 
         python -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1

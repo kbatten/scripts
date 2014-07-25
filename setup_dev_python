@@ -28,6 +28,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     pip_install virtualenv
     pip_install requests
     pip_install Flask
+    pip_install Twisted
     pip_install sh
     pip_install pep8
     pip_install pylint

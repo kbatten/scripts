@@ -10,7 +10,9 @@ function pip_install_win {
 
         local package_test=${package}
         if [[ "${package}" == "PyOpenGL" || "${package}" == "PyOpenGL_accelerate" ]] ; then
-            local package_test="OpenGL"
+            package_test="OpenGL"
+        elif [[ "${package}" == "Twisted" ]] ; then
+            package_test="twisted"
         fi
 
         wine "C:\Python27\python.exe" -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1
@@ -82,7 +84,7 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     echo '#!/bin/bash
 pyinstaller_dir=$(dirname "$(readlink ~/bin/pyinstaller)")
 PYTHONPATH=${PYTHONPATH}:"${pyinstaller_dir}"
-wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -c -F "${@}"' > ~/bin/pyinstaller-win
+wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -F "${@}"' > ~/bin/pyinstaller-win
     chmod 755 ~/bin/pyinstaller-win
 
 
@@ -95,6 +97,7 @@ wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -c -F "${@}"
     pip_install_win speech
     pip_install_win PyOpenGL PyOpenGL_accelerate
     pip_install_win markdown
+    pip_install_win Twisted
 
     echo "*other"
     echo " freeglut"

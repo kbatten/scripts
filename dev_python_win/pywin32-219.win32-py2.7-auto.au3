@@ -1,10 +1,10 @@
-ConsoleWrite("installing pywin32-218.win32-py2.7.exe" & @CRLF)
+ConsoleWrite("installing pywin32-219.win32-py2.7.exe" & @CRLF)
 if ($CmdLine[0] == 1) Then
-   ConsoleWrite("running: " & $CmdLine[1] & "\pywin32-218.win32-py2.7.exe" & @CRLF)
-   Run($CmdLine[1] & "\pywin32-218.win32-py2.7.exe")
+   ConsoleWrite("running: " & $CmdLine[1] & "\pywin32-219.win32-py2.7.exe" & @CRLF)
+   Run($CmdLine[1] & "\pywin32-219.win32-py2.7.exe")
 Else
-   ConsoleWrite("running: pywin32-218.win32-py2.7.exe" & @CRLF)
-   Run("pywin32-218.win32-py2.7.exe")
+   ConsoleWrite("running: pywin32-219.win32-py2.7.exe" & @CRLF)
+   Run("pywin32-219.win32-py2.7.exe")
 EndIf
 
 ConsoleWrite("WinWaitActive(""Setup"")" & @CRLF)

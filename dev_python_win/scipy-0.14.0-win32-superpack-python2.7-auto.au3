@@ -1,10 +1,10 @@
-ConsoleWrite("installing scipy-0.12.0b1-win32-superpack-python2.7.exe" & @CRLF)
+ConsoleWrite("installing scipy-0.14.0-win32-superpack-python2.7.exe" & @CRLF)
 if ($CmdLine[0] == 1) Then
-   ConsoleWrite("running: " & $CmdLine[1] & "\scipy-0.12.0b1-win32-superpack-python2.7.exe /S" & @CRLF)
-   Run($CmdLine[1] & "\scipy-0.12.0b1-win32-superpack-python2.7.exe /S")
+   ConsoleWrite("running: " & $CmdLine[1] & "\scipy-0.14.0-win32-superpack-python2.7.exe /S" & @CRLF)
+   Run($CmdLine[1] & "\scipy-0.14.0-win32-superpack-python2.7.exe /S")
 Else
-   ConsoleWrite("running: scipy-0.12.0b1-win32-superpack-python2.7.exe /S" & @CRLF)
-   Run("scipy-0.12.0b1-win32-superpack-python2.7.exe /S")
+   ConsoleWrite("running: scipy-0.14.0-win32-superpack-python2.7.exe /S" & @CRLF)
+   Run("scipy-0.14.0-win32-superpack-python2.7.exe /S")
 EndIf
 
 ConsoleWrite("WinWaitActive(""Setup"")" & @CRLF)

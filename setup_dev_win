@@ -7,7 +7,8 @@ function winetricks_install() {
     local trick=${@}
 
     echo " ${trick}"
-    xvfb-run winetricks -q ${trick} &> /dev/null
+    echo "xvfb-run winetricks -q ${trick}" >> ${LOGFILE}
+    xvfb-run winetricks -q ${trick} >> ${LOGFILE} 2>&1
     sleep 1
 }
 

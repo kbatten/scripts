@@ -1,7 +1,14 @@
 #!/bin/bash
 
+DISP=":99"
+if [[ -n $1 ]]; then
+    DISP=$1
+fi
+
+export XAUTHORITY=$(ls -d /tmp/xvfb-run* | head)/Xauthority
+
 rm -f ~/tmp/image.xwd ~/tmp/image.png
-xwd -display :99 -root -out ~/tmp/image.xwd
+xwd -display $DISP -root -out ~/tmp/image.xwd
 convert ~/tmp/image.xwd ~/tmp/image.png
 cd ~/tmp
 python -m SimpleHTTPServer

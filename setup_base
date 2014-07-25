@@ -91,12 +91,12 @@ function package_install {
                     package="wine1.4"
                 fi
             fi
-            if [[ ${os} == 'debian' ]] ; then
-                if [[ "${package}" == "wine" ]] ; then
-                    sudo dpkg --add-architecture i386 &> /dev/null
-                    package="wine-bin:i386"
-                fi
-            fi
+#            if [[ ${os} == 'debian' ]] ; then
+#                if [[ "${package}" == "wine" ]] ; then
+#                    sudo dpkg --add-architecture i386 &> /dev/null
+#                    package="wine-bin:i386"
+#                fi
+#            fi
             sudo apt-get -y install ${package} "${package}" >> "${LOGFILE}" 2>&1
             dpkg --get-selections | grep "^${package}\s" >> "${LOGFILE}" 2>&1
             set_rvalue "${package}"
@@ -125,6 +125,7 @@ function file_install {
         git clone -n git@github.com:kbatten/scripts.git --depth 1 &> /dev/null
         cd scripts &> /dev/null
         git checkout HEAD "${file}" &> /dev/null
+	mkdir -p "${dest}" &> /dev/null
         cp -f "${file}" "${dest}" &> /dev/null || sudo cp -f "${file}" "${dest}" &> /dev/null
         result=${?}
         popd &> /dev/null
@@ -226,14 +227,18 @@ function fetch_and_install() {
         extract "${filename}" "${directory}"
     fi
     if [[ "$(_extension "${filename}")" == "msi" ]] ; then
-        msiexec /q /i "${filename}" &> /dev/null
+        echo "xvfb-run wine msiexec.exe /q /i \"${filename}\"" >> "${LOGFILE}" 2>&1
+        xvfb-run wine msiexec.exe /q /i "${filename}" >> "${LOGFILE}" 2>&1
+        sleep 1
     elif [[ "$(_extension "${filename}")" == "exe" ]] ; then
         local auto=$(find ~/src/scripts -name "${filename/%.exe/-auto.exe}" | head -n1)
         if [[ -n "${auto}" ]] ; then
-            xvfb-run wine "${auto}" &> /dev/null
+            echo "xvfb-run wine \"${auto}\"" >> "${LOGFILE}" 2>&1
+            xvfb-run wine "${auto}" >> "${LOGFILE}" 2>&1
             sleep 1
         else
-            xvfb-run wine "${filename}" "${installer}" &> /dev/null
+            echo "xvfb-run wine \"${filename}\" \"${installer}\"" >> "${LOGFILE}" 2>&1
+            xvfb-run wine "${filename}" "${installer}" >> "${LOGFILE}" 2>&1
             sleep 1
         fi
     else

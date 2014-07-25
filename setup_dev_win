@@ -29,12 +29,9 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
 
 
     echo "*packages"
-    package_update
-    package_install git
     package_install xvfb
     package_install ttf-mscorefonts-installer
     package_install wine
-    package_install wine1.4-dev
 
 
     echo "*winetricks"

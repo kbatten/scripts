@@ -98,6 +98,8 @@ wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -F "${@}"' >
     pip_install_win PyOpenGL PyOpenGL_accelerate
     pip_install_win markdown
     pip_install_win Twisted
+    # fix a problem where pyinstaller doesn't pick up zope.interface
+    touch ${HOME}/.wine/drive_c/Python27/Lib/site-packages/zope/__init__.py
 
     echo "*other"
     echo " freeglut"

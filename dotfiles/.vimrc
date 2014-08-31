@@ -10,6 +10,7 @@ syntax on
 
 autocmd FileType go set tabstop=4 colorcolumn=79
 autocmd FileType python set tabstop=4 expandtab colorcolumn=79
+autocmd FileType html set tabstop=2 expandtab
 
 set wildmenu
 set hlsearch

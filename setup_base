@@ -322,21 +322,21 @@ if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
     echo "setting up..."
 
 
-    echo "*aliases"
-    add_alias 'll' 'ls -alF'
-    add_alias 'mv' 'mv -i'
-    add_alias 'cp' 'cp -i'
-    add_alias 'rm' 'rm -i'
-    add_path "${HOME}/bin"
+#    echo "*aliases"
+#    add_alias 'll' 'ls -alF'
+#    add_alias 'mv' 'mv -i'
+#    add_alias 'cp' 'cp -i'
+#    add_alias 'rm' 'rm -i'
 
 
     echo "*bin"
     mkdir ~/bin &> /dev/null
+    add_path "${HOME}/bin"
 
 
     echo "*packages"
     package_update
-    package_install emacs23-nox
+#    package_install emacs23-nox
     package_install git
     package_install fail2ban
 

@@ -8,9 +8,13 @@ set runtimepath+=/usr/share/vim/addons/
 filetype plugin on
 syntax on
 
-autocmd FileType go set tabstop=4 colorcolumn=79
-autocmd FileType python set tabstop=4 expandtab colorcolumn=79
-autocmd FileType html set tabstop=2 expandtab
+" always use spaces and tabstop 4 except where specified
+set expandtab
+set tabstop=4 softtabstop=4
+set colorcolumn=79
+
+autocmd FileType go setlocal noexpandtab
+autocmd FileType make setlocal noexpandtab
 
 set wildmenu
 set hlsearch

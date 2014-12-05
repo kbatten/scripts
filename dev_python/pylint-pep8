@@ -1,0 +1,13 @@
+#!/bin/bash
+r=0
+if [[ ${TERM} == "xterm-color" ]] ; then
+    pylint -r n ${1} 2>&1 | grep -v "No config file found, using default configuration" | sed 's/\([0-9]\+\)/\x1B[31m\1\x1B[0m/'
+    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
+    pep8 ${1} 2>&1 | sed 's/\([0-9]\+\)/\x1B[31m\1\x1B[0m/'
+    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
+else
+    pylint -r n ${1} 2>&1 | grep -v "No config file found, using default configuration"
+    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
+    pep8 ${1} 2>&1 | r=1
+fi
+exit ${r}

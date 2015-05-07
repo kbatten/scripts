@@ -1,4 +1,5 @@
-alias ll='ls -halF'
+alias sudo='sudo '
+alias ll='ls -hAlF'
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias mv='mv -i'

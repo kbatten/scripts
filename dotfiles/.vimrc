@@ -10,8 +10,15 @@ syntax on
 
 " always use spaces and tabstop 4 except where specified
 set expandtab
-set tabstop=4 softtabstop=4
-set colorcolumn=79
+set tabstop=4 softtabstop=4 shiftwidth=4
+
+" show color column in insert mode
+highlight ColorColumn ctermbg=4
+augroup ColorcolumnOnlyInInsertMode
+  autocmd!
+  autocmd InsertEnter * setlocal colorcolumn=79
+  autocmd InsertLeave * setlocal colorcolumn=0
+augroup END
 
 autocmd FileType go setlocal noexpandtab
 autocmd FileType make setlocal noexpandtab

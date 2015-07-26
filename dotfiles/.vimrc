@@ -26,6 +26,9 @@ autocmd FileType make setlocal noexpandtab
 set wildmenu
 set hlsearch
 
+" don't automatically continue comments
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
 " Use case insensitive search, except when using capital letters
 set ignorecase
 set smartcase

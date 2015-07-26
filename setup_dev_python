@@ -47,13 +47,13 @@ pip_install pep8
 pip_install pylint
 
 echo "*other"
-fetch_and_install "https://pypi.python.org/packages/source/P/PyInstaller/PyInstaller-2.1.tar.gz" "" "" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
+fetch_and_install "https://pypi.python.org/packages/source/P/PyInstaller/PyInstaller-2.1.tar.gz" "" "" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null ; chmod 755 \$(pwd)/pyinstaller.py"
 
 echo "*bashrc"
 set_variable "PYTHONDONTWRITEBYTECODE" "true"
 
 echo "*bin"
-file_install "dev_python/pylint-pep8"
+file_install "dev_python/pylint-pep8" ~/bin
 file_install "dev_python/pyvirt" ~/bin
 fi
 

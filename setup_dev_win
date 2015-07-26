@@ -42,6 +42,7 @@ echo "*packages"
 package_install xvfb
 #package_install ttf-mscorefonts-installer
 package_install wine
+package_install winetricks
 
 echo "*bin"
 file_install "dev_win/xvfb-grab" ~/bin

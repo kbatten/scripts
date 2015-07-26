@@ -1,28 +1,20 @@
-#
-#have pyvirt &&
 _pyvirt()
 {
-	local cur create
-
 	COMPREPLY=()
-	cur=${COMP_WORDS[COMP_CWORD]}
-	create=$([[ "${COMP_WORDS[1]}" == "-c" ]] && echo 1 || echo 0)
+	local cur=${COMP_WORDS[COMP_CWORD]}
+    local venvs
 
 	if [[ $COMP_CWORD -eq 1 ]] ; then
-		local dirs=$(\ls ~/.virtualenvs/ 2> /dev/null)
-		local commands="-c"
-		COMPREPLY=( $(compgen -W "${commands} ${dirs}" -- $cur) )
-		return 0
-	fi
+        venvs=$(\ls ~/.virtualenvs/ 2> /dev/null)
+        COMPREPLY=( $(compgen -W "-c ${venvs}" -- $cur) )
+        return
+    fi
 
-	if [[ $COMP_CWORD -eq 2 && $create -eq 1 ]] ; then
-		return 0
-	fi
-
-	if [[ $COMP_CWORD -eq 2 || ($COMP_CWORD -eq 3 && $create -eq 1) ]] ; then
-		COMPREPLY=( $(compgen -c $cur) )
-		return 0
-	fi
+    if [[ $COMP_CWORD -eq 2 && ${COMP_WORDS[1]} == "-c" ]] ; then
+        venvs=$(\ls ~/.virtualenvs/ 2> /dev/null)
+        COMPREPLY=( $(compgen -W "${venvs}" -- $cur) )
+        return
+    fi
 
 	_filedir
 }

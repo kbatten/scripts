@@ -1,113 +1,73 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # set up a python windows dev environment
 
 
-function pip_install_win {
-    for package in $@ ; do
-        echo " ${package}" | tee -a "${LOGFILE}"
-        wine "C:\Python27\Scripts\pip.exe" install "${package}" >> "${LOGFILE}" 2>&1
-
-        local package_test=${package}
-        if [[ "${package}" == "PyOpenGL" || "${package}" == "PyOpenGL_accelerate" ]] ; then
-            package_test="OpenGL"
-        elif [[ "${package}" == "Twisted" ]] ; then
-            package_test="twisted"
-        fi
-
-        wine "C:\Python27\python.exe" -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1
-        set_rvalue "${package}"
-    done
-}
-
-function easy_install_win {
-    local package=${1}
-
-    echo " $package"
-    PYTHONDONTWRITEBYTECODE= wine "C:\Python27\Scripts\easy_install.exe" "${package}" &> /dev/null
-}
-
-
-# includes
+if [[ -n "$SCRIPTS_SETUP_DEV_WIN" ]] ; then
+    return
+fi
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+# dependencies
 source "${SCRIPTPATH}/setup_dev_python"
 source "${SCRIPTPATH}/setup_dev_win"
 
 
-if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
-    echo "setting up..."
+pip_install_win() {
+    local package=
+    for package in $@ ; do
+        echo " ${package}" | tee -a "${LOGFILE}"
+        xvfb-run wine "C:\\Python27\\python.exe" -m pip install "${package}" >> "${LOGFILE}" 2>&1
 
-    mkdir ${DOWNLOADDIR} &> /dev/null
+        local package_test=${package}
+        if [[ "${package}" == "pillow" ]] ; then
+            package_test="PIL"
+        elif [[ "${package}" == "PyOpenGL" || "${package}" == "PyOpenGL_accelerate" ]] ; then
+           package_test="OpenGL"
+        elif [[ "${package}" == "pyopenssl" ]] ; then
+            package_test="OpenSSL"
+        elif [[ "${package}" == "pyxdg" ]] ; then
+            package_test="xdg"
+        elif [[ "${package}" == "twisted" ]] ; then
+            # fix a problem where pyinstaller doesn't pick up zope.interface
+            touch ${HOME}/.wine/drive_c/Python27/Lib/site-packages/zope/__init__.py
+        fi
 
-
-    echo "*packages"
-#    package_update
-#    package_install git
-    package_install python-pip
-    package_install xvfb
-    package_install ttf-mscorefonts-installer
-    package_install wine
-#    package_install wine1.4-dev
-    package_install winetricks
-    package_install p7zip
-
-
-    echo "*winetricks"
-    winetricks_install vcrun2008
-
-
-    echo "*pip"
-    pip_install virtualenv
-
-
-    echo "*other"
-    fetch_and_install "http://www.python.org/ftp/python/2.7.8/python-2.7.8.msi"
-    fetch_and_install "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20219/pywin32-219.win32-py2.7.exe"
-    fetch_and_install "http://pypi.python.org/packages/2.7/s/setuptools/setuptools-0.6c11.win32-py2.7.exe"
-    fetch_and_install "http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe"
-
-    # fix bug in 1.1.7 _imagingft.pyd
-    f=$(mktemp)
-    head -c 387025 ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd > ${f}
-    echo -n "!--" >> ${f}
-    tail -c +387029 ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd | head -c 246 >> ${f}
-    echo -n "--" >> ${f}
-    tail -c +387277 ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd >> ${f}
-    \mv ${f} ${HOME}/.wine/drive_c/Python27/Lib/site-packages/PIL/_imagingft.pyd
-
-    fetch_and_install "http://downloads.sourceforge.net/project/numpy/NumPy/1.8.1/numpy-1.8.1-win32-superpack-python2.7.exe"
-
-    fetch_and_install "http://downloads.sourceforge.net/project/scipy/scipy/0.14.0/scipy-0.14.0-win32-superpack-python2.7.exe"
-
-    echo " pyinstaller-win"
-    fetch_and_install "https://pypi.python.org/packages/source/P/PyInstaller/PyInstaller-2.1.tar.gz" "pyinstaller-dev.tar.gz" "pyinstaller-dev" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
-    echo '#!/bin/bash
-pyinstaller_dir=$(dirname "$(readlink ~/bin/pyinstaller)")
-PYTHONPATH=${PYTHONPATH}:"${pyinstaller_dir}"
-wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -F "${@}"' > ~/bin/pyinstaller-win
-    chmod 755 ~/bin/pyinstaller-win
+        wine "C:\\Python27\\python.exe" -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1
+        set_rvalue "${package}"
+    done
+}
 
 
-    echo "*easy_install"
-    easy_install_win pip
-#    easy_install_win numpy
+RUNALL=true
+if $RUNALL; then
+echo "*other"
+fetch_and_install "https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi"
+fetch_and_install "http://downloads.sourceforge.net/project/pywin32/pywin32/Build%20219/pywin32-219.win32-py2.7.exe"
+fetch_and_install "http://downloads.sourceforge.net/project/numpy/NumPy/1.8.1/numpy-1.8.1-win32-superpack-python2.7.exe"
+fetch_and_install "http://downloads.sourceforge.net/project/scipy/scipy/0.14.0/scipy-0.14.0-win32-superpack-python2.7.exe"
+fetch_and_install "http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi"
 
-    echo "*pip"
-    pip_install_win ntfsutils
-    pip_install_win speech
-    pip_install_win PyOpenGL PyOpenGL_accelerate
-    pip_install_win markdown
-    pip_install_win Twisted
-    # fix a problem where pyinstaller doesn't pick up zope.interface
-    touch ${HOME}/.wine/drive_c/Python27/Lib/site-packages/zope/__init__.py
+echo "*bin"
+file_install "dev_python_win/python-win" ~/bin
+file_install "dev_python_win/pyinstaller-win" ~/bin
 
-    echo "*other"
-    echo " freeglut"
-    fetch_and_install "http://files.transmissionzero.co.uk/software/development/GLUT/freeglut-MSVC.zip"
-    \cp ${HOME}/opt/freeglut-MSVC/bin/freeglut.dll ~/.wine/drive_c/Python27/Lib/site-packages/OpenGL/DLLS/ &> /dev/null
+echo "*pip"
+pip_install_win pillow
+pip_install_win ntfsutils
+pip_install_win speech
+pip_install_win PyOpenGL PyOpenGL_accelerate
+pip_install_win markdown
+pip_install_win twisted
 
-    fetch_and_install "http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi"
-
-
-    cleanup
+echo "*other"
+echo " freeglut"
+fetch_and_install "http://files.transmissionzero.co.uk/software/development/GLUT/freeglut-MSVC.zip"
+\cp ${HOME}/opt/freeglut-MSVC/bin/freeglut.dll ~/.wine/drive_c/Python27/Lib/site-packages/OpenGL/DLLS/ &> /dev/null
+fetch_and_install "http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi"
 fi
+
+
+cleanup
+export SCRIPTS_SETUP_DEV_WIN=1

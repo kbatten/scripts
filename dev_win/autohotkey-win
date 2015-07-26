@@ -1,0 +1,2 @@
+#!/bin/bash
+xvfb-run wine "C:\\Program Files\\AutoHotkey\\Compiler\\Ahk2Exe.exe" /in "${1}" 2> /dev/null

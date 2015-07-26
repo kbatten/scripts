@@ -1,59 +1,62 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # set up a python dev environment
 
 
-# global variables should all match setup_base
+if [[ -n "$SCRIPTS_SETUP_DEV_PYTHON" ]] ; then
+    return
+fi
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
-# includes
+# dependencies
 source "${SCRIPTPATH}/setup_base"
 
 
-if [[ "${BASH_SOURCE}" == "${0}" ]] ; then
-    echo "setting up..."
+pip_install() {
+    for package in $@ ; do
+        echo " ${package}" | tee -a "${LOGFILE}"
+        sudo pip install "${package}" >> "${LOGFILE}" 2>&1
 
-    echo "*packages"
-    package_install python-pip
-    package_install python-dev
-    package_install python-pygame
-    package_install python-opencv
-    package_install python-scipy
-    package_install python-numpy
-    package_install python-imaging
+        local package_test=${package}
 
-
-    echo "*pip packages"
-    pip_install virtualenv
-    pip_install requests
-    pip_install Flask
-    pip_install Twisted
-    pip_install sh
-    pip_install pep8
-    pip_install pylint
+        python -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1
+        set_rvalue "${package}"
+    done
+}
 
 
-    echo "*other"
-    fetch_and_install "https://pypi.python.org/packages/source/P/PyInstaller/PyInstaller-2.1.tar.gz" "pyinstaller-dev.tar.gz" "pyinstaller-dev" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
-    set_variable "PYTHONDONTWRITEBYTECODE" "true"
-    file_install "dev_python/pyvirt" ~/bin
+RUNALL=true
+if $RUNALL; then
+echo "*packages"
+package_install python-pip
+package_install python-dev
+package_install python-pygame
+package_install python-opencv
+package_install python-scipy
+package_install python-numpy
+package_install python-imaging
 
-    echo '#!/bin/bash
-r=0
-if [[ ${TERM} == "xterm-color" ]] ; then
-    pylint -i n -s n -r n ${1} 2>&1 | grep -v "No config file found, using default configuration" | sed '"'"'s/\([0-9]\+\)/\x1B[31m\1\x1B[0m/'"'"'
-    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
-    pep8 ${1} 2>&1 | sed '"'"'s/\([0-9]\+\)/\x1B[31m\1\x1B[0m/'"'"'
-    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
-else
-    pylint -i n -s n -r n ${1} 2>&1 | grep -v "No config file found, using default configuration"
-    if [[ ${PIPESTATUS#0} -ne 0 ]] ; then r=1; fi
-    pep8 ${1} 2>&1 | r=1
+echo "*pip packages"
+pip_install virtualenv
+pip_install requests
+pip_install flask
+pip_install twisted
+pip_install sh
+pip_install pep8
+pip_install pylint
+
+echo "*other"
+fetch_and_install "https://pypi.python.org/packages/source/P/PyInstaller/PyInstaller-2.1.tar.gz" "" "" "ln -sfT \$(pwd)/pyinstaller.py ${HOME}/bin/pyinstaller &> /dev/null"
+
+echo "*bashrc"
+set_variable "PYTHONDONTWRITEBYTECODE" "true"
+
+echo "*bin"
+file_install "dev_python/pylint-pep8"
+file_install "dev_python/pyvirt" ~/bin
 fi
-exit ${r}' > ~/bin/pylint-pep8
-    chmod 755 ~/bin/pylint-pep8
 
 
-    cleanup
-fi
+cleanup
+export SCRIPTS_SETUP_DEV_PYTHON=1

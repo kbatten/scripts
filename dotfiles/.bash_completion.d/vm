@@ -1,0 +1,27 @@
+_running_vms() {
+    if [[ $COMP_CWORD -eq 1 ]] ; then
+        local words=$(vboxmanage list runningvms | sed 's/^"\([^"]*\)".*$/\1/g')
+        COMPREPLY=( $(compgen -W "${words}" -- ${COMP_WORDS[COMP_CWORD]}) )
+    fi
+}
+
+_non_running_vms() {
+    if [[ $COMP_CWORD -eq 1 ]] ; then
+        local running="$(vboxmanage list runningvms | sed 's/^"\([^"]*\)".*$/\1/g')"
+        local all="$(vboxmanage list vms | sed 's/^"\([^"]*\)".*$/\1/g')"
+        local words=" "
+        for w in "${all}" ; do
+            if ! echo "${running}" | grep "^${w}$" &> /dev/null ; then
+                words="${words}${w}"
+            fi
+        done
+        words="${words# }"
+        COMPREPLY=( $(compgen -W "${words}" -- ${COMP_WORDS[COMP_CWORD]}) )
+    fi
+}
+
+complete -F _running_vms vmsnap
+complete -o nospace -F _non_running_vms vmstart
+complete -o nospace -F _running_vms vmstop
+complete -o nospace -F _running_vms vmtag
+

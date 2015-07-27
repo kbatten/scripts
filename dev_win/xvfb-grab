@@ -7,6 +7,7 @@ fi
 
 export XAUTHORITY=$(ls -d /tmp/xvfb-run* | head)/Xauthority
 
+mkdir ~/tmp &> /dev/null
 rm -f ~/tmp/image.xwd ~/tmp/image.png
 xwd -display $DISP -root -out ~/tmp/image.xwd
 convert ~/tmp/image.xwd ~/tmp/image.png

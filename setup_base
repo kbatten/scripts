@@ -170,12 +170,19 @@ fetch_and_install() {
         extract "${filename}" "${directory}"
     fi
     if [[ "$(extname "${filename}")" == "msi" ]] ; then
+        local auto=$(find "${SCRIPTPATH}" -name "$(rootname "${filename}")-auto.au3" | head -n1)
         echo "  installing..."
-        echo "xvfb-run wine msiexec.exe /q /i \"${filename}\"" >> "${LOGFILE}" 2>&1
-        xvfb-run wine msiexec.exe /q /i "${filename}" >> "${LOGFILE}" 2>&1
-        sleep 1
+        if [[ -n "${auto}" ]] ; then
+            echo "xvfb-run wine \"C:/Program Files/AutoIt3/AutoIt3.exe\" \"${auto}\"" >> "${LOGFILE}" 2>&1
+            xvfb-run wine "C:/Program Files/AutoIt3/AutoIt3.exe" "${auto}" >> "${LOGFILE}" 2>&1
+            sleep 1
+        else
+            echo "xvfb-run wine msiexec.exe /q /i \"${filename}\"" >> "${LOGFILE}" 2>&1
+            xvfb-run wine msiexec.exe /q /i "${filename}" >> "${LOGFILE}" 2>&1
+            sleep 1
+        fi
     elif [[ "$(extname "${filename}")" == "exe" ]] ; then
-        local auto=$(find "${SCRIPTPATH}" -name "${filename/%.exe/-auto.au3}" | head -n1)
+        local auto=$(find "${SCRIPTPATH}" -name "$(rootname "${filename}")-auto.au3" | head -n1)
         echo "  installing..."
         if [[ -n "${auto}" ]] ; then
             echo "xvfb-run wine \"C:/Program Files/AutoIt3/AutoIt3.exe\" \"${auto}\"" >> "${LOGFILE}" 2>&1

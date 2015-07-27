@@ -19,6 +19,11 @@ pip_install() {
         sudo pip install "${package}" >> "${LOGFILE}" 2>&1
 
         local package_test=${package}
+        if [[ "${package}" == "pyopenssl" ]] ; then
+            package_test="OpenSSL"
+        elif [[ "${package}" == "pyxdg" ]] ; then
+            package_test="xdg"
+        fi
 
         python -c "$(echo -e "try:\n  import ${package_test}\nexcept ImportError as e:\n  raise e\nexcept Exception:\n  pass\n")" >> "${LOGFILE}" 2>&1
         set_rvalue "${package}"

@@ -43,6 +43,7 @@ package_install xvfb
 #package_install ttf-mscorefonts-installer
 package_install wine
 package_install winetricks
+package_install imagemagick
 
 echo "*bin"
 file_install "dev_win/xvfb-grab" ~/bin

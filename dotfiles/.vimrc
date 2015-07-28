@@ -22,6 +22,8 @@ augroup END
 
 autocmd FileType go setlocal noexpandtab
 autocmd FileType make setlocal noexpandtab
+autocmd FileType html setlocal tabstop=2 softtabstop=2
+autocmd FileType javascript setlocal tabstop=2 softtabstop=2
 
 set wildmenu
 set hlsearch

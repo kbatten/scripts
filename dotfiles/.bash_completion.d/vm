@@ -10,9 +10,9 @@ _non_running_vms() {
         local running="$(vboxmanage list runningvms | sed 's/^"\([^"]*\)".*$/\1/g')"
         local all="$(vboxmanage list vms | sed 's/^"\([^"]*\)".*$/\1/g')"
         local words=" "
-        for w in "${all}" ; do
+        for w in ${all} ; do
             if ! echo "${running}" | grep "^${w}$" &> /dev/null ; then
-                words="${words}${w}"
+                words="${words}${w} "
             fi
         done
         words="${words# }"

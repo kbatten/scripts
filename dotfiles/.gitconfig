@@ -13,7 +13,7 @@
 [core]
        logAllRefUpdates = true
        excludesfile = ~/.gitignore
-       pager = less -r
+       pager = less -r -x4
 [branch]
        autosetupmerge = always
        autosetuprebase = always

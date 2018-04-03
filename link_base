@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+# link basic dotfiles
+function link_dotfiles() {
+  ln -s -f "$PWD/dotfiles/$@" "$HOME/$@"
+}
+
+# link dev bins
+function link_devbin() {
+  ln -s -f "$PWD/dev/$@" "$HOME/bin/$@"
+}
+
+link_dotfiles .bash_aliases
+link_dotfiles .gitconfig
+link_dotfiles .gitignore
+link_dotfiles .vimrc
+
+link_devbin profile_dirs

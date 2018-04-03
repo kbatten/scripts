@@ -1,0 +1,39 @@
+#!/bin/bash
+
+function usage() {
+    if [[ -n "$1" ]] ; then
+        echo "Error $1"
+    fi
+    echo "$0 [-c] <venv> [commands]"
+    exit $2
+}
+
+create=0
+if [[ "${1}" == "-c" ]] ; then
+    create=1
+    shift
+fi
+venv=
+if [[ -n "${1}" ]] ; then
+    venv=$1
+    shift
+else
+    usage "missing venv" 1
+fi
+
+if [[ ! -f ~/.virtualenvs/${venv}/bin/activate ]] ; then
+    if [[ ${create} -eq 1 ]] ; then
+        mkdir "${HOME}/.virtualenvs" &> /dev/null
+        python3 -m venv "${HOME}/.virtualenvs/${venv}"
+    else
+        echo "env \"${venv}\" not found"
+        exit
+    fi
+fi
+
+if [[ -n "${@}" ]] ; then
+    source "${HOME}/.virtualenvs/${venv}/bin/activate"
+    ${@}
+else
+    bash --init-file <(echo "source ${HOME}/.bashrc ; source \"${HOME}/.virtualenvs/${venv}/bin/activate\"")
+fi

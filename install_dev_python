@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+source ./script_lib/link.inc
+
+sudo apt-get install python3-venv curl binutils
+link_bin python3-venv
+# python3-venv -c <venv>
+# python3-venv <venv> [python] <script.py>
+# python3-venv <venv> pip install pyinstaller
+# python3-venv <venv> pyinstaller --onefile <script.py>
+# python3-venv <venv>

@@ -1,9 +1,22 @@
 #!/bin/bash
 
+if [[ "$1" == "-s" ]] ; then
+    SORT=1
+    shift
+else
+    SORT=
+fi
 
-IFS='
-'
-for d in $(ls) ; do
-    echo -n "$d "
-    du -ch "$d" 2> /dev/null | tail -n1 | awk '{print $1}'
-done
+function sort_by_size() {
+    sort -n | sed 's/^[0-9]*[[::space::]]*//g' | tr '\n' '\0'
+}
+
+if [[ -n "$1" ]] ; then
+    cd "$1"
+fi
+
+if [[ "$SORT" == "1" ]] ; then
+    ls -A | tr '\n' '\0' | xargs -0 du -s | sort -n | sed 's/^[0-9]*[[:space:]]*//g' | tr '\n' '\0' | xargs -0 du -h -s
+else
+    ls -A | tr '\n' '\0' | xargs -0 du -s -h
+fi

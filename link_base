@@ -6,8 +6,8 @@ function link_dotfiles() {
 }
 
 # link dev bins
-function link_devbin() {
-  ln -s -f "$PWD/dev/$@" "$HOME/bin/$@"
+function link_bin() {
+  ln -s -f "$PWD/bin/$@" "$HOME/bin/$@"
 }
 
 link_dotfiles .bash_aliases
@@ -15,4 +15,4 @@ link_dotfiles .gitconfig
 link_dotfiles .gitignore
 link_dotfiles .vimrc
 
-link_devbin profile_dirs
+link_bin profile_dirs

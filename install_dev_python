@@ -2,7 +2,8 @@
 
 source ./script_lib/link.inc
 
-sudo apt-get install python3-venv curl binutils
+sudo apt-get install -y python3-venv binutils nfs-common rar net-tools ipython3 bc
+
 link_bin python3-venv
 # python3-venv -c <venv>
 # python3-venv <venv> [python] <script.py>

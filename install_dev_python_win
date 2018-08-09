@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/graphics.inc
+
+sudo dpkg --add-architecture i386 && sudo apt-get update
+sudo apt-get install -y wine32 winetricks
+
+sudo xvfb-run winetricks -q vcrun2008
+
+download https://www.python.org/ftp/python/3.6.5/python-3.6.5-embed-amd64.zip

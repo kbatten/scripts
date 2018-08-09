@@ -26,3 +26,5 @@ function download() {
 
     popd &> /dev/null
 }
+
+sudo apt-get install -y curl

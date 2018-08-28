@@ -3,6 +3,7 @@
 source ./script_lib/std.inc
 source ./script_lib/install.inc
 source ./script_lib/graphics.inc
+source ./script_lib/link.inc
 
 #sudo dpkg --add-architecture i386 && sudo apt-get update
 sudo apt-get install -y wine winetricks
@@ -17,3 +18,4 @@ download https://www.python.org/ftp/python/2.7.15/python-2.7.15.msi
 install_msi python-2.7.15.msi
 wine pip install pyinstaller numpy scipy ntfsutils
 
+link_bin pyinstaller-win

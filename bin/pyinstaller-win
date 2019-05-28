@@ -1,3 +1,9 @@
 #!/bin/bash
 
-wine pyinstaller -F $@
+if [[ "$!" == "--onedir" ]] ; then
+    ARGS="--onedir"
+else
+    ARGS="--onefile"
+fi
+
+wine pyinstaller ${ARGS} $@

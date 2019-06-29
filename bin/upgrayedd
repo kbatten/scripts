@@ -1,1 +1,1 @@
-sudo apt-get update && sudo apt-get upgrade && sudo apt-get autoremove
+sudo apt-get -o Acquire::ForceIPv4=true update && sudo apt-get -o Acquire::ForceIPv4=true upgrade && sudo apt-get autoremove

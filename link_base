@@ -9,6 +9,8 @@ link_dotfiles .vimrc
 
 link_bash_completion
 
+link_bin bsync
+
 if [[ -e ../profile_dirs ]] ; then
     link_bin_external ../profile_dirs/profile_dirs.py profile_dirs
 else

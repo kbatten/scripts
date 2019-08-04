@@ -1,0 +1,11 @@
+_bsync_git_branch() {
+    if [[ $COMP_CWORD -eq 1 ]] ; then
+        local words=$(git branch 2> /dev/null | sed 's/^[* ]*//g')
+        COMPREPLY=( $(compgen -W "${words} -u" -- ${COMP_WORDS[COMP_CWORD]}) )
+    elif [[ "${COMP_WORDS[1]}" == "-u" && ($COMP_CWORD -eq 2 || $COMP_CWORD -eq 3) ]] ; then
+        local words=$(git branch 2> /dev/null | sed 's/^[* ]*//g')
+        COMPREPLY=( $(compgen -W "${words}" -- ${COMP_WORDS[COMP_CWORD]}) )
+    fi
+
+}
+complete -F _bsync_git_branch bsync

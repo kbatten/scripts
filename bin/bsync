@@ -1,0 +1,116 @@
+#!/bin/bash
+
+usage() {
+    local err=$1
+    local msg=$2
+
+    if [[ -n "$msg" ]] ; then
+        echo "ERROR: $msg"
+        echo
+    fi
+
+    echo "$0 [-u <upstream>] [branch]"
+    echo
+
+    exit $err
+}
+
+# defaults
+UPSTREAM=$(echo $(git branch | sed 's/*//g' | grep -e " develop$" -e " master$"))
+
+while getopts "u:h" opt ; do
+    case $opt in
+        u) UPSTREAM_T=$OPTARG
+           UPSTREAM=$(echo $(git branch | sed 's/*//g' | grep -e " $UPSTREAM_T$"));
+           shift 2;;
+        h) usage;;
+    esac
+done
+
+# check for upstream fork
+if ! git remote 2> /dev/null | grep -e "^upstream$" &> /dev/null ; then
+    usage 1 "not a fork"
+    exit 1
+fi
+
+# check for upstream branch
+if [[ -z "$UPSTREAM" ]] ; then
+    usage 1 "upstream $UPSTREAM_T not found"
+fi
+
+BRANCH_T=$1
+BRANCH=$(echo $(git branch | sed 's/*//g' | grep -e " $BRANCH_T$"))
+if [[ -n "$BRANCH_T" && -z "$BRANCH" ]] ; then
+    usage 1 "branch $BRANCH_T not found"
+fi
+
+if [ -n "$(git diff)" ] ; then
+    usage 1 "uncommited code"
+fi
+
+git checkout $UPSTREAM
+git fetch upstream
+git merge upstream/$UPSTREAM
+git push origin $UPSTREAM
+
+if [[ -z "$BRANCH" ]] ; then
+    exit
+fi
+
+git checkout $BRANCH
+git rebase $UPSTREAM
+
+exit
+
+
+function bsync_master_develop() {
+    local master=$(echo $(git branch | sed 's/*//g' | grep -e " develop$" -e " master$"))
+    local branch=$(echo $(git branch | sed 's/*//g' | grep -e " $1$"))
+
+    if [[ -n "$1" && -z "$branch" ]] ; then
+        echo "$1 not found"
+        exit 2
+    fi
+
+    if [[ ! $master == "develop" && ! $master == "master" ]] ; then
+        echo "invalid master branch name"
+        exit 1
+    fi
+
+    if [ -n "$(git diff)" ] ; then
+        echo "uncommited code"
+        exit 1
+    fi
+
+    git checkout $master
+    git fetch upstream
+    git merge upstream/$master
+    git push origin $master
+
+    if [[ -z "$branch" ]] ; then
+        exit
+    fi
+
+    git checkout $branch
+    git rebase $master
+}
+
+function bsync_1_9() {
+    local branch=${1-1.9}
+
+    if [ -n "$(git diff)" ] ; then
+        echo "uncommited code"
+        exit 1
+    fi
+
+    git checkout $branch
+
+    git fetch upstream && git rebase upstream/$branch && git push origin $branch
+}
+
+if [[ "$1" == "-m" ]] ; then
+    shift
+    bsync_1_9 $@
+else
+    bsync_master_develop $@
+fi

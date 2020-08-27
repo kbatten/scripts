@@ -16,3 +16,5 @@ if [[ -e ../profile_dirs ]] ; then
 else
     link_bin profile_dirs
 fi
+
+link_bin unjson_tool.py unjson

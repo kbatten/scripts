@@ -5,17 +5,17 @@ source ./script_lib/install.inc
 source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
-#sudo dpkg --add-architecture i386 && sudo apt-get update
+sudo dpkg --add-architecture i386 && sudo apt-get update
 sudo apt-get install -y wine winetricks
 
-#export WINEPREFIX="$HOME/.wine32"
-#export WINEARCH=win32
-#wine wineboot
+export WINEPREFIX="$HOME/.wine32"
+export WINEARCH=win32
+wine wineboot
 
 xvfb-run winetricks -q vcrun2008
 
-download https://www.python.org/ftp/python/2.7.15/python-2.7.15.msi
-install_msi python-2.7.15.msi
-wine pip install pyinstaller numpy scipy ntfsutils
+download https://www.python.org/ftp/python/2.7.18/python-2.7.18.msi
+install_msi python-2.7.18.msi
+wine pip install numpy scipy ntfsutils pyinstaller==3.6
 
 link_bin pyinstaller-win

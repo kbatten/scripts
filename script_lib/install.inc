@@ -37,4 +37,15 @@ function install_msi() {
     xvfb-run wine msiexec.exe /q /i ${filepath}
 }
 
+function run() {
+    local filename=${1}
+    local directory=${2}
+    local downloaddir="./downloads/"
+
+    local filepath="${downloaddir}${directory}/${filename}"
+
+    #xvfb-run wine ${filepath}
+    wine ${filepath}
+}
+
 sudo apt-get install -y curl

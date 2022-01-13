@@ -1,13 +1,23 @@
 #!/bin/bash
 
 if [[ "$1" == "-h" ]] ; then
-    echo "$0 [-4]"
+    echo "$0 [-4] [-d]"
     exit
 fi
 
 EXTRAOPTS=
 if [[ "$1" == "-4" ]] ; then
     EXTRAOPTS="-o Acquire::ForceIPv4=true"
+    shift
 fi
 
-sudo apt-get ${EXTRAOPTS} update && sudo apt-get ${EXTRAOPTS} upgrade && sudo apt-get autoremove
+DIST=
+DONE="echo done"
+if [[ "$1" == "-d" ]] ; then
+    DIST="sudo apt $EXTRAOPTS dist-upgrade"
+    DONE="echo \"done with dist-upgrade\""
+    shift
+fi
+
+
+sudo apt ${EXTRAOPTS} update && sudo apt ${EXTRAOPTS} upgrade && sudo apt autoremove && $DIST && $DONE

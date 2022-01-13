@@ -37,6 +37,20 @@ function install_msi() {
     xvfb-run wine msiexec.exe /q /i ${filepath}
 }
 
+function install_go() {
+    local filename=${1}
+    local directory=${2}
+    local downloaddir="./downloads/"
+
+    local dirname="$(rootname ${filename})"
+    local dirpath="${downloaddir}${directory}/${dirname}"
+    local destpath=${HOME}/opt/
+
+    if [[ ! -e "${destpath}/${dirname}" ]]; then
+        cp -r $dirpath ${destpath}
+    fi
+}
+
 function run() {
     local filename=${1}
     local directory=${2}

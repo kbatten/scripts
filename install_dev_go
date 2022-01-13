@@ -1,3 +1,14 @@
 #!/bin/bash -e
 
-sudo apt-get install -y golang graphviz
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+
+filename=go1.17.6.linux-amd64.tar.gz
+dirname=$(rootname go1.17.6.linux-amd64.tar.gz)
+
+download https://go.dev/dl/${filename}
+install_go ${filename}
+
+link_bin_external "${HOME}/opt/${dirname}/bin/go"
+link_bin_external "${HOME}/opt/${dirname}/bin/gofmt"

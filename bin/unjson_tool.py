@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import json
@@ -18,7 +18,7 @@ def main():
     with infile:
         try:
             obj = json.load(infile)
-        except ValueError, e:
+        except ValueError as e:
             raise SystemExit(e)
     with outfile:
         json.dump(obj, outfile, sort_keys=True, separators=(',', ': '))

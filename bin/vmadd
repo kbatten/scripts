@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [[ -z "$1" ]] ; then
+    echo "$0 <vbox file>"
+    exit
+fi
+
+VM=$1
+
+PRE=$(vmlist)
+vboxmanage registervm "$VM"
+R=$?
+if [[ $R -ne 0 ]] ; then exit $R ; fi
+
+POST=$(vmlist)
+while [[ "$POST" == "$PRE" ]] ; do
+    sleep 1
+    POST=$(vmlist)
+done
+diff <(echo "$PRE") <(echo "$POST") | tail -n1 | sed 's/> //'

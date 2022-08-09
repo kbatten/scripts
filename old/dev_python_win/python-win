@@ -1,2 +1,0 @@
-#!/bin/bash
-wine "C:\\Python27\\python.exe" "${@}"

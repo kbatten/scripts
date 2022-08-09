@@ -1,4 +1,0 @@
-#!/bin/bash
-pyinstaller_dir=$(dirname "$(readlink ~/bin/pyinstaller)")
-PYTHONPATH=${PYTHONPATH}:"${pyinstaller_dir}"
-wine "C:\\Python27\\python.exe" "${pyinstaller_dir}/pyinstaller.py" -F "${@}"

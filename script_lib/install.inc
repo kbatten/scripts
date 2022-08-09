@@ -51,6 +51,19 @@ function install_go() {
     fi
 }
 
+function install_virtualbox() {
+    local filename=${1}
+    local downloaddir="./downloads/"
+
+    local filepath="${downloaddir}${filename}"
+
+    local packagename="$(dpkg --info ${filepath} | grep Package: | awk '{print $2}')"
+    if ! dpkg -s "${packagename}" &> /dev/null ; then
+        echo "  installing..."
+        sudo dpkg -i "$filepath"
+    fi
+}
+
 function run() {
     local filename=${1}
     local directory=${2}

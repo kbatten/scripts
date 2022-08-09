@@ -14,6 +14,7 @@ download https://download.virtualbox.org/virtualbox/6.1.36/${filename}
 install_virtualbox ${filename}
 
 link_bin vmadd
+link_bin vmfixnetwork
 link_bin vmimport
 link_bin vmlist
 link_bin vmsnap

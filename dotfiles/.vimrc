@@ -1,5 +1,8 @@
 colorscheme darkblue
 
+" Disable visual insert
+set mouse-=a
+
 " Some Linux distributions set filetype in /etc/vimrc.
 " Clear filetype flags before changing runtimepath to force Vim to reload them.
 filetype off

@@ -1,3 +1,10 @@
+_all_vms() {
+    if [[ $COMP_CWORD -eq 1 ]] ; then
+        local words=$(vboxmanage list vms | sed 's/^"\([^"]*\)".*$/\1/g')
+        COMPREPLY=( $(compgen -W "${words}" -- ${COMP_WORDS[COMP_CWORD]}) )
+    fi
+}
+
 _running_vms() {
     if [[ $COMP_CWORD -eq 1 ]] ; then
         local words=$(vboxmanage list runningvms | sed 's/^"\([^"]*\)".*$/\1/g')
@@ -20,8 +27,7 @@ _non_running_vms() {
     fi
 }
 
-complete -F _running_vms vmsnap
+complete -F _all_vms vmsnap
 complete -o nospace -F _non_running_vms vmstart
 complete -o nospace -F _running_vms vmstop
-complete -o nospace -F _running_vms vmtag
-
+complete -o nospace -F _all_vms vmtag

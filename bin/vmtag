@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [[ -z "$1" ]] ; then
+    echo "$0 <vm>"
+    exit
+fi
+
+VM=$@
+
+vboxmanage snapshot "$VM" edit tag --name tag_old
+vboxmanage snapshot "$VM" take tag
+vboxmanage snapshot "$VM" delete tag_old

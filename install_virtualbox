@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+
+sudo apt-get install -y libqt5core5a libqt5gui5 libqt5opengl5 libqt5printsupport5 libqt5widgets5 libqt5x11extras5 libsdl1.2debian linux-headers-$(uname -r)
+
+filename=virtualbox-6.1_6.1.36-152435~Debian~bullseye_amd64.deb
+dirname=$(rootname $filename)
+
+download https://download.virtualbox.org/virtualbox/6.1.36/${filename}
+
+install_virtualbox ${filename}
+
+link_bin vmimport
+link_bin vmsnap
+link_bin vmstart
+link_bin vmstop
+link_bin vmtag

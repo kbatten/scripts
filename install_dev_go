@@ -4,8 +4,9 @@ source ./script_lib/std.inc
 source ./script_lib/install.inc
 source ./script_lib/link.inc
 
-filename=go1.17.6.linux-amd64.tar.gz
-dirname=$(rootname go1.17.6.linux-amd64.tar.gz)
+version=1.19
+filename=go${version}.linux-amd64.tar.gz
+dirname=$(rootname go${version}.linux-amd64.tar.gz)
 
 download https://go.dev/dl/${filename}
 install_go ${filename}

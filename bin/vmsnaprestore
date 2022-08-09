@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ -z "$2" ]] ; then
+    echo "$0 <vm> <snapname>"
+    exit
+fi
+
+VM=$1
+SNAP=$2
+
+SNAPUUID="$(vmsnaplist "${VM}" | grep "(UUID: ${SNAP})" | sed 's/.*UUID: //' | sed 's/).*//')"
+if [[ -z "$SNAPUUID" ]] ; then
+    SNAPUUID="$(vmsnaplist "${VM}" | grep "Name: ${SNAP} (UUID" | sed 's/.*UUID: //' | sed 's/).*//')"
+fi
+
+vboxmanage snapshot $VM restore $SNAPUUID

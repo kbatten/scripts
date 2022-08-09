@@ -27,7 +27,19 @@ _non_running_vms() {
     fi
 }
 
-complete -F _all_vms vmsnap
+_snaps() {
+    _all_vms
+
+    if [[ $COMP_CWORD -eq 2 ]] ; then
+        local words=$(vboxmanage snapshot ${COMP_WORDS[1]} list | grep Name: | sed 's/.*UUID: //' | sed 's/).*//')
+        COMPREPLY=( $(compgen -W "${words}" -- ${COMP_WORDS[COMP_CWORD]}) )
+    fi
+}
+
+complete -o nospace -F _all_vms vmsnap
+complete -F _snaps vmsnapdelete
+complete -o nospace -F _all_vms vmsnaplist
+complete -F _snaps vmsnaprestore
 complete -o nospace -F _non_running_vms vmstart
 complete -o nospace -F _running_vms vmstop
 complete -o nospace -F _all_vms vmtag

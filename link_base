@@ -7,8 +7,6 @@ link_dotfiles .gitconfig
 link_dotfiles .gitignore
 link_dotfiles .vimrc
 
-link_bash_completion
-
 link_bin bsync
 
 if [[ -e ../profile_dirs ]] ; then

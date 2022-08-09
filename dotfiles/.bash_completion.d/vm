@@ -36,6 +36,7 @@ _snaps() {
     fi
 }
 
+complete -o nospace -F _all_vms vmfixnetwork
 complete -o nospace -F _all_vms vmsnap
 complete -F _snaps vmsnapdelete
 complete -o nospace -F _all_vms vmsnaplist

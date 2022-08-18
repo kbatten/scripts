@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-source ./script_lib/link.inc
-
-link_bin upgrayedd

@@ -4,12 +4,14 @@ source ./script_lib/link.inc
 
 mkdir ~/bin &> /dev/null && true
 
+sudo apt-get install -y vim-nox
+
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig
 link_dotfiles .gitignore
 link_dotfiles .vimrc
-
 link_bin bsync
+link_bin upgrayedd
 
 if [[ -e ../profile_dirs ]] ; then
     link_bin_external ../profile_dirs/profile_dirs.py profile_dirs

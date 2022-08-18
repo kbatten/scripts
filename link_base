@@ -2,6 +2,8 @@
 
 source ./script_lib/link.inc
 
+mkdir ~/bin &> /dev/null && true
+
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig
 link_dotfiles .gitignore

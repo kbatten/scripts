@@ -11,7 +11,7 @@ dirname=$(rootname $filename)
 
 download https://download.virtualbox.org/virtualbox/6.1.36/${filename}
 
-install_virtualbox ${filename}
+install_deb ${filename}
 
 link_bin vmadd
 link_bin vmfixnetwork

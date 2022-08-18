@@ -51,7 +51,7 @@ function install_go() {
     fi
 }
 
-function install_virtualbox() {
+function install_deb() {
     local filename=${1}
     local downloaddir="./downloads/"
 

@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+
+sudo apt-get install -y snapd
+
+sudo snap install plex-desktop

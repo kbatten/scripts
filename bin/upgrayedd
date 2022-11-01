@@ -1,23 +1,44 @@
 #!/bin/bash
 
-if [[ "$1" == "-h" ]] ; then
-    echo "$0 [-4] [-d]"
+usage() {
+    echo "$0 [-4] [-d] [-y]"
+    echo
+    echo "  -4  use ipv4"
+    echo "  -d  perform a dist-upgrade"
+    echo "  -y  automatic yes to prompts"
+    echo
     exit
-fi
+}
 
 EXTRAOPTS=
-if [[ "$1" == "-4" ]] ; then
-    EXTRAOPTS="-o Acquire::ForceIPv4=true"
-    shift
-fi
-
 DIST=
+DODIST=0
+YES=
+
+while getopts "4dyh" opt ; do
+    case $opt in
+        4)
+            EXTRAOPTS="${EXTRAOPTS} -o Acquire::ForceIPv4=true"
+            ;;
+        d)
+            DODIST=1
+            ;;
+        y)
+            YES="-y"
+            ;;
+        h)
+            usage
+            ;;
+    esac
+done
+
+
 DONE="echo done"
-if [[ "$1" == "-d" ]] ; then
-    DIST="sudo apt $EXTRAOPTS dist-upgrade"
+if [[ $DODIST -eq 1 ]] ; then
+    DIST="sudo apt ${YES} ${EXTRAOPTS} dist-upgrade"
     DONE="echo \"done with dist-upgrade\""
     shift
 fi
 
 
-sudo apt ${EXTRAOPTS} update && sudo apt ${EXTRAOPTS} upgrade && sudo apt autoremove && $DIST && $DONE
+sudo apt ${YES} ${EXTRAOPTS} update && sudo apt ${YES} ${EXTRAOPTS} upgrade && sudo apt ${YES} autoremove && ${DIST} && ${DONE}

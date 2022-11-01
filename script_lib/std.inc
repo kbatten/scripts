@@ -26,5 +26,9 @@ function extract() {
                 mv "${directory_orig}" "${directory}" &> /dev/null
             fi
             ;;
+        "zip")
+            echo "  extracting..."
+            unzip -d "${directory}" "${filename}"
+            ;;
     esac
 }

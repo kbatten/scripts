@@ -6,9 +6,9 @@ source ./script_lib/link.inc
 
 name="yt-dlp"
 version=2022.10.04
+filename="${name}.${version}.zip"
 remote="https://github.com/yt-dlp/yt-dlp/releases/download/${version}/yt-dlp_linux.zip"
 
-filename="${name}.${version}.zip"
 dirname="$(rootname "${filename}")"
 
 download "${remote}" "${filename}"

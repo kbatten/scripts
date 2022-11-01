@@ -4,12 +4,15 @@ source ./script_lib/std.inc
 source ./script_lib/install.inc
 source ./script_lib/link.inc
 
+name=go
 version=1.19
-filename=go${version}.linux-amd64.tar.gz
-dirname=$(rootname go${version}.linux-amd64.tar.gz)
+filename="${name}${version}.linux-amd64.tar.gz"
+remote="https://go.dev/dl/${filename}"
 
-download https://go.dev/dl/${filename}
-install_go ${filename}
+dirname="$(rootname "${filename}")"
+
+download "${remote}" "${filename}"
+install_go "${filename}"
 
 link_bin_external "${HOME}/opt/${dirname}/bin/go"
 link_bin_external "${HOME}/opt/${dirname}/bin/gofmt"

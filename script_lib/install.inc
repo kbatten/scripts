@@ -1,8 +1,10 @@
+TANQ_DOWNLOAD_DIR="${TANQ_DOWNLOAD_DIR:=$HOME/.tanq_downloads/}"
+
 function download() {
     local url=${1}
     local filename=${2}
     local directory=${3}
-    local downloaddir="./downloads/"
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     if [[ -z "${filename}" ]] ; then
         filename=$(basename "${url}")
@@ -30,7 +32,7 @@ function download() {
 function install_msi() {
     local filename=${1}
     local directory=${2}
-    local downloaddir="./downloads/"
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     local filepath="${downloaddir}${directory}/${filename}"
 
@@ -40,7 +42,7 @@ function install_msi() {
 function install_go() {
     local filename=${1}
     local directory=${2}
-    local downloaddir="./downloads/"
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     local dirname="$(rootname ${filename})"
     local dirpath="${downloaddir}${directory}/${dirname}"
@@ -53,7 +55,7 @@ function install_go() {
 
 function install_deb() {
     local filename=${1}
-    local downloaddir="./downloads/"
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     local filepath="${downloaddir}${filename}"
 
@@ -67,7 +69,7 @@ function install_deb() {
 function install_ytdlp() {
     local filename=${1}
     local directory=${2}
-    local downloaddir="./downloads/"
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     local dirname="$(rootname ${filename})"
     local dirpath="${downloaddir}${directory}/${dirname}"
@@ -81,7 +83,7 @@ function install_ytdlp() {
 function run() {
     local filename=${1}
     local directory=${2}
-    local downloaddir="./downloads/"
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     local filepath="${downloaddir}${directory}/${filename}"
 

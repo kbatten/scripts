@@ -6,27 +6,18 @@ source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
 py2version=2.7.18
-py3version=3.9.5
 
-sudo dpkg --add-architecture i386 && sudo apt-get update
 sudo apt-get install -y wine winetricks
 
-#export WINEPREFIX="$HOME/.wine32"
-export WINEARCH=win32
 wine wineboot
-
-xvfb-run winetricks -q vcrun2008
-
-download https://www.python.org/ftp/python/${py2version}/python-${py2version}.msi
-install_msi python-${py2version}.msi
-wine pip install numpy scipy ntfsutils pyinstaller==3.6
-
-link_bin pyinstaller-win
-
 xvfb-run winetricks -q win10 vcrun2015
 
-download https://www.python.org/ftp/python/${py3version}/python-${py3version}.exe
-#run "python-3.9.5.exe /quiet /passive /layout c:/tmp"
-#run "c:/tmp/python-3.9.5.exe /quiet /passive /simple InstallAllUsers=1 PrependPath=1"
-run "python-${py3version}.exe PrependPath=1"
-#wine pip3 install numpy scipy ntfsutils pyinstaller
+download https://www.python.org/ftp/python/${py2version}/python-${py2version}.amd64.msi
+install_msi python-${py2version}.amd64.msi
+
+wine pip install pyinstaller==3.6
+
+wine pip install ntfsutils
+wine pip install numpy scipy
+
+link_bin pyinstaller-win

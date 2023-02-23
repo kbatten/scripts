@@ -14,7 +14,7 @@ function link_dotfiles() {
 function link_bash_completion() {
   local filename="$1"
   [ ! -d "$HOME/.bash_completion.d" ] && mkdir "$HOME/.bash_completion.d"
-  ln -s -f "$PWD/dotfiles/.bash_completion.d/${filename}" "$HOME/.bash_completion.d/"
+  [ ! -f "$HOME/.bash_completion.d/${filename}" ]  && ln -s -f "$PWD/dotfiles/.bash_completion.d/${filename}" "$HOME/.bash_completion.d/"
   bashrc_source_script "link_bash_completion_${filename}" "$HOME/.bash_completion.d/${filename}"
 }
 

@@ -9,8 +9,12 @@ source ./script_lib/install.inc
 version="23.1"
 filename="OPNsense-${version}-OpenSSL-dvd-amd64.iso.bz2"
 remote="https://mirror.sfo12.us.leaseweb.net/opnsense/releases/${version}/${filename}"
+vmdir="~/.vms"
 
 download "${remote}"
+
+mkdir -p "${vmdir}" || true
+vboxmanage createvm --name opnsense --ostype FreeBSD_64 --register --basefolder "${vmdir}"
 
 exit
 

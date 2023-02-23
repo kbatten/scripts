@@ -4,12 +4,12 @@ source ./script_lib/std.inc
 source ./script_lib/install.inc
 source ./script_lib/link.inc
 
-version="6.1.36"
-versionb="152435"
+version="7.0.6"
+versionb="155176"
 filename="virtualbox-${version%.*}_${version}-${versionb}~Debian~bullseye_amd64.deb"
 remote="https://download.virtualbox.org/virtualbox/${version}/${filename}"
 
-sudo apt-get install -y libqt5core5a libqt5gui5 libqt5opengl5 libqt5printsupport5 libqt5widgets5 libqt5x11extras5 libsdl1.2debian linux-headers-$(uname -r)
+sudo apt-get install -y libxcursor1 libvpx6 libqt5xml5 libqt5x11extras5 libqt5widgets5 libqt5printsupport5 libqt5opengl5 libqt5help5 libqt5gui5 libqt5dbus5 libqt5core5a libgl1 libvulkan1 linux-headers-$(uname -r)
 
 dirname=$(rootname "${filename}")
 

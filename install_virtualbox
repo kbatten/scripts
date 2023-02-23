@@ -4,8 +4,8 @@ source ./script_lib/std.inc
 source ./script_lib/install.inc
 source ./script_lib/link.inc
 
-version="6.1.36"
-versionb="152435"
+version="7.0.6"
+versionb="155176"
 filename="virtualbox-${version%.*}_${version}-${versionb}~Debian~bullseye_amd64.deb"
 remote="https://download.virtualbox.org/virtualbox/${version}/${filename}"
 

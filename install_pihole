@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+
+download https://install.pi-hole.net pihole-install.sh
+download https://git.io/vpn openvpn-install.sh
+
+run_bash pihole-install.sh
+run_sudo_bash openvpn-install.sh

@@ -91,4 +91,35 @@ function run() {
     wine ${filepath}
 }
 
-sudo apt-get install -y curl
+function run() {
+    local filename=${1}
+    local directory=${2}
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
+
+    local filepath="${downloaddir}${directory}/${filename}"
+
+    #xvfb-run wine ${filepath}
+    wine ${filepath}
+}
+
+function run_bash() {
+    local filename=${1}
+    local directory=${2}
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
+
+    local filepath="${downloaddir}${directory}/${filename}"
+
+    bash ${filepath}
+}
+
+function run_sudo_bash() {
+    local filename=${1}
+    local directory=${2}
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
+
+    local filepath="${downloaddir}${directory}/${filename}"
+
+    sudo bash ${filepath}
+}
+
+sudo apt-get install -y curl || true

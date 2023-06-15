@@ -19,7 +19,8 @@ xvfb-run winetricks -q vcrun2008
 
 download https://www.python.org/ftp/python/${py2version}/python-${py2version}.msi
 install_msi python-${py2version}.msi
-wine pip install numpy scipy ntfsutils pyinstaller==3.6
+wine python -m pip install --upgrade pip
+wine pip install numpy scipy ntfsutils pyaudio pyinstaller==3.6
 
 link_bin pyinstaller-win
 

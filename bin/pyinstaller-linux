@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ "$!" == "--onedir" ]] ; then
+    ARGS="--onedir"
+else
+    ARGS="--onefile"
+fi
+
+python3-venv pyinstaller-linux ~/.virtualenvs/pyinstaller/bin/pyinstaller ${ARGS} $@

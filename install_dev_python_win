@@ -23,5 +23,6 @@ wine pip install pyinstaller==5.12.0
 
 wine pip install ntfsutils
 wine pip install numpy scipy
+wine pip install sounddevice
 
 link_bin pyinstaller-win

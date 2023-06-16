@@ -7,6 +7,10 @@ source ./script_lib/link.inc
 
 py2version=2.7.18
 
+
+sudo dpkg --add-architecture i386
+sudo apt-get update
+
 sudo apt-get install -y wine winetricks
 
 wine wineboot

@@ -39,6 +39,17 @@ function install_msi() {
     xvfb-run wine msiexec.exe /q /i ${filepath}
 }
 
+function install_exe() {
+    local filename=${1}
+    local params="${2}"
+    local directory=${3}
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
+
+    local filepath="${downloaddir}${directory}/${filename}"
+
+    xvfb-run wine ${filepath} ${params}
+}
+
 function install_go() {
     local filename=${1}
     local directory=${2}

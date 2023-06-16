@@ -5,7 +5,7 @@ source ./script_lib/install.inc
 source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
-py2version=2.7.18
+py3version=3.8.10
 
 
 sudo dpkg --add-architecture i386
@@ -16,10 +16,10 @@ sudo apt-get install -y wine winetricks
 wine wineboot
 xvfb-run winetricks -q win10 vcrun2015
 
-download https://www.python.org/ftp/python/${py2version}/python-${py2version}.amd64.msi
-install_msi python-${py2version}.amd64.msi
+download https://www.python.org/ftp/python/${py3version}/python-${py3version}-amd64.exe
+install_exe python-${py3version}-amd64.exe "/quiet PrependPath=1"
 
-wine pip install pyinstaller==3.6
+wine pip install pyinstaller==5.12.0
 
 wine pip install ntfsutils
 wine pip install numpy scipy

@@ -1,5 +1,7 @@
 TANQ_DOWNLOAD_DIR="${TANQ_DOWNLOAD_DIR:=$HOME/.tanq_downloads/}"
 
+source ./script_lib/std.inc
+
 function download() {
     local url=${1}
     local filename=${2}

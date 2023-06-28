@@ -1,0 +1,38 @@
+#!/bin/bash
+
+function usage() {
+    if [[ -n "$1" ]] ; then
+        echo "Error $1"
+    fi
+    echo "$0 [-c] <venv> [commands]"
+    exit $2
+}
+
+create=0
+if [[ "${1}" == "-c" ]] ; then
+    create=1
+    shift
+fi
+venv=
+if [[ -n "${1}" ]] ; then
+    venv=$1
+    shift
+else
+    usage "missing venv" 1
+fi
+
+if [[ ! -f "$HOME/.wine/drive_c/users/$USER/.virtualenvs/${venv}/Scripts/activate.bat" ]] ; then
+    if [[ ${create} -eq 1 ]] ; then
+        wine cmd /c mkdir "%HomeDrive%%HomePath%/.virtualenvs" &> /dev/null
+        wine cmd /c python -m venv "%HomeDrive%%HomePath%/.virtualenvs/${venv}"
+    else
+        echo "env \"${venv}\" not found"
+        exit
+    fi
+fi
+
+if [[ -n "${@}" ]] ; then
+    wine cmd /c "%HomeDrive%%HomePath%/.virtualenvs/${venv}/Scripts/activate.bat" "&&" ${@}
+else
+    wine cmd /k "%HomeDrive%%HomePath%/.virtualenvs/${venv}/Scripts/activate.bat"
+fi

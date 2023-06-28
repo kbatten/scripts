@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source ./script_lib/install.inc
+
+./install_dev_python_win
+
+python3-venv-win -c pygame pip install numpy scipy sounddevice pygame PyOpenGL PyOpenGL_accelerate

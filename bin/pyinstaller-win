@@ -1,9 +1,29 @@
 #!/bin/bash
 
-if [[ "$!" == "--onedir" ]] ; then
-    ARGS="--onedir"
-else
-    ARGS="--onefile"
-fi
+ARGS="--onefile"
+CMD="wine cmd /c"
+PATHS=""
+for arg in "$@"; do
+    case "$arg" in
+        '--help')
+            echo "$0 [--onedir] [--venv <venv>]"
+            exit
+            ;;
+        '--onedir')
+            shift
+            ARGS="--onedir"
+            ;;
+        '--venv')
+            shift
+            CMD="python3-venv-win -c $1"
+            PATHS="set PYTHONPATH=%HomeDrive%%HomePath%\\.virtualenvs\\${1}\\Lib\\site-packages &&"
+            shift
+            ;;
+        '--')
+            shift
+            break
+            ;;
+    esac
+done
 
-wine pyinstaller ${ARGS} $@
+${CMD} "${PATHS} pyinstaller ${ARGS} $@"

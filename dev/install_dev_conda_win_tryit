@@ -1,22 +1,24 @@
 #!/bin/bash
 
-CUDA=10.2
+CUDA=11.1
+CUDAB=
 
 ./install_dev_conda_win
 
 mkdir -p ~/src/tryit &> /dev/null
 cd ~/src/tryit
 
-echo 'name: tryit
+echo "name: tryit
 channels:
   - pytorch
   - nvidia
+  - conda-forge
 dependencies:
   - python >= 3.8
   - numpy>=1.20
   - pytorch=*=*cuda${CUDA}*
-  - cudatoolkit=${CUDA}
-  - pyinstaller' \
+  - cudatoolkit=${CUDA}${CUDAB}
+  - pyinstaller" \
      > environment.yml
 
 if [[ ! -e "tryit.py" ]] ; then

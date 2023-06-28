@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source ./script_lib/install.inc
+
+./install_dev_python_win
+
+python3-venv-win -c ntfs pip install ntfsutils
+
+# pyinstaller-win --venv ntfs -- --uac-admin linkssd.py
+# pyinstaller-win --venv ntfs profile_dirs.py

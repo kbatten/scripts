@@ -1,0 +1,80 @@
+From 84f8535d7e81c947e28abafd5f0e2f00456a2a75 Mon Sep 17 00:00:00 2001
+From: Brian Koropoff <bkoropoff@gmail.com>
+Date: Fri, 8 Jul 2022 21:54:05 -0700
+Subject: [PATCH 1/3] fs: fix invalid handle value
+
+DWORD is unsigned, so -1 must be cast appropriately
+---
+ ntfsutils/fs.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ntfsutils/fs.py b/ntfsutils/fs.py
+index c90a711..7f6629c 100644
+--- a/ntfsutils/fs.py
++++ b/ntfsutils/fs.py
+@@ -28,7 +28,7 @@
+ 
+ MAX_PATH = 260
+ 
+-INVALID_HANDLE_VALUE = -1
++INVALID_HANDLE_VALUE = HANDLE(-1).value
+ 
+ class FILETIME(ctypes.Structure):
+     _fields_ = [("dwLowDateTime", DWORD),
+
+From c100bd02adf83138d579ed664a45235070ad80c5 Mon Sep 17 00:00:00 2001
+From: Brian Koropoff <bkoropoff@gmail.com>
+Date: Fri, 8 Jul 2022 21:56:01 -0700
+Subject: [PATCH 2/3] junction: fix isjunction
+
+os.path.exists will return False for junctions with invalid targets.
+Check for an error from GetFileAttributes instead.
+---
+ ntfsutils/junction.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/ntfsutils/junction.py b/ntfsutils/junction.py
+index 4c49802..992a61e 100644
+--- a/ntfsutils/junction.py
++++ b/ntfsutils/junction.py
+@@ -100,10 +100,13 @@ def unparsed_unconvert(path):
+     return path
+ 
+ def isjunction(path):
+-    if not os.path.exists(path) or not fs.junctions_supported(path):
++    if not fs.junctions_supported(path):
+         return False
+ 
+     attrs = GetFileAttributes(path)
++    if attrs == DWORD(-1).value:
++        return False
++
+     return bool((attrs & fs.FILE_ATTRIBUTE_DIRECTORY) and
+                 (attrs & fs.FILE_ATTRIBUTE_REPARSE_POINT))
+ 
+
+From 42600251d88aaa270d48620dddb47e6427b76524 Mon Sep 17 00:00:00 2001
+From: Brian Koropoff <bkoropoff@gmail.com>
+Date: Fri, 8 Jul 2022 21:57:18 -0700
+Subject: [PATCH 3/3] junction: fix readlink
+
+Use 0 for desired access, or you can get permission denied in some
+circumstances.
+---
+ ntfsutils/junction.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ntfsutils/junction.py b/ntfsutils/junction.py
+index 992a61e..b0da63c 100644
+--- a/ntfsutils/junction.py
++++ b/ntfsutils/junction.py
+@@ -160,7 +160,7 @@ def readlink(path):
+     if not isjunction(path):
+         raise Exception("%s does not exist or is not a junction" % path)
+ 
+-    hlink = CreateFile(path, fs.GENERIC_READ, fs.FILE_SHARE_READ, None,
++    hlink = CreateFile(path, 0, fs.FILE_SHARE_READ, None,
+         fs.OPEN_EXISTING,
+         fs.FILE_FLAG_OPEN_REPARSE_POINT | fs.FILE_FLAG_BACKUP_SEMANTICS,
+         None)
+

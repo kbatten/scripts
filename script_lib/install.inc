@@ -135,4 +135,13 @@ function run_sudo_bash() {
     sudo bash ${filepath}
 }
 
+function apply_patch() {
+    local patchname="$1"
+    local patchdest="$2"
+    local patch="$(scriptpath)/${patchname}"
+    pushd "${patchdest}"
+    git apply "${patch}"
+    popd
+}
+
 sudo apt-get install -y curl || true

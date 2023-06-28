@@ -12,6 +12,11 @@ function rootname() {
     echo "${filename%.${extension}}"
 }
 
+function scriptpath() {
+    local relativepath="$(dirname "$0")"
+    echo "$(cd "$relativepath" ; pwd)"
+}
+
 function extract() {
     local filename=${1}
     local directory=${2}

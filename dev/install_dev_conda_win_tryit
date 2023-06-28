@@ -1,0 +1,46 @@
+#!/bin/bash
+
+CUDA=10.2
+
+./install_dev_conda_win
+
+mkdir -p ~/src/tryit &> /dev/null
+cd ~/src/tryit
+
+echo 'name: tryit
+channels:
+  - pytorch
+  - nvidia
+dependencies:
+  - python >= 3.8
+  - numpy>=1.20
+  - pytorch=*=*cuda${CUDA}*
+  - cudatoolkit=${CUDA}
+  - pyinstaller' \
+     > environment.yml
+
+if [[ ! -e "tryit.py" ]] ; then
+    git init
+    echo 'import torch
+train_on_gpu = torch.cuda.is_available()
+if train_on_gpu:
+    print("CUDA is available, Training on GPU ...")
+else:
+    print("CUDA is not available!  Training on CPU ...")' > tryit.py
+    git add tryit.py environment.yml
+    git commit -m "initial"
+fi
+
+if [[ $(git diff | wc | awk '{print $1}') -ne 0 ]] ; then
+    git add tryit.py environment.yml
+    git commit -a -m "update environment"
+fi
+
+wine conda env create -f environment.yml
+wine conda env update -f environment.yml
+wine conda info
+wine conda env list
+
+
+echo "make sure to install nvidia cuda tools version ${CUDA}"
+echo "git clean -dfx && wine cmd /c conda activate tryit \"&&\" pyinstaller --onefile tryit.py"

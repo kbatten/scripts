@@ -19,3 +19,5 @@ wine conda env list
 
 echo "make sure to install nvidia cuda tools version ${CUDA}"
 echo "git clean -dfx && wine cmd /c conda activate stylegan3 \"&&\" pyinstaller --onefile visualizer_drag.py"
+
+# git@github.com:XingangPan/DragGAN.git

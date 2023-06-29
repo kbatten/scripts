@@ -1,0 +1,21 @@
+#!/bin/bash
+
+CUDA=11.1
+CUDAB=
+
+./install_dev_conda_win
+
+cd ~/src/DragGAN
+git checkout environment.yml
+
+sed -i 's/ - nvidia/ - nvidia\n  - conda-forge/g' environment.yml
+sed -i 's/dependencies:/dependencies:\n  - pyinstaller/g' environment.yml
+
+wine conda env create -f environment.yml
+wine conda env update -f environment.yml
+wine conda info
+wine conda env list
+
+
+echo "make sure to install nvidia cuda tools version ${CUDA}"
+echo "git clean -dfx && wine cmd /c conda activate stylegan3 \"&&\" pyinstaller --onefile visualizer_drag.py"

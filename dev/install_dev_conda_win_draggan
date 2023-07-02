@@ -17,6 +17,7 @@ wine conda info
 wine conda env list
 
 sed -i 's/(result, consumed) = self\._buffer_decode(data, self\.errors, final)/(result, consumed) = self._buffer_decode(data, "replace", final)/g' ${HOME}/.wine/drive_c/users/${USER}/miniconda3/envs/stylegan3/lib/codecs.py
+sed -i "s/'could not get source code'/f'could not get source code: {file}'/g" ${HOME}/.wine/drive_c/users/${USER}/miniconda3/envs/stylegan3/lib/inspect.py
 
 echo "make sure to install nvidia cuda tools version ${CUDA}"
 echo "git clean -dfx && wine cmd /c conda activate stylegan3 \"&&\" pyinstaller --onedir visualizer_drag.py"

@@ -20,7 +20,7 @@ sed -i 's/(result, consumed) = self\._buffer_decode(data, self\.errors, final)/(
 
 echo "make sure to install nvidia cuda tools version ${CUDA}"
 echo "git clean -dfx && wine cmd /c conda activate stylegan3 \"&&\" pyinstaller --onedir visualizer_drag.py"
-echo "wine cmd /c conda activate stylegan3 "&&" python -m compileall -b training"
+echo "wine cmd /c conda activate stylegan3 \"&&\" python -m compileall -b training"
 echo "copy ${HOME}/.wine/drive_c/users/${USER}/miniconda3/envs/stylegan3/lib/site-packages/glfw/glfw3.dll"
 echo "copy ${HOME}/.wine/drive_c/users/${USER}/miniconda3/envs/stylegan3/Library/bin/ninja.exe"
 echo "copy ${HOME}/.wine/drive_c/users/${USER}/miniconda3/envs/stylegan3/include"

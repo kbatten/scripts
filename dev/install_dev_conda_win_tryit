@@ -1,7 +1,6 @@
 #!/bin/bash
 
-CUDA=11.1
-CUDAB=
+CUDA=11.8
 
 ./install_dev_conda_win
 
@@ -15,9 +14,10 @@ channels:
   - conda-forge
 dependencies:
   - python >= 3.8
-  - numpy>=1.20
-  - pytorch=*=*cuda${CUDA}*
-  - cudatoolkit=${CUDA}${CUDAB}
+  - numpy>=1.25
+  - pytorch>=2.0.1
+  - pytorch-cuda=${CUDA}
+  - cudatoolkit=${CUDA}
   - pyinstaller" \
      > environment.yml
 
@@ -33,13 +33,7 @@ else:
     git commit -m "initial"
 fi
 
-if [[ $(git diff | wc | awk '{print $1}') -ne 0 ]] ; then
-    git add tryit.py environment.yml
-    git commit -a -m "update environment"
-fi
-
 wine conda env create -f environment.yml
-wine conda env update -f environment.yml
 wine conda info
 wine conda env list
 

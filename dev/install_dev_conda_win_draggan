@@ -1,18 +1,18 @@
 #!/bin/bash
 
-CUDA=11.1
-CUDAB=
+CUDA=11.8
 
 ./install_dev_conda_win
 
 cd ~/src/DragGAN
 git checkout environment.yml
 
-sed -i 's/ - nvidia/ - nvidia\n  - conda-forge/g' environment.yml
+sed -i 's/^  - nvidia/  - nvidia\n  - conda-forge/g' environment.yml
 sed -i 's/dependencies:/dependencies:\n  - pyinstaller/g' environment.yml
+sed -i 's/\(^.*pytorch.*=.*$\)/\1\n  - pytorch-cuda='"${CUDA}"'/g' environment.yml
+sed -i 's/^  - cudatoolkit=.*$/  - cudatoolkit='"${CUDA}"'/g' environment.yml
 
 wine conda env create -f environment.yml
-wine conda env update -f environment.yml
 wine conda info
 wine conda env list
 

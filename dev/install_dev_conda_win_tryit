@@ -22,15 +22,12 @@ dependencies:
      > environment.yml
 
 if [[ ! -e "tryit.py" ]] ; then
-    git init
     echo 'import torch
 train_on_gpu = torch.cuda.is_available()
 if train_on_gpu:
     print("CUDA is available, Training on GPU ...")
 else:
     print("CUDA is not available!  Training on CPU ...")' > tryit.py
-    git add tryit.py environment.yml
-    git commit -m "initial"
 fi
 
 wine conda env create -f environment.yml

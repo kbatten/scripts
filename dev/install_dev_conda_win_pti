@@ -1,0 +1,48 @@
+#!/bin/bash
+
+CUDA=11.8
+
+./install_dev_conda_win
+
+cd ~/src/PTI
+
+echo "name: pti
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python >= 3.8
+  - pip
+  - numpy>=1.25
+  - scipy=1.11.0
+  - pytorch>=2.0.1
+  - pytorch-cuda=${CUDA}
+  - torchvision>=0.15.2
+  - cudatoolkit=${CUDA}
+  - tqdm=4.62.2
+  - matplotlib=3.4.2
+  - dlib
+  - pyinstaller
+  - pip:
+    - lpips
+    - wandb" \
+     > environment.yml
+
+mkdir -p extrahooks
+echo "# extra-hooks/hook-wandb.py
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+hiddenimports = []
+datas = collect_data_files('wandb', include_py_files=True, includes=['**/vendor/**/*.py'])
+
+# These are imports from vendored stuff in wandb
+hiddenimports += collect_submodules('pathtools')" \
+    > extrahooks/hook-wandb
+
+# make modificaitons here
+wine conda env create -f environment.yml
+wine conda info
+wine conda env list
+
+echo "make sure to install nvidia cuda tools version ${CUDA}"
+echo "git clean -dfx && wine cmd /c conda activate pti \"&&\" pyinstaller --onedir pti.py"

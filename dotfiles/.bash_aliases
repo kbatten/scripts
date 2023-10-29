@@ -1,6 +1,6 @@
 alias sudo='sudo '
 alias ll='ls -hAlF'
-alias ls='ls -G'
+ls --color=always &> /dev/null && alias ls='ls --color=always' || alias ls='ls -G'
 alias grep='grep --color=auto'
 alias mv='mv -i'
 alias rm='rm -i'

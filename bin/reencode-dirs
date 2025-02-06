@@ -19,14 +19,24 @@ speed="fast"
 
 for indir in */; do
     pushd "$indir"
-    for infile in *.avi *.mkv ; do
-        outfile="${infile}-reencodex265.mkv"
-        $DRYRUN ffmpeg -i "${infile}" ${di_opts} ${qual_opts}  -c:v ${codec} -sn -c:a aac ${subtitle} -preset ${speed} "${outfile}"
+    for infile in * ; do
+        case "$infile" in
+        *reencode*) ;;
+        *.avi | *.mkv)
+            outfile="${infile}-reencodex265.mkv"
+            $DRYRUN ffmpeg -i "${infile}" ${di_opts} ${qual_opts}  -c:v ${codec} -sn -c:a aac ${subtitle} -preset ${speed} "${outfile}"
+            ;;
+        esac
     done && \
     $DRYRUN rm -f *.nfo && \
     $DRYRUN rm -rf "*__thumb" && \
-    for x in *.mkv *.avi ; do
-        echo "\rm -f \"${indir}${x}\"" | grep -v "reencode" >> ../remove
+    for x in * ; do
+        case "4x" in
+            *reencode*) ;;
+            *mkv | *avi) 
+                echo "\rm -f \"${indir}${x}\"" | grep -v "reencode" >> ../remove
+                ;;
+        esac
     done
     popd
 done

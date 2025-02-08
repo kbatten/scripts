@@ -27,7 +27,7 @@ for infile in * ; do
     esac
 done && \
 $DRYRUN rm -f *.nfo && \
-$DRYRUN rm -rf "*__thumb" && \
+$DRYRUN rm -rf ".*__thumb" && \
 for x in * ; do
     case "$x" in
         *reencode*) ;;

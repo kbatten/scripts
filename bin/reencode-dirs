@@ -20,12 +20,14 @@ speed="fast"
 for indir in */; do
     pushd "$indir"
     reencode $@
-    cat remove >> ..remove
+    echo "cd \"$indir\"" >> ../remove
+    cat remove >> ../remove
+    echo "cd .." >> ../remove
     rm -f remove
     popd
-done
-
-$DRYRUN rm -f *.nfo
+done && \
+$DRYRUN rm -f *.nfo && \
+$DRYRUN rm -rf ".*__thumb" && \
 
 echo "\rm -f remove" >> remove
 

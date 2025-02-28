@@ -27,7 +27,7 @@ for indir in */; do
     popd
 done && \
 $DRYRUN rm -f *.nfo && \
-$DRYRUN rm -rf ".*thumb" && \
+$DRYRUN rm -rf '.@__thumb' && \
 
 echo "\rm -f remove" >> remove
 

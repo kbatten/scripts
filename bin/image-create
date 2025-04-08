@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if [[ -z "$3" ]] ; then
+    echo "$0 <image_name> <dev> <num partitions> [--dry-run]"
+    exit 1
+fi
+
+if [[ -z "$4" ]] ; then
+    DRYRUN=""
+else
+    DRYRUN="echo"
+fi
+
+imagename="$1"
+dev="$2"
+numpartitions="$3"
+
+mountdir="$(sudo mktemp -d)"
+imagedir="/tmp/$imagename"
+
+for I in $(seq "$numpartitions") ; do
+    $DRYRUN sudo mount "$dev$I" "$mountdir"
+    $DRYRUN mkdir -p "$imagedir/partition$I/"
+    $DRYRUN sudo cp -rf --preserve=all "$mountdir/"* "$imagedir/partition$I/"
+    $DRYRUN sudo umount "$mountdir"
+done
+$DRYRUN sudo dd if="$dev" of="$imagedir/mbr.img" bs=446 count=1
+
+$DRYRUN sudo tar --directory=/tmp -czf $imagename.tgz $imagename
+$DRYRUN sudo chown $USER:$USER $imagename.tgz
+$DRYRUN sudo rm -rf /tmp/$imagename
+
+sudo rm -rf "$mountdir"

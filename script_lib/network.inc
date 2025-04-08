@@ -12,10 +12,12 @@ function network_get_default_address() {
 function sysctl_set() {
   local key=$1
   local value=$2
-  if sudo grep "^$key\W*=.*" "/etc/sysctl.conf" &> /dev/null ; then
-    sudo sed -i 's/^'"$key"'\W*=.*$/'"$key"'='"$value"'/g' "/etc/sysctl.conf"
+  local file="/etc/sysctl.d/99-sysctl.conf"
+  if sudo grep "^$key\W*=.*" "$file" &> /dev/null ; then
+    sudo sed -i 's/^'"$key"'\W*=.*$/'"$key"'='"$value"'/g' "$file"
   else
-    echo "$key=$value" | sudo tee -a "/etc/sysctl.conf" > /dev/null
+    echo "$key=$value" | sudo tee -a "$file" > /dev/null
   fi
+  sudo sysctl -p
 }
 

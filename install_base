@@ -10,9 +10,10 @@ link_dotfiles .bash_aliases
 link_dotfiles .gitconfig
 link_dotfiles .gitignore
 link_dotfiles .vimrc
-link_dotfiles .bash_completion.d
 
 link_bin bsync
+link_bash_completion bsync
+
 link_bin upgrayedd
 
 if [[ -e ../profile_dirs ]] ; then

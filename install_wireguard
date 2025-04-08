@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+source ./script_lib/std.inc
+source ./script_lib/link.inc
+source ./script_lib/network.inc
+
 usage() {
     local err=$1
     local msg=$2
@@ -9,49 +13,127 @@ usage() {
         echo
     fi
 
-    echo "$0 [-h] -n ADDRESS/NETMASK -p PORT"
+    echo "$0 [-h] -4 ADDRESS/NETMASK -6 ADDRESS6/NETMASK6 -v VPNADDRESS:VPNPORT"
     echo
 
     exit $err
 }
 
-while getopts "n:p:h" opt ; do
+while getopts "4:6:v:h" opt ; do
     case $opt in
-        n)  NETWORK_T=$OPTARG
-            ADDRESS=${NETWORK_T%/*}
-            if [[ "$NETWORK_T" == *"/"* ]] ; then
-                NETMASK=${NETWORK_T#*/}
+        4)  NETWORK4_T=$OPTARG
+            ADDRESS4=${NETWORK4_T%/*}
+            if [[ "$NETWORK4_T" == *"/"* ]] ; then
+                NETMASK4=${NETWORK4_T#*/}
             fi
             ;;
-        p)  PORT=$OPTARG
+        6)  NETWORK6_T=$OPTARG
+            ADDRESS6=${NETWORK6_T%/*}
+            if [[ "$NETWORK6_T" == *"/"* ]] ; then
+                NETMASK6=${NETWORK6_T#*/}
+            fi
+            ;;
+        v)  VPN_T=$OPTARG
+            VPN=${VPN_T%:*}
+            if [[ "$VPN_T" == *":"* ]] ; then
+                PORT=${VPN_T#*:}
+            fi
             ;;
         h)  usage
             ;;
     esac
 done
 
-if [[ -z $ADDRESS ]] ; then usage 1 "missing address"; fi
-if [[ -z $NETMASK ]] ; then usage 1 "missing netmask"; fi
+if [[ -z $ADDRESS4 ]] ; then usage 1 "missing ipv4 address"; fi
+if [[ -z $NETMASK4 ]] ; then usage 1 "missing ipv4 netmask"; fi
+if [[ -z $ADDRESS6 ]] ; then usage 1 "missing ipv6 address"; fi
+if [[ -z $NETMASK6 ]] ; then usage 1 "missing ipv6 netmask"; fi
+if [[ -z $VPN ]] ; then usage 1 "missing vpn address"; fi
 if [[ -z $PORT ]] ; then usage 1 "missing port"; fi
 
-source ./script_lib/std.inc
-source ./script_lib/link.inc
-source ./script_lib/network.inc
+ADDRESS4ROOT="${ADDRESS4%.*}"
+ADDRESS6ROOT="${ADDRESS6%:*}"
 
-sudo apt-get install -y wireguard wireguard-tools
+sudo apt-get install -y wireguard wireguard-tools qrencode
 
 OUMASK=$(umask)
 umask 077
 wg genkey | sudo tee /etc/wireguard/server.key | wg pubkey | sudo tee /etc/wireguard/server.pub > /dev/null
 
 echo "[Interface]
-Address = $ADDRESS/$NETMASK
+Address = $ADDRESS4/$NETMASK4, $ADDRESS6/$NETMASK6
 ListenPort = $PORT
 PrivateKey = $(sudo cat /etc/wireguard/server.key)
 PostUp = nft add table ip wireguard; nft add chain ip wireguard wireguard_chain {type nat hook postrouting priority srcnat\; policy accept\;}; nft add rule ip wireguard wireguard_chain counter packets 0 bytes 0 masquerade; nft add table ip6 wireguard; nft add chain ip6 wireguard wireguard_chain {type nat hook postrouting priority srcnat\; policy accept\;}; nft add rule ip6 wireguard wireguard_chain counter packets 0 bytes 0 masquerade
 PostDown = nft delete table ip wireguard; nft delete table ip6 wireguard" | sudo tee /etc/wireguard/wg0.conf > /dev/null
 
 umask $OUMASK
+
+echo '#! /usr/bin/env bash
+umask 077
+
+usage() {
+    local err=$1
+    local msg=$2
+
+    if [[ -n "$msg" ]] ; then
+        echo "ERROR: $msg"
+        echo
+    fi
+
+    echo "$0 <client index, starting from 2> <name> [dns]"
+    echo
+
+    exit $err
+}
+
+if [[ -z "$2" ]] ; then
+    usage 1
+fi
+
+if [[ "$1" -lt 2 ]] ; then
+    usage 1 "client index must be 2 or greater"
+fi
+
+ipv4="'$ADDRESS4ROOT'.$1"
+ipv6="'$ADDRESS6ROOT':$1"
+serv4="'$ADDRESS4'"
+serv6="'$ADDRESS6'"
+dns="${3-'$ADDRESS4'}"
+name="$2"
+target="'$VPN':'$PORT'"
+
+cd /etc/wireguard
+
+wg genkey | tee "${name}.key" | wg pubkey > "${name}.pub"
+wg genpsk > "${name}.psk"
+
+echo "" >> /etc/wireguard/wg0.conf
+echo "# $name" >> /etc/wireguard/wg0.conf
+echo "[Peer]" >> /etc/wireguard/wg0.conf
+echo "PublicKey = $(cat "${name}.pub")" >> /etc/wireguard/wg0.conf
+echo "PresharedKey = $(cat "${name}.psk")" >> /etc/wireguard/wg0.conf
+echo "AllowedIPs = $ipv4/32, $ipv6/128" >> /etc/wireguard/wg0.conf
+echo "" >> /etc/wireguard/wg0.conf
+
+echo "[Interface]" > "${name}.conf"
+echo "Address = $ipv4/'$NETMASK4', $ipv6/'$NETMASK6'" >> "${name}.conf"
+echo "DNS = ${dns}" >> "${name}.conf" #Specifying DNS Server
+echo "PrivateKey = $(cat "${name}.key")" >> "${name}.conf"
+echo "" >> "${name}.conf"
+echo "[Peer]" >> "${name}.conf"
+echo "PublicKey = $(cat server.pub)" >> "${name}.conf"
+echo "PresharedKey = $(cat "${name}.psk")" >> "${name}.conf"
+echo "Endpoint = $target" >> "${name}.conf"
+# echo "AllowedIPs = ${serv4}/32, ${serv6}/128" >> "${name}.conf" # clients isolated from one another
+# echo "AllowedIPs = '$ADDRESS4ROOT'.0/'$NETMASK4', '$ADDRESS6ROOT':/'$NETMASK6'" >> "${name}.conf" # clients can see each other
+echo "AllowedIPs = 0.0.0.0/0, ::/0" >> "${name}.conf" # client routes all traffic
+echo "PersistentKeepalive = 25" >> "${name}.conf"
+
+wg syncconf wg0 <(wg-quick strip wg0)
+
+# Print QR code scanable by the Wireguard mobile app on screen
+qrencode -t ansiutf8 < "${name}.conf"' > "$HOME/bin/wg-add-client"
 
 
 echo "On Router, forward port: $PORT to $(network_get_default_address) ($(network_get_default_interface))"

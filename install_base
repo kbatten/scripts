@@ -11,6 +11,7 @@ link_dotfiles .gitconfig
 link_dotfiles .gitignore
 link_dotfiles .vimrc
 link_dotfiles .bash_completion.d
+
 link_bin bsync
 link_bin upgrayedd
 
@@ -22,5 +23,8 @@ fi
 
 link_bin unjson_tool.py unjson
 
-link_bin reencode reencode
-link_bin reencode-dirs reencode-dirs
+link_bin reencode
+link_bin reencode-dirs
+
+link_bin image-create
+link_bin image-deploy

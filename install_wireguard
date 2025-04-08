@@ -1,0 +1,57 @@
+#!/bin/bash -e
+
+usage() {
+    local err=$1
+    local msg=$2
+
+    if [[ -n "$msg" ]] ; then
+        echo "ERROR: $msg"
+        echo
+    fi
+
+    echo "$0 [-h] -n ADDRESS/NETMASK -p PORT"
+    echo
+
+    exit $err
+}
+
+while getopts "n:p:h" opt ; do
+    case $opt in
+        n)  NETWORK_T=$OPTARG
+            ADDRESS=${NETWORK_T%/*}
+            if [[ "$NETWORK_T" == *"/"* ]] ; then
+                NETMASK=${NETWORK_T#*/}
+            fi
+            ;;
+        p)  PORT=$OPTARG
+            ;;
+        h)  usage
+            ;;
+    esac
+done
+
+if [[ -z $ADDRESS ]] ; then usage 1 "missing address"; fi
+if [[ -z $NETMASK ]] ; then usage 1 "missing netmask"; fi
+if [[ -z $PORT ]] ; then usage 1 "missing port"; fi
+
+source ./script_lib/std.inc
+source ./script_lib/link.inc
+source ./script_lib/network.inc
+
+sudo apt-get install -y wireguard wireguard-tools
+
+OUMASK=$(umask)
+umask 077
+wg genkey | sudo tee /etc/wireguard/server.key | wg pubkey | sudo tee /etc/wireguard/server.pub > /dev/null
+
+echo "[Interface]
+Address = $ADDRESS/$NETMASK
+ListenPort = $PORT
+PrivateKey = $(sudo cat /etc/wireguard/server.key)
+PostUp = nft add table ip wireguard; nft add chain ip wireguard wireguard_chain {type nat hook postrouting priority srcnat\; policy accept\;}; nft add rule ip wireguard wireguard_chain counter packets 0 bytes 0 masquerade; nft add table ip6 wireguard; nft add chain ip6 wireguard wireguard_chain {type nat hook postrouting priority srcnat\; policy accept\;}; nft add rule ip6 wireguard wireguard_chain counter packets 0 bytes 0 masquerade
+PostDown = nft delete table ip wireguard; nft delete table ip6 wireguard" | sudo tee /etc/wireguard/wg0.conf > /dev/null
+
+umask $OUMASK
+
+
+echo "On Router, forward port: $PORT to $(network_get_default_address) ($(network_get_default_interface))"

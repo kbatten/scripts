@@ -135,5 +135,11 @@ wg syncconf wg0 <(wg-quick strip wg0)
 # Print QR code scanable by the Wireguard mobile app on screen
 qrencode -t ansiutf8 < "${name}.conf"' > "$HOME/bin/wg-add-client"
 
+sysctl_set net.ipv4.ip_forward 1
+sysctl_set net.ipv6.conf.all.forwarding 1
+
+sudo systemctl enable wg-quick@wg0.service
+sudo systemctl daemon-reload
+sudo systemctl start wg-quick@wg0
 
 echo "On Router, forward port: $PORT to $(network_get_default_address) ($(network_get_default_interface))"

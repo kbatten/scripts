@@ -2,15 +2,37 @@
 
 # reencode all files in the dir
 
-du -H -c . | tail -n1 | cut -f 1
+usage() {
+    local err=$1
+    local msg=$2
+
+    if [[ -n "$msg" ]] ; then
+        echo "ERROR: $msg"
+        echo
+    fi
+
+    echo "$0 [-h] [-d] [-s]"
+    echo
+    echo "-h  help"
+    echo "-d  dryrun"
+    echo "-s  slower"
+    echo
+
+    exit $err
+}
+
+DRYRUN=""
+while getopts "dsh" opt ; do
+    case $opt in
+        d)  DRYRUN="echo"
+            ;;
+        s)  ;;
+        h)  usage
+            ;;
+    esac
+done
 
 START=$(du -c . | tail -n1 | cut -f 1)
-
-if [[ "$1" == "-d" ]] ; then
-    DRYRUN="echo"
-else
-    DRYRUN=""
-fi
 
 echo "" > remove
 
@@ -18,7 +40,7 @@ for infile in * ; do
     case "$infile" in
         *reencode*) ;;
         *.avi | *.mkv | *.mp4)
-            reencode-file $@ "$infile"
+            reencode-file $@ -f "$infile"
             ;;
     esac
 done && \
@@ -37,4 +59,5 @@ echo "\rm -f remove" >> remove
 
 END=$(du -c . | tail -n1 | cut -f 1)
 
+echo -n "reencode size percent: "
 echo "(${END}-${START}) / ${START}" | bc -l

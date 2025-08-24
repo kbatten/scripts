@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# reencode all files in the dir
+
 du -H -c . | tail -n1 | cut -f 1
 
 START=$(du -c . | tail -n1 | cut -f 1)
@@ -12,17 +14,11 @@ fi
 
 echo "" > remove
 
-di_opts=""
-qual_opts="-crf 21"
-codec="libx265"
-speed="fast"
-
 for infile in * ; do
     case "$infile" in
         *reencode*) ;;
         *.avi | *.mkv | *.mp4)
-            outfile="${infile}-reencodex265.mkv"
-            $DRYRUN ffmpeg -i "${infile}" ${di_opts} ${qual_opts}  -c:v ${codec} -sn -c:a aac ${subtitle} -preset ${speed} "${outfile}"
+            reencode-file $@ "$infile"
             ;;
     esac
 done && \

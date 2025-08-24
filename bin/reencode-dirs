@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# reencode all subdirs
+
 du -H -c . | tail -n1 | cut -f 1
 
 START=$(du -c . | tail -n1 | cut -f 1)

@@ -24,6 +24,7 @@ fi
 
 link_bin unjson_tool.py unjson
 
+link_bin reencode-file
 link_bin reencode
 link_bin reencode-dirs
 

@@ -21,7 +21,6 @@ usage() {
     exit $err
 }
 
-START=$(du -c . | tail -n1 | cut -f 1)
 
 DRYRUN=""
 SPEED="fast"
@@ -48,11 +47,13 @@ codec="libx265"
 speed="$SPEED"
 
 infile="$FILENAME"
-
 outfile="${infile}-reencodex265.mkv"
+
+START=$(du -c "$infile" | tail -n1 | cut -f 1)
+
 $DRYRUN ffmpeg -i "${infile}" ${di_opts} ${qual_opts}  -c:v ${codec} -sn -c:a aac ${subtitle} -preset ${speed} "${outfile}"
 
-END=$(du -c . | tail -n1 | cut -f 1)
+END=$(du -c "$outfile" | tail -n1 | cut -f 1)
 
 echo -n "reencode-file size percent: "
 echo "(${END}-${START}) / ${START}" | bc -l

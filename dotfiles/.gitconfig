@@ -13,7 +13,7 @@
 [core]
        logAllRefUpdates = true
        excludesfile = ~/.gitignore
-       pager = less -r -x4
+	pager = cat
 [branch]
        autosetupmerge = always
        autosetuprebase = always
@@ -26,3 +26,5 @@
 	v = describe --tags --long --match v*
 [push]
   default = simple
+[init]
+	defaultBranch = main

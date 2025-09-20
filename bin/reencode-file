@@ -11,11 +11,13 @@ usage() {
         echo
     fi
 
-    echo "$0 [-h] [-d] [-s] <-f filename>"
+    echo "$0 [-h] [-d] [-s] [-7] <-f filename>"
     echo
     echo "-h  help"
     echo "-d  dryrun"
     echo "-s  slower"
+    echo "-f  filename"
+    echo "-7  reencode to 720p"
     echo
 
     exit $err
@@ -24,6 +26,7 @@ usage() {
 
 DRYRUN=""
 SPEED="fast"
+FILTER=""
 while getopts "dshf:" opt ; do
     case $opt in
         d)  DRYRUN="echo"
@@ -31,6 +34,8 @@ while getopts "dshf:" opt ; do
         s)  SPEED="slower"
             ;;
         f)  FILENAME="${OPTARG}"
+            ;;
+        7)  FILTER="-filter:v scale=720:-1"
             ;;
         h)  usage
             ;;
@@ -51,7 +56,7 @@ outfile="${infile}-reencodex265.mkv"
 
 START=$(du -c "$infile" | tail -n1 | cut -f 1)
 
-$DRYRUN ffmpeg -i "${infile}" ${di_opts} ${qual_opts}  -c:v ${codec} -sn -c:a aac ${subtitle} -preset ${speed} "${outfile}"
+$DRYRUN ffmpeg -i "${infile}" ${FILTER} ${di_opts} ${qual_opts}  -c:v ${codec} -sn -c:a aac ${subtitle} -preset ${speed} "${outfile}"
 
 END=$(du -c "$outfile" | tail -n1 | cut -f 1)
 

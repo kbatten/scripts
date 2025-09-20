@@ -30,3 +30,8 @@ link_bin reencode-dirs
 
 link_bin image-create
 link_bin image-deploy
+
+
+# personal git configurations, this is saved in .gitconfig, but here to show that it is being changed
+git config --global init.defaultBranch main
+git config --global core.pager cat

@@ -4,7 +4,7 @@ source ./script_lib/link.inc
 
 mkdir ~/bin &> /dev/null && true
 
-sudo apt-get install -y vim-nox rar
+sudo apt-get install -y vim-nox rar mc
 
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig

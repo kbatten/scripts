@@ -1,0 +1,42 @@
+#!/bin/bash
+
+usage() {
+    echo "$0 <-a <activation_bytes> | -f> <aax input>"
+    echo
+    echo "  -a  set activation_bytes"
+    echo "  -f  automatically get activation_bytes from ~/.activation_bytes"
+    echo "         echo -n \"activation_bytes\" > ~/.activation_bytes"
+    echo
+    exit
+}
+
+ACTIVATION_BYTES=
+
+while getopts "a:fh" opt ; do
+    case $opt in
+        a)
+            ACTIVATION_BYTES="$OPTARG"
+            ;;
+        f)
+            ACTIVATION_BYTES="$(cat "$HOME/.activation_bytes")"
+            ;;
+        h)
+            usage
+            ;;
+    esac
+done
+
+if [[ -z $ACTIVATION_BYTES ]] ; then
+    usage
+fi
+
+shift $(($OPTIND - 1))
+
+if [[ -z "$1" ]] ; then
+    usage
+fi
+
+INFILE="$1"
+OUTFILE="${INFILE%.*}.m4b"
+
+ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" -codec copy "$OUTFILE"

@@ -39,7 +39,7 @@ echo "" > remove
 for infile in * ; do
     case "$infile" in
         *reencode*) ;;
-        *.avi | *.mkv | *.mp4)
+        *.avi | *.mkv | *.mp4 | *.MP4)
             reencode-file $@ -f "$infile"
             ;;
     esac
@@ -49,7 +49,7 @@ $DRYRUN rm -rf '.@__thumb' && \
 for x in * ; do
     case "$x" in
         *reencode*) ;;
-        *.mkv | *.avi | *.mp4)
+        *.mkv | *.avi | *.mp4 | *.MP4)
             echo "\rm -f \"${x}\"" | grep -v reencode >> remove
             ;;
     esac

@@ -53,4 +53,4 @@ echo "\rm -f remove" >> remove
 END=$(du -c . | tail -n1 | cut -f 1)
 
 echo -n "reencode-dirs size percent: "
-echo "(${END}-${START}) / ${START}" | bc -l
+echo "(${START}-${END}) / ${START}" | bc -l

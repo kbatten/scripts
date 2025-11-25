@@ -11,13 +11,13 @@ usage() {
         echo
     fi
 
-    echo "$0 [-h] [-d] [-s] [-7] <-f filename>"
+    echo "$0 [-h] [-d] [-p <veryslow | slower | slow | medium | (fast) | faster | superfast | ultrafast>] [-7] <-f filename>"
     echo
     echo "-h  help"
     echo "-d  dryrun"
-    echo "-s  slower"
-    echo "-f  filename"
+    echo "-p  preset"
     echo "-7  reencode to 720p"
+    echo "-f  filename"
     echo
 
     exit $err
@@ -27,15 +27,15 @@ usage() {
 DRYRUN=""
 SPEED="fast"
 FILTER=""
-while getopts "dshf:" opt ; do
+while getopts "dp:7f:h" opt ; do
     case $opt in
         d)  DRYRUN="echo"
             ;;
-        s)  SPEED="slower"
-            ;;
-        f)  FILENAME="${OPTARG}"
+        s)  SPEED="${OPTARG}"
             ;;
         7)  FILTER="-filter:v scale=720:-1"
+            ;;
+        f)  FILENAME="${OPTARG}"
             ;;
         h)  usage
             ;;

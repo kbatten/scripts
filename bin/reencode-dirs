@@ -11,22 +11,22 @@ usage() {
         echo
     fi
 
-    echo "$0 [-h] [-d] [-s]"
+    echo "$0 [-h] [-d] [-p <veryslow | slower | slow | medium | (fast) | faster | superfast | ultrafast>]"
     echo
     echo "-h  help"
     echo "-d  dryrun"
-    echo "-s  slower"
+    echo "-p  preset"
     echo
 
     exit $err
 }
 
 DRYRUN=""
-while getopts "dsh" opt ; do
+while getopts "dp:h" opt ; do
     case $opt in
         d)  DRYRUN="echo"
             ;;
-        s)  ;;
+        p)  ;;
         h)  usage
             ;;
     esac

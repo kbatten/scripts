@@ -61,4 +61,4 @@ $DRYRUN ffmpeg -i "${infile}" ${FILTER} ${di_opts} ${qual_opts}  -c:v ${codec} -
 END=$(du -c "$outfile" | tail -n1 | cut -f 1)
 
 echo -n "reencode-file size percent: "
-echo "(${END}-${START}) / ${START}" | bc -l
+echo "(${START}-${END}) / ${START}" | bc -l

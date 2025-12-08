@@ -26,5 +26,6 @@
 	v = describe --tags --long --match v*
 [push]
   default = simple
+	autoSetupRemote = true
 [init]
 	defaultBranch = main

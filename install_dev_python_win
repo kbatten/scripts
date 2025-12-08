@@ -5,10 +5,10 @@ source ./script_lib/install.inc
 source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
-py3_version=3.8.10
+py3_version=3.11.9
+pyinstaller_version=6.17.0
 
 
-sudo dpkg --add-architecture i386
 sudo apt-get update
 
 sudo apt-get install -y wine winetricks
@@ -17,9 +17,10 @@ wine wineboot
 xvfb-run winetricks -q win10 vcrun2015
 
 download https://www.python.org/ftp/python/${py3_version}/python-${py3_version}-amd64.exe
-install_exe python-${py3_version}-amd64.exe "/quiet PrependPath=1"
 
-wine pip install pyinstaller==5.12.0
+install_exe python-${py3_version}-amd64.exe "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0"
+
+wine pip install pyinstaller==${pyinstaller_version}
 
 link_bin pyinstaller-win
 link_bin python3-venv-win

@@ -4,7 +4,12 @@ source ./script_lib/link.inc
 
 mkdir ~/bin &> /dev/null && true
 
-sudo apt-get install -y vim-nox rar mc
+# update apt sources
+sudo sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /etc/apt/sources.list && \
+sudo rm -f /etc/apt/sources.list.tmp
+sudo apt-get update
+
+sudo apt-get install -y vim-nox rar mc nfs-common tmux git
 
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig

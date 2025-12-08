@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+
+install_wine
+install_wine_java8
+
+download https://download.videohelp.com/r0lZ/BD3D2AVS/BD3D2MK3D.7z
+
+# https://www.mediafire.com/folder/x6f7yqjufdg7c/Groucho's_Avisynth_Stuff
+download "https://download1584.mediafire.com/vauipv1dq7rgvjzGKa-AmeR8kKsBQCotUBom8AzgRarVk9R8CtCueipXgfi92pBDyDKlTvrciuXHDurw9gj2efBTzBDBkPYqHk4NqjLeikf5iIRnXr_WRJ5U7JlJHj7F-jufnlmSrZdVbpqTkxK1duZj47tYTj23mSXXaQSq3TXu/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z"
+
+# UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd
+# remove admin check from setavs.cmd
+# select 9
+# wine BD3D2MK3D.exe
+# remove all audio streams, will try to readd them back with ffmpeg
+
+

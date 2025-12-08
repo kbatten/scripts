@@ -1,0 +1,24 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+
+sudo apt-get install nasm pkg-config libx264-dev libx265-dev
+
+cd "$TANQ_DOWNLOAD_DIR"
+if [[ -e FFmpeg ]] ; then
+  cd FFmpeg
+  git pull
+else
+  git clone git@github.com:FFmpeg/FFmpeg.git
+  cd FFmpeg
+fi
+
+export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH
+./configure --enable-gpl --enable-libx264 --enable-libx265 --prefix="$HOME/opt/ffmpeg"
+make
+make install
+
+link_bin_external "$HOME/opt/ffmpeg/bin/ffmpeg"
+link_bin_external "$HOME/opt/ffmpeg/bin/ffprobe"

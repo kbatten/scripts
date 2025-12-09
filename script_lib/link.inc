@@ -5,6 +5,13 @@ function bashrc_source_script() {
   grep "^source.*# $tag$" "$HOME/.bashrc" &> /dev/null || echo "source $@  # $tag" >> "$HOME/.bashrc"
 }
 
+# modify .bashrc to add a variable
+function bashrc_export_variable() {
+  local tag=$1
+  shift
+  grep "^export.*# $tag$" "$HOME/.bashrc" &> /dev/null || echo "export $@  # $tag" >> "$HOME/.bashrc"
+}
+
 # link basic dotfiles
 function link_dotfiles() {
   ln -s -f "$PWD/dotfiles/$@" "$HOME/$@"

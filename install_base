@@ -38,6 +38,8 @@ link_bin image-deploy
 
 link_bin audiobook-decode
 
+bashrc_export_variable bash_editor EDITOR=vi
+
 
 # personal git configurations, this is saved in .gitconfig, but here to show that it is being changed
 git config --global init.defaultBranch main

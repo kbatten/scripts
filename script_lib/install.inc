@@ -144,4 +144,11 @@ function apply_patch() {
     popd
 }
 
+function install_wine()
+{
+    sudo dpkg --add-architecture i386
+    sudo apt-get install -y wine32 wine64
+    wine wineboot
+}
+
 sudo apt-get install -y curl || true

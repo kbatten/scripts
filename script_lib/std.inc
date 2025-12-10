@@ -35,5 +35,9 @@ function extract() {
             echo "  extracting..."
             unzip -d "${directory}" "${filename}"
             ;;
+        "7z")
+            echo "  extracting..."
+            7z x -o"${directory}" "${filename}"
+            ;;
     esac
 }

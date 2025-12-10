@@ -32,6 +32,8 @@ function download() {
 }
 
 function install_msi() {
+    source ./script_lib/graphics.inc
+
     local filename=${1}
     local directory=${2}
     local downloaddir="${TANQ_DOWNLOAD_DIR}"
@@ -42,6 +44,8 @@ function install_msi() {
 }
 
 function install_exe() {
+    source ./script_lib/graphics.inc
+
     local filename=${1}
     local params="${2}"
     local directory=${3}
@@ -152,6 +156,21 @@ function install_wine()
     sudo apt-get update
     sudo apt-get install -y wine32
     wine wineboot
+}
+
+function install_wine_java8() {
+    download https://corretto.aws/downloads/latest/amazon-corretto-8-x64-windows-jdk.msi
+    install_msi amazon-corretto-8-x64-windows-jdk.msi
+}
+
+function install_wine_gecko() {
+    local gecko_version=2.47.4
+
+    download http://dl.winehq.org/wine/wine-gecko/${gecko_version}/wine-gecko-${gecko_version}-x86_64.msi
+    install_msi wine-gecko-${GECKO_VERSION}-x86_64.msi
+
+    download http://dl.winehq.org/wine/wine-gecko/${gecko_version}/wine-gecko-${gecko_version}-x86.msi
+    install_msi wine-gecko-${GECKO_VERSION}-x86.msi
 }
 
 sudo apt-get install -y curl || true

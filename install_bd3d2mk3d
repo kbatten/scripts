@@ -13,14 +13,12 @@ download https://download.videohelp.com/r0lZ/BD3D2AVS/BD3D2MK3D.7z
 
 download "https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file"
 
-sed -i.tmp 's/if errorlevel 1 goto :noAdmin//g' "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd"
+# remove admin check from save and force 9 for x86
+sed -i.tmp -e 's/if errorlevel 1 goto :noAdmin//g' -e 's/set \/p no=.*/set no=9/g' -e 's/pause//g' "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd"
 rm -f "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd.tmp"
 
+wine "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd"
 
-# UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd
-# remove admin check from setavs.cmd
-# select 9
-# wine BD3D2MK3D.exe
-# remove all audio streams, will try to readd them back with ffmpeg
+# wine BD3D2MK3D/BD3D2MK3D/BD3D2MK3D.exe
 
 

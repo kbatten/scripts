@@ -160,7 +160,7 @@ function apply_patch() {
 
 function install_wine()
 {
-    sudo apt-get install -y wine winbind
+    sudo apt-get install -y wine wine64 wine32 winbind
 }
 
 function install_wine_java8() {

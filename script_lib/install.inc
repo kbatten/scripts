@@ -155,6 +155,7 @@ function install_wine()
     sudo apt-get install -y wine64
     sudo apt-get update
     sudo apt-get install -y wine32
+    sudo apt-get install -y winbind
 }
 
 function install_wine_java8() {

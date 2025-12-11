@@ -150,12 +150,7 @@ function apply_patch() {
 
 function install_wine()
 {
-    sudo dpkg --add-architecture i386
-    sudo apt-get install -y wine
-    sudo apt-get install -y wine64
-    sudo apt-get update
-    sudo apt-get install -y wine32
-    sudo apt-get install -y winbind
+    sudo apt-get install -y wine winbind
 }
 
 function install_wine_java8() {

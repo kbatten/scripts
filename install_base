@@ -10,7 +10,7 @@ sudo sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /e
 sudo rm -f /etc/apt/sources.list.tmp
 sudo apt-get update
 
-sudo apt-get install -y vim-nox rar mc nfs-common tmux git
+sudo apt-get install -y vim-nox rar mc nfs-common tmux git build-essential
 
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig

@@ -23,7 +23,7 @@ function extract() {
     local extension=$(extname "${filename}")
 
     case "${extension}" in
-        "tar.gz" | "tgz" | "tar.bz2")
+        "tar.gz" | "tgz" | "tar.bz2" | "tar.xz")
             echo "  extracting..."
             tar xf "${filename}" &> /dev/null
             local directory_orig=$(basename $(tar tf "${filename}" | head -n1))

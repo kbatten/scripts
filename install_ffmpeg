@@ -22,7 +22,7 @@ else
     fi
 
     export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH
-    ./configure --enable-gpl --enable-libx264 --enable-libx265 --enable-libvidstab --prefix="$HOME/opt/ffmpeg"
+    ./configure --enable-gpl --enable-libx264 --enable-libx265 --enable-libvidstab --enable-openssl --prefix="$HOME/opt/ffmpeg"
     make
     make install
 

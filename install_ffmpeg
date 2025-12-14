@@ -9,7 +9,7 @@ FROM_SOURCE=1
 if [[ $FROM_SOURCE -eq 0 ]] ; then
     sudo apt-get install -y ffmpeg
 else
-    sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential
+    sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential libvidstab-dev
 
     mkdir -p "${TANQ_DOWNLOAD_DIR}" &> /dev/null
     cd "$TANQ_DOWNLOAD_DIR"
@@ -22,7 +22,7 @@ else
     fi
 
     export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH
-    ./configure --enable-gpl --enable-libx264 --enable-libx265 --prefix="$HOME/opt/ffmpeg"
+    ./configure --enable-gpl --enable-libx264 --enable-libx265 --enable-libvidstab --prefix="$HOME/opt/ffmpeg"
     make
     make install
 

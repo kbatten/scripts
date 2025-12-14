@@ -4,12 +4,12 @@ source ./script_lib/std.inc
 source ./script_lib/install.inc
 source ./script_lib/link.inc
 
-FROM_SOURCE=0
+FROM_SOURCE=1
 
 if [[ $FROM_SOURCE -eq 0 ]] ; then
     sudo apt-get install -y ffmpeg
 else
-    sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev
+    sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential
 
     mkdir -p "${TANQ_DOWNLOAD_DIR}" &> /dev/null
     cd "$TANQ_DOWNLOAD_DIR"

@@ -2,12 +2,12 @@
 
 source ./script_lib/link.inc
 
-sudo apt-get install -y python3-pip python3-venv binutils nfs-common net-tools ipython3 libfreetype6-dev libjpeg-dev
+sudo apt-get install -y python3-pip python3-venv binutils nfs-common net-tools ipython3 libfreetype6-dev libjpeg-dev python3-pillow
 
 link_bin python3-venv
 link_bin pyinstaller-linux
 
-python3-venv -c pyinstaller pip install pyinstaller==5.12.0
+python3-venv -c pyinstaller pip install pyinstaller==6.17.0
 
 # python3-venv -c <venv>
 # python3-venv <venv> [python] <script.py>

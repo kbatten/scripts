@@ -12,6 +12,7 @@ pyinstaller_version=6.17.0
 sudo apt-get update
 
 install_wine
+wineboot
 
 download https://www.python.org/ftp/python/${py3_version}/python-${py3_version}-amd64.exe
 

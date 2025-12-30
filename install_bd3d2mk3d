@@ -2,13 +2,18 @@
 
 source ./script_lib/std.inc
 source ./script_lib/install.inc
+source ./script_lib/link.inc
 
 install_wine
 wineboot
 
 install_wine_java8
 
+link_bin bd3d
+
 download https://download.videohelp.com/r0lZ/BD3D2AVS/BD3D2MK3D.7z
+rm -rf "${TANQ_DOWNLOAD_DIR}/BD3D2MK3D" || true
+cp -r "${TANQ_DOWNLOAD_DIR}/BD3D2MK3D/BD3D2MK3D" ~/opt/
 
 # https://www.mediafire.com/folder/x6f7yqjufdg7c/Groucho's_Avisynth_Stuff
 # https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file

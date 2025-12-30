@@ -1,0 +1,3 @@
+#!/bin/bash
+
+wine "$HOME/opt/BD3D2MK3D/BD3D2MK3D.exe" $@

@@ -4,6 +4,8 @@ source ./script_lib/std.inc
 source ./script_lib/install.inc
 
 install_wine
+wineboot
+
 install_wine_java8
 
 download https://download.videohelp.com/r0lZ/BD3D2AVS/BD3D2MK3D.7z

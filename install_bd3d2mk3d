@@ -31,12 +31,16 @@ wine "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepositor
 echo '
 bd3d
 INPUT=<FILE>
-ffmpeg -i "$INPUT" -acodec copy tmp.thd
+ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -vcodec copy -acodec ac3 tmp.mkv
 
-#do not mux
-bd3d "$INPUT"
+bd3d
+# full sbs
+# deselect all non video streams
+# crf 21
+# do not mux
 
-#edit __MUX_3D_OPTIONS.json to remove --ui-language and change audio input to tmp.thd
+# mv tmp.thd to project directory
+# edit __MUX_3D_OPTIONS.json to remove --ui-language and change audio input to tmp.thd
 mkvmerge @__MUX_3D_OPTIONS.json
 '
 

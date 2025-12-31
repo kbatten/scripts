@@ -12,6 +12,7 @@ wineboot
 install_wine_java8
 
 link_bin bd3d
+link_bin bd3d-mkvmerge
 
 download https://download.videohelp.com/r0lZ/BD3D2AVS/BD3D2MK3D.7z BD3D2MK3D.7z BD3D2MK3D
 rm -rf "${HOME}/opt/BD3D2MK3D" || true
@@ -31,7 +32,7 @@ wine "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepositor
 echo '
 bd3d
 INPUT=<FILE>
-ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -vcodec copy -acodec ac3 tmp.mkv
+ffmpeg -i "$INPUT" -acodec copy tmp.thd
 
 bd3d
 # full sbs

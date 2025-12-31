@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ ! -e "__MUX_3D_OPTIONS.json" ]] ; then
+    echo "run in bd3d project folder"
+    exit 1
+fi
+
+

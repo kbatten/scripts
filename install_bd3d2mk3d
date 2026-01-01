@@ -38,12 +38,15 @@ ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -an -vcodec copy t
 bd3d
 # full sbs
 # crf 21
-# deselect all audio
 # do not mux
 
 # mv tmp.thd to project directory
 # edit __MUX_3D_OPTIONS.json to remove --ui-language and change audio input to tmp.thd
 mkvmerge @__MUX_3D_OPTIONS.json
+
+or
+
+bd3d-mkvmerge
 '
 
 

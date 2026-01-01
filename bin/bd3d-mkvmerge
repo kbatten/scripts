@@ -5,6 +5,13 @@ if [[ ! -e "__MUX_3D_OPTIONS.json" ]] ; then
     exit 1
 fi
 
-sed -e 's/"en",//g' -e 's/"--ui-language",//g' __MUX_3D_OPTIONS.json
+if [[ ! -e "tmp.thd" ]] ; then
+    echo "copying tmp.thd..."
+    cp ../../tmp.thd .
+fi
 
 
+sed -i -e 's/"en",//g' -e 's/"--ui-language",//g' \
+ -e 's/\/\/ ### Audio stream(s)/\/\/ ### Updated Audio stream(s)\n    "--track-name",\n	"0:English (Original AC3)",\n	"--language",\n	"0:eng",\n	"--default-track",\n	"0:no",\n	"--sync",\n	"0:0",\n	"--compression",\n	"0:none",\n	"--audio-tracks",\n	"0",\n	"tmp.thd",/g' __MUX_3D_OPTIONS.json
+
+mkvmerge @__MUX_3D_OPTIONS.json

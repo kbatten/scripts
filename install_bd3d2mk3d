@@ -36,7 +36,6 @@ INPUT=<FILE>
 ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -an -vcodec copy tmp.mkv
 
 bd3d
-# tools - encode x265
 # full sbs
 # crf 21
 # deselect all audio

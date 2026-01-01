@@ -21,8 +21,6 @@ cp -r "${TANQ_DOWNLOAD_DIR}/BD3D2MK3D/BD3D2MK3D" ~/opt/
 # https://www.mediafire.com/folder/x6f7yqjufdg7c/Groucho's_Avisynth_Stuff
 # https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file
 
-exit
-
 # Look into AviSynth+ - www.github.com/pinterf/AviSynthPlus
 download "https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file" UniversalAvisynthInstaller_20210119.7z
 
@@ -35,7 +33,7 @@ wine "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepositor
 echo '
 bd3d
 INPUT=<FILE>
-ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -vcodec copy tmp.mkv
+ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -an -vcodec copy tmp.mkv
 
 bd3d
 # tools - encode x265

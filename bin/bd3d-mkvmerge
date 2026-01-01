@@ -5,4 +5,6 @@ if [[ ! -e "__MUX_3D_OPTIONS.json" ]] ; then
     exit 1
 fi
 
+sed -e 's/"en",//g' -e 's/"--ui-language",//g' __MUX_3D_OPTIONS.json
+
 

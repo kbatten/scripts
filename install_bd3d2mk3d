@@ -31,6 +31,10 @@ rm -f "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthReposito
 wine "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd"
 
 echo '
+**NOTE**
+This can take up to 30x storage compared to the compressed video in .wine
+********
+
 bd3d
 INPUT=<FILE>
 ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -an -vcodec copy tmp.mkv

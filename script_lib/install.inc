@@ -8,6 +8,11 @@ function download() {
     local directory=${3}
     local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
+    # get the actual download url from mediafire, very fragile
+    if echo "$url" | grep mediafire && echo "$url" | grep "file$" ; then
+        download_mediafire $1 $2 $3
+    fi
+
     if [[ -z "${filename}" ]] ; then
         filename=$(basename "${url}")
     fi
@@ -29,6 +34,11 @@ function download() {
     fi
 
     popd &> /dev/null
+}
+
+function download_mediafire() {
+    url=$(curl $1 | grep 'id="downloadButton"' | sed 's/.*href="//g' | sed 's/".*//g')
+    download "$url" $2 $3
 }
 
 function install_msi() {

@@ -1,0 +1,57 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+
+sudo apt-get install -y mkvtoolnix
+
+install_wine
+wineboot
+
+install_wine_java8
+
+link_bin bd3d
+link_bin bd3d-mkvmerge
+
+download https://download.videohelp.com/r0lZ/BD3D2AVS/BD3D2MK3D.7z BD3D2MK3D.7z BD3D2MK3D
+rm -rf "${HOME}/opt/BD3D2MK3D" || true
+cp -r "${TANQ_DOWNLOAD_DIR}/BD3D2MK3D/BD3D2MK3D" ~/opt/
+
+# https://www.mediafire.com/folder/x6f7yqjufdg7c/Groucho's_Avisynth_Stuff
+# https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file
+
+# Look into AviSynth+ - www.github.com/pinterf/AviSynthPlus
+download "https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file" UniversalAvisynthInstaller_20210119.7z
+
+# remove admin check from save and force 9 for x86
+sed -i.tmp -e 's/if errorlevel 1 goto :noAdmin//g' -e 's/set \/p no=.*/set no=9/g' -e 's/pause//g' "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd"
+rm -f "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd.tmp"
+
+wine "${TANQ_DOWNLOAD_DIR}/UniversalAvisynthInstaller_20210119/AvisynthRepository/setavs.cmd"
+
+echo '
+**NOTE**
+This can take up to 30x storage compared to the compressed video in .wine
+********
+
+bd3d
+INPUT=<FILE>
+ffmpeg -i "$INPUT" -acodec copy tmp.thd && ffmpeg -i "$INPUT" -an -vcodec copy tmp.mkv
+
+bd3d
+# full sbs
+# crf 21
+# do not mux
+
+# mv tmp.thd to project directory
+# edit __MUX_3D_OPTIONS.json to remove --ui-language and change audio input to tmp.thd
+mkvmerge @__MUX_3D_OPTIONS.json
+
+or
+
+bd3d-mkvmerge
+'
+
+
+

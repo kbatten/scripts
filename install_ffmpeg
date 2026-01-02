@@ -11,7 +11,7 @@ if [[ $FROM_SOURCE -eq 0 ]] ; then
 else
     sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential libvidstab-dev libssl-dev libopus-dev libaom-dev
 
-    mkdir -p "${TANQ_DOWNLOAD_DIR}" &> /dev/null
+    mkdir -p "${TANQ_DOWNLOAD_DIR}" || true &> /dev/null
     cd "$TANQ_DOWNLOAD_DIR"
     if [[ -e FFmpeg ]] ; then
       cd FFmpeg

@@ -206,4 +206,30 @@ function install_wine_gecko() {
     install_msi wine-gecko-${GECKO_VERSION}-x86.msi
 }
 
+function install_wine_c() {
+    sudo apt-get install -y winetricks
+    #sudo winetricks --self-update -y
+
+    # cmake
+    download https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-windows-x86_64.msi
+    install_msi cmake-4.2.1-windows-x86_64.msi
+
+    # nmake
+    download "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=community&channel=stable&version=VS18&source=VSLandingPage&cid=2500:067eae3e75eb40fc8159e6389951b9c4" VisualStudioSetup.exe
+
+    install_wine
+    wineboot
+    #xvfb-run winetricks -q corefonts
+    #xvfb-run winetricks -q msxml6
+    xvfb-run winetricks -q arial d3dcompiler_47 && sudo ls &> /dev/null
+    xvfb-run winetricks -q dotnet35 && sudo ls &> /dev/null
+    xvfb-run winetricks -q dotnet46 && sudo ls &> /dev/null
+    xvfb-run winetricks -q dotnet472 && sudo ls &> /dev/null
+    xvfb-run winetricks -q dotnet48 && sudo ls &> /dev/null
+    ##xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
+    #install_exe VisualStudioSetup.exe --quiet
+    xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
+    #xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
+}
+
 sudo apt-get install -y curl || true

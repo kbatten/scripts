@@ -13,6 +13,7 @@ else
 
     download_github git@github.com:FFmpeg/FFmpeg.git
     pushd "${TANQ_DOWNLOAD_DIR}/FFmpeg"
+
     export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH
     ./configure --enable-gpl --enable-libx264 --enable-libx265 --enable-libvidstab --enable-openssl --enable-version3 --enable-libopus --enable-libaom --prefix="$HOME/opt/ffmpeg"
     make

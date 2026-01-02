@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+
+sudo apt-get install -y qrencode imagemagick pwgen
+
+echo "qrencode -t ASCII 'WIFI:S:atari;T:WPA2;P:pitfall;;'"
+echo "qrencode -s 1 -l H -o wifi.png 'WIFI:S:atari;T:WPA2;P:pitfall;;'"
+echo "qrencode -o output.png -t png https://www.youtube.com/watch?v=dQw4w9WgXcQ"

@@ -6,11 +6,7 @@ source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
 
-sudo dpkg --add-architecture i386
-sudo apt-get update
-
-sudo apt-get install -y wine winetricks
-
+install_wine
 wine wineboot
 xvfb-run winetricks -q win10 vcrun2019 cmd
 

@@ -107,6 +107,28 @@ function install_ytdlp() {
     fi
 }
 
+function install_rust() {
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source "$HOME/.cargo/env"
+    rustup update
+}
+
+function download_github() {
+    local url="${1}"
+    local downloaddir="${TANQ_DOWNLOAD_DIR}"
+
+    local dirname="$(rootname $url)"
+
+    mkdir -p "${downloaddir}" &> /dev/null
+    pushd "$downloaddir"
+    if [[ -e "$dirname" ]] ; then
+        cd "$dirname"
+        git pull
+    else
+        git clone "$url"
+    fi
+}
+
 function run() {
     local filename=${1}
     local directory=${2}

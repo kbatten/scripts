@@ -53,5 +53,4 @@ or
 bd3d-mkvmerge
 '
 
-
-
+echo "finished $0"

@@ -22,3 +22,5 @@ wine pip install pyinstaller==${pyinstaller_version}
 
 link_bin pyinstaller-win
 link_bin python3-venv-win
+
+echo "finished $0"

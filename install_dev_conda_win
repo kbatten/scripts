@@ -6,13 +6,11 @@ source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
 
-sudo dpkg --add-architecture i386
-sudo apt-get update
-
-sudo apt-get install -y wine winetricks
-
+install_wine
 wine wineboot
 xvfb-run winetricks -q win10 vcrun2019 cmd
 
 download https://repo.anaconda.com/miniconda/Miniconda3-py38_23.3.1-0-Windows-x86_64.exe
 install_exe Miniconda3-py38_23.3.1-0-Windows-x86_64.exe "/InstallationType=JustMe /AddToPath=1 /RegisterPython=1 /S"
+
+echo "finished $0"

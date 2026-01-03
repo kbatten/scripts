@@ -35,3 +35,5 @@ else
 
     link_bin_external "$HOME/opt/gifski/gifski"
 fi
+
+echo "finished $0"

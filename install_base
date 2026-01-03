@@ -48,3 +48,5 @@ bashrc_export_variable bash_editor EDITOR=vi
 git config --global init.defaultBranch main
 git config --global core.pager cat
 git config --global --replace-all --bool push.autoSetupRemote true
+
+echo "finished $0"

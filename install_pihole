@@ -7,3 +7,5 @@ source ./script_lib/install.inc
 download https://install.pi-hole.net pihole-install.sh
 
 run_bash pihole-install.sh
+
+echo "finished $0"

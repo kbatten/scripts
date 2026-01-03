@@ -9,6 +9,8 @@ link_bin pyinstaller-linux
 
 python3-venv -c pyinstaller pip install pyinstaller==6.17.0
 
+echo "finished $0"
+
 # python3-venv -c <venv>
 # python3-venv <venv> [python] <script.py>
 # python3-venv <venv> pip install pyinstaller

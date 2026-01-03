@@ -5,7 +5,7 @@ source ./script_lib/install.inc
 source ./script_lib/link.inc
 
 name=go
-version=1.19
+version=1.25.5
 filename="${name}${version}.linux-amd64.tar.gz"
 remote="https://go.dev/dl/${filename}"
 
@@ -16,3 +16,5 @@ install_go "${filename}"
 
 link_bin_external "${HOME}/opt/${dirname}/bin/go"
 link_bin_external "${HOME}/opt/${dirname}/bin/gofmt"
+
+echo "finished $0"

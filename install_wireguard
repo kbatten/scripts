@@ -143,3 +143,5 @@ sudo systemctl daemon-reload
 sudo systemctl start wg-quick@wg0
 
 echo "On Router, forward port: $PORT to $(network_get_default_address) ($(network_get_default_interface))"
+
+echo "finished $0"

@@ -17,3 +17,5 @@ install_ytdlp ${filename}
 link_bin_external "${HOME}/opt/${dirname}/yt-dlp_linux" "yt-dlp"
 
 yt-dlp -U
+
+echo "finished $0"

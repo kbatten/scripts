@@ -9,8 +9,7 @@ versionb="170995"
 filename="virtualbox-${version%.*}_${version}-${versionb}~Debian~trixie_amd64.deb"
 remote="https://download.virtualbox.org/virtualbox/${version}/${filename}"
 
-sudo apt-get install -y libqt6core6t64 # libqt6dbus6 libqt6gui6 libqt6help6 libqt6printsupport6 libqt6statemachine6 libqt6widgets6 libqt6xml6 libb2-1 libdouble-conversion3 libpcre2-16-0
-exit
+sudo apt-get install -y libqt6core6t64 libqt6dbus6 libqt6gui6 libqt6help6 libqt6printsupport6 libqt6statemachine6 libqt6widgets6 libqt6xml6 libb2-1 libdouble-conversion3 libpcre2-16-0
 
 #sudo apt-get install -y libxcursor1 libvpx6 libqt5xml5 libqt5x11extras5 libqt5widgets5 libqt5printsupport5 libqt5opengl5 libqt5help5 libqt5gui5 libqt5dbus5 libqt5core5a libgl1 libvulkan1 linux-headers-$(uname -r)
 

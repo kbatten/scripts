@@ -119,6 +119,8 @@ function download_github() {
 
     local dirname="$(rootname $url)"
 
+    pushd . &> /dev/null
+
     mkdir -p "${downloaddir}" &> /dev/null
     pushd "$downloaddir"
     if [[ -e "$dirname" ]] ; then
@@ -127,6 +129,7 @@ function download_github() {
     else
         git clone "$url"
     fi
+    popd &> /dev/null
 }
 
 function run() {

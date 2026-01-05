@@ -5,12 +5,17 @@ source ./script_lib/install.inc
 source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
+MINICONDA_VERSION="313_25.11.1-1"
 
 install_wine
 wine wineboot
 xvfb-run winetricks -q win10 vcrun2019 cmd
 
-download https://repo.anaconda.com/miniconda/Miniconda3-py38_23.3.1-0-Windows-x86_64.exe
-install_exe Miniconda3-py38_23.3.1-0-Windows-x86_64.exe "/InstallationType=JustMe /AddToPath=1 /RegisterPython=1 /S"
+download https://repo.anaconda.com/miniconda/Miniconda3-py${MINICONDA_VERSION}-Windows-x86_64.exe
+if [[ ! -e "${HOME}/.wine/drive_c/users/keith/miniconda3" ]] ; then
+    install_exe Miniconda3-py${MINICONDA_VERSION}-Windows-x86_64.exe "/InstallationType=JustMe /AddToPath=1 /RegisterPython=1 /S"
+else
+    echo "miniconda3 already installed"
+fi
 
 echo "finished $0"

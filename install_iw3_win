@@ -1,0 +1,41 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+
+./install_dev_python_win
+xvfb-run winetricks -q vcrun2019
+
+python3-venv-win -c iw3 python.exe -m pip install --upgrade pip
+
+
+function install_nunif() {
+    # c86aabe716017fe4d873d42d1c4254b862b16195
+    download_github https://github.com/nagadomi/nunif
+
+    python3-venv-win -c iw3 python.exe -m pip install --upgrade setuptools
+
+    pushd "${TANQ_DOWNLOAD_DIR}"/nunif
+
+    python3-venv-win -c iw3 pip install -r requirements-torch.txt
+
+    sed -i.tmp 's/av==\(15.0.0\)$/--only-binary=:all: av==\1/g' requirements.txt
+    rm -f requirements.txt.tmp
+    python3-venv-win -c iw3 pip install -r requirements.txt
+
+    python3-venv-win -c iw3 pip install -r requirements-gui.txt
+
+    sed  -e 's/^from \. /from iw3 /g' -e 's/from \.\([^ ]\)/from iw3.\1/g' iw3/download_models.py > iw3_download_models.py
+    sed  -e 's/^from \. /from iw3 /g' -e 's/from \.\([^ ]\)/from iw3.\1/g' iw3/gui.py > iw3_gui.py
+    sed  -e 's/^from \. /from iw3.desktop /g' -e 's/from \.\([^ ]\)/from iw3.desktop.\1/g' iw3/desktop/__main__.py > iw3_desktop.py
+
+    popd
+}
+
+install_nunif
+
+echo "pyinstaller-win --venv iw3 tmp/tryit.py"
+echo "pyinstaller-win --venv iw3 --noconfirm --collect-submodules torch --collect-submodules timm --onefile iw3_download_models.py"
+
+echo "finished $0"

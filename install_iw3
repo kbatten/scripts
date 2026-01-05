@@ -10,7 +10,11 @@ download_github https://github.com/nagadomi/nunif
 
 python3-venv-win -c iw3 pip install --upgrade setuptools
 
-#TODO: install https://wiki.python.org/moin/WindowsCompilers
+# install https://wiki.python.org/moin/WindowsCompilers
+# https://visualstudio.microsoft.com/vs/older-downloads/#microsoft-build-tools-2015
+download https://download.microsoft.com/download/5/F/7/5F7ACAEB-8363-451F-9425-68A90F98B238/visualcppbuildtools_full.exe
+
+install_exe visualcppbuildtools_full.exe
 
 python3-venv-win -c iw3 pip install -r requirements.txt
 exit

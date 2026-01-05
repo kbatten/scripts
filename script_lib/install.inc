@@ -210,26 +210,27 @@ function install_wine_c() {
     sudo apt-get install -y winetricks
     #sudo winetricks --self-update -y
 
-    # cmake
-    download https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-windows-x86_64.msi
-    install_msi cmake-4.2.1-windows-x86_64.msi
+    ## cmake
+    #download https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-windows-x86_64.msi
+    #install_msi cmake-4.2.1-windows-x86_64.msi
 
-    # nmake
-    download "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=community&channel=stable&version=VS18&source=VSLandingPage&cid=2500:067eae3e75eb40fc8159e6389951b9c4" VisualStudioSetup.exe
+    ## nmake
+    #download "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=community&channel=stable&version=VS18&source=VSLandingPage&cid=2500:067eae3e75eb40fc8159e6389951b9c4" VisualStudioSetup.exe
+
+    download "https://download.visualstudio.microsoft.com/download/pr/6efb3484-905b-485c-8b5f-9d3a5f39e731/07908cd6d91e75b8ea4339d8f2cfa6e8d8bb4fd706af7b918ae391cd6fc2a066/vs_BuildTools.exe" vs_BuildTools.exe
 
     install_wine
-    wineboot
+    wineboot && sudo ls &> /dev/null
     #xvfb-run winetricks -q corefonts
     #xvfb-run winetricks -q msxml6
-    xvfb-run winetricks -q arial d3dcompiler_47 && sudo ls &> /dev/null
+    #xvfb-run winetricks -q arial d3dcompiler_47 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet35 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet46 && sudo ls &> /dev/null
-    xvfb-run winetricks -q dotnet472 && sudo ls &> /dev/null
-    xvfb-run winetricks -q dotnet48 && sudo ls &> /dev/null
+    #xvfb-run winetricks -q dotnet472 && sudo ls &> /dev/null
+    #xvfb-run winetricks -q dotnet48 && sudo ls &> /dev/null
     ##xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
-    #install_exe VisualStudioSetup.exe --quiet
     xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
-    #xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
+    install_exe vs_BuildTools.exe --quiet
 }
 
 sudo apt-get install -y curl || true

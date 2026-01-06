@@ -233,7 +233,7 @@ function install_wine_c() {
     #install_exe vs_BuildTools.exe --quiet
     #echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine vs_BuildTools.exe"
     #install_exe "visualcppbuildtools_full.exe" "/Full /Q /NoRefresh /NoRestart"
-    echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine visualcppbuildtools_full.exe /Full /NoRefresh /NoRestart /Passive /Log visualcppbuildtools_full.exe.log.txt"
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine visualcppbuildtools_full.exe /Full /Passive /Log visualcppbuildtools_full.exe.log.txt"
     find ~ -iname cmake.exe ; find ~ -iname nmake.exe
     read
 }

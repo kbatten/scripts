@@ -223,14 +223,19 @@ function install_wine_c() {
     wineboot && sudo ls &> /dev/null
     #xvfb-run winetricks -q corefonts
     #xvfb-run winetricks -q msxml6
-    #xvfb-run winetricks -q arial d3dcompiler_47 && sudo ls &> /dev/null
+    xvfb-run winetricks -q arial d3dcompiler_47 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet35 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet46 && sudo ls &> /dev/null
     #xvfb-run winetricks -q dotnet472 && sudo ls &> /dev/null
     #xvfb-run winetricks -q dotnet48 && sudo ls &> /dev/null
     ##xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
     xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
-    install_exe vs_BuildTools.exe --quiet
+    #install_exe vs_BuildTools.exe --quiet
+    #echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine vs_BuildTools.exe"
+    #install_exe "visualcppbuildtools_full.exe" "/Full /Q /NoRefresh /NoRestart"
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine visualcppbuildtools_full.exe /Full /NoRefresh /NoRestart"
+    find ~ -iname cmake.exe ; find ~ -iname nmake.exe
+    read
 }
 
 sudo apt-get install -y curl || true

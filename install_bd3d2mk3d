@@ -24,9 +24,6 @@ cp -r "${TANQ_DOWNLOAD_DIR}/BD3D2MK3D/BD3D2MK3D" ~/opt/
 # https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file
 
 if [[ $AVISYNTHPLUS -eq 1 ]] ; then
-    export WINEARCH=win32
-    export WINEPREFIX="$HOME/.wine-msvc"
-
     install_wine_c
 
     if [[ -e AviSynthPlus ]] ; then

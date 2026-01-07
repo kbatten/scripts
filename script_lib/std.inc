@@ -1,3 +1,6 @@
+export WINEARCH=win64
+export WINEPREFIX="$HOME/.wine"
+
 function extname() {
     local filename="$(basename "${1}")"
     if [[ "$(echo "${filename}" | grep "\..*\." | sed 's/^.*\.\([^.]*\)\.[^.]*$/\1/')" == "tar" ]] ; then

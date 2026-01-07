@@ -240,7 +240,7 @@ function install_wine_c_vs_BuildTools() {
     download "https://download.visualstudio.microsoft.com/download/pr/6efb3484-905b-485c-8b5f-9d3a5f39e731/07908cd6d91e75b8ea4339d8f2cfa6e8d8bb4fd706af7b918ae391cd6fc2a066/vs_BuildTools.exe"
 
     #install_exe vs_BuildTools.exe --quiet
-    echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine vs_BuildTools.exe --passive" > "${TANQ_DOWNLOAD_DIR}"/vs_BuildTools.sh
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine vs_BuildTools.exe" > "${TANQ_DOWNLOAD_DIR}"/vs_BuildTools.sh
     echo "bash ./vs_BuildTools.sh"
 }
 

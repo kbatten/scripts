@@ -234,7 +234,8 @@ function install_wine_c() {
     echo "*** PAUSED ***"
     read
 
-    install_wine_c_vs_BuildTools
+    #install_wine_c_vs_BuildTools
+    install_wine_c_visualcppbuildtools_full
 
     find ~ -iname cmake.exe ; find ~ -iname nmake.exe
     read

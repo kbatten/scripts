@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROM_SRC="$1"
+
+echo "TI-89 dev + emulator setup for Debian"
+echo
+
+if [[ "${EUID}" -eq 0 ]]; then
+  echo "Please run as a normal user (it will use sudo when needed)."
+  exit 1
+fi
+
+need_cmd() {
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "Missing required command: $1"
+    exit 1
+  }
+}
+
+need_cmd sudo
+
+if [[ ! -f "$ROM_SRC" ]]; then
+  echo "ROM file not found at:"
+  echo "$ROM_SRC"
+  exit 1
+fi
+
+if [[ ! -r "$ROM_SRC" ]]; then
+  echo "ROM file exists but is not readable (permission or mount options):"
+  echo "$ROM_SRC"
+  echo "Fix permissions or copy it into your home folder and update ROM_SRC."
+  exit 1
+fi
+
+echo "Installing distro packages (tiemu, tilp, build deps)..."
+sudo apt-get update
+sudo apt-get install -y \
+  tiemu tilp2 \
+  git curl ca-certificates \
+  build-essential autoconf automake libtool pkg-config \
+  libgmp-dev libmpfr-dev libmpc-dev \
+  libgtk2.0-0 libgtk2.0-dev \
+  xdotool || true
+
+echo
+echo "Installing GCC4TI (TIGCC toolchain) to /usr/local/share/gcc4ti ..."
+workdir="$(mktemp -d)"
+trap 'rm -rf "$workdir"' EXIT
+
+cd "$workdir"
+git clone https://github.com/debrouxl/gcc4ti
+cd gcc4ti/trunk/tigcc-linux/scripts/
+
+echo "Updating GCC4TI sources..."
+sudo ./updatesrc
+
+cd ../gcc4ti-0.96b11
+
+echo "Running GCC4TI installer (attempting default answers)..."
+if ! yes "" | sudo scripts/Install; then
+  echo
+  echo "Installer needed manual input."
+  echo "Re-running interactively. Press Enter to accept defaults when prompted."
+  sudo scripts/Install
+fi
+
+echo
+echo "Setting up environment variables..."
+GCC4TI_ROOT="/usr/local/share/gcc4ti"
+PROFILE_SNIPPET="$HOME/.bashrc"
+
+if ! grep -q 'export TIGCC=/usr/local/share/gcc4ti' "$PROFILE_SNIPPET" 2>/dev/null; then
+  {
+    echo
+    echo "# GCC4TI / TIGCC"
+    echo "export TIGCC=${GCC4TI_ROOT}"
+    echo 'export PATH="$PATH:/usr/local/share/gcc4ti/bin"'
+  } >> "$PROFILE_SNIPPET"
+fi
+
+export TIGCC="${GCC4TI_ROOT}"
+export PATH="$PATH:${GCC4TI_ROOT}/bin"
+
+echo
+echo "Verifying toolchain..."
+need_cmd tigcc
+
+echo
+echo "Creating hello world program..."
+projdir="$HOME/ti89_hello"
+mkdir -p "$projdir"
+cd "$projdir"
+
+cat > hello.c <<'EOF'
+#include <tigcclib.h>
+
+void _main(void) {
+  ClrScr();
+  DrawStr(0, 0, "Hello, World!", A_NORMAL);
+  ngetchx();
+}
+EOF
+
+echo "Compiling with tigcc..."
+tigcc -O2 hello.c
+
+if [[ ! -f "hello.89z" ]]; then
+  echo "Expected output hello.89z not found. Listing directory:"
+  ls -la
+  exit 1
+fi
+
+echo
+echo "Starting TiEmu using your ROM file so it can be imported and used..."
+echo "ROM: $ROM_SRC"
+echo "If TiEmu shows a first-run wizard, complete it until you can see the HOME screen."
+echo
+
+# Launch TiEmu with the ROM path. Per tiemu(1), passing a ROM file will convert it and add it to the image repository. :contentReference[oaicite:0]{index=0}
+( tiemu "$ROM_SRC" >/dev/null 2>&1 & )
+sleep 3
+
+echo
+echo "Best-effort config for virtual link (so TiLP can send files)..."
+TIEMU_CFG="$HOME/.tiemu"
+if [[ -f "$TIEMU_CFG" ]]; then
+  if grep -q '^linktype=' "$TIEMU_CFG"; then
+    sed -i 's/^linktype=.*/linktype=virtual/' "$TIEMU_CFG"
+  else
+    echo "linktype=virtual" >> "$TIEMU_CFG"
+  fi
+
+  if grep -q '^port=' "$TIEMU_CFG"; then
+    sed -i 's/^port=.*/port=1/' "$TIEMU_CFG"
+  else
+    echo "port=1" >> "$TIEMU_CFG"
+  fi
+
+  # For TI-89 Titanium / "Platinum" ROMs, ti89t is commonly the right model.
+  if grep -q '^calctype=' "$TIEMU_CFG"; then
+    sed -i 's/^calctype=.*/calctype=ti89t/' "$TIEMU_CFG"
+  else
+    echo "calctype=ti89t" >> "$TIEMU_CFG"
+  fi
+
+  # Ensure RC_END exists (required by config format). :contentReference[oaicite:1]{index=1}
+  if ! tail -n 1 "$TIEMU_CFG" | grep -q 'RC_END'; then
+    echo "RC_END" >> "$TIEMU_CFG"
+  fi
+else
+  echo "No $TIEMU_CFG yet. If this is your first run, finish the TiEmu wizard,"
+  echo "close TiEmu once, then re-run this script to auto-configure the link."
+fi
+
+echo
+echo "Sending hello.89z into the emulator via TiLP (TiEmu virtual link, port 1)..."
+set +e
+tilp --calc=ti89 --cable=TiEmu --port=1 --no-gui --silent "$projdir/hello.89z"
+rc=$?
+set -e
+
+if [[ $rc -ne 0 ]]; then
+  echo
+  echo "Transfer failed (exit code $rc). Common fixes:"
+  echo "1) In TiEmu, make sure you reached the HOME screen."
+  echo "2) In TiEmu link settings, enable virtual link on port 1."
+  echo "3) Close and re-open TiEmu, then run this script again."
+  exit 1
+fi
+
+echo
+echo "Transfer succeeded."
+echo
+
+echo "Attempting to auto-run the program (optional)..."
+if command -v xdotool >/dev/null 2>&1 && [[ -n "${DISPLAY:-}" ]]; then
+  xdotool search --name "TiEmu" windowactivate --sync 2>/dev/null || true
+  sleep 0.5
+  xdotool type --delay 60 "hello()" 2>/dev/null || true
+  xdotool key Return 2>/dev/null || true
+  echo "If the program did not start, use the manual run steps below."
+else
+  echo "xdotool or DISPLAY not available, skipping auto-run."
+fi
+
+echo
+echo "Manual run steps inside TiEmu (if needed):"
+echo "1) Go to the HOME screen."
+echo '2) Type: hello() then press Enter.'
+echo "3) If that does not work, use VAR-LINK or the catalog to find and run 'hello'."
+echo
+echo "Done. Your project is in: $projdir"
+

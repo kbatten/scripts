@@ -245,6 +245,7 @@ function install_wine_c_vs_BuildTools() {
     #install_exe vs_BuildTools.exe --quiet
     echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine vs_BuildTools.exe" > "${TANQ_DOWNLOAD_DIR}"/vs_BuildTools.sh
     echo "bash ./vs_BuildTools.sh"
+    read
 }
 
 function install_wine_c_visualcppbuildtools_full() {
@@ -253,6 +254,7 @@ function install_wine_c_visualcppbuildtools_full() {
     #install_exe "visualcppbuildtools_full.exe" "/Full /Q /NoRefresh /NoRestart"
     echo "export WINEARCH=$WINEARCH; export WINEPREFIX="$HOME/.wine-msvc" ; wine visualcppbuildtools_full.exe /Full /Passive /Log visualcppbuildtools_full.exe.log.txt" > "${TANQ_DOWNLOAD_DIR}"/visualcppbuildtools_full.sh
     echo "bash ./visualcppbuildtools_full.sh"
+    read
 }
 
 sudo apt-get install -y curl || true

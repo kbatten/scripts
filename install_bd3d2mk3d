@@ -27,7 +27,7 @@ if [[ $AVISYNTHPLUS -eq 1 ]] ; then
     install_wine_c
 
     download_github git@github.com:pinterf/AviSynthPlus.git
-    pushd "${TANQ_DOWNLOAD_DIR}/AviSyntPlus"
+    pushd "${TANQ_DOWNLOAD_DIR}/AviSynthPlus"
 
     mkdir avisynth-build &> /dev/null || true
     cd avisynth-build

@@ -26,20 +26,16 @@ cp -r "${TANQ_DOWNLOAD_DIR}/BD3D2MK3D/BD3D2MK3D" ~/opt/
 if [[ $AVISYNTHPLUS -eq 1 ]] ; then
     install_wine_c
 
-    if [[ -e AviSynthPlus ]] ; then
-        cd AviSynthPlus
-        git pull
-    else
-        git clone git@github.com:pinterf/AviSynthPlus.git
-        cd AviSynthPlus
-    fi
+    download_github git@github.com:pinterf/AviSynthPlus.git
+    pushd "${TANQ_DOWNLOAD_DIR}/AviSyntPlus"
+
     mkdir avisynth-build &> /dev/null || true
     cd avisynth-build
     wine cmake ..\\ -DHEADERS_ONLY:bool=on
     wine make VersionGen install
     find "$WINEPREFIX" -iname cmake*
     find "$WINEPREFIX" -iname nmake*
-    cd ..
+    popd
 else
     download "https://www.mediafire.com/file/lpn7r702r38l3k6/UniversalAvisynthInstaller_20210119.7z/file" UniversalAvisynthInstaller_20210119.7z
 

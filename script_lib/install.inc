@@ -230,6 +230,9 @@ function install_wine_c() {
     ##xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
     xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
 
+    echo "*** PAUSED ***"
+    read
+
     install_wine_c_vs_BuildTools
 
     find ~ -iname cmake.exe ; find ~ -iname nmake.exe

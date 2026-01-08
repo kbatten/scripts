@@ -217,23 +217,24 @@ function install_wine_c() {
 
     install_wine
     wineboot && sudo ls &> /dev/null
-    #xvfb-run winetricks -q corefonts
+    xvfb-run winetricks -q corefonts vcrun2015
     #xvfb-run winetricks -q msxml6
     xvfb-run winetricks -q arial d3dcompiler_47 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet35 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet46 && sudo ls &> /dev/null
-    #xvfb-run winetricks -q dotnet472 && sudo ls &> /dev/null
-    #xvfb-run winetricks -q dotnet48 && sudo ls &> /dev/null
-    ##xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
+    xvfb-run winetricks -q dotnet472 && sudo ls &> /dev/null
+    xxvfb-run winetricks -q dotnet48 && sudo ls &> /dev/null
+    #xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
     xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
+    wine winecfg -v win10
 
     echo "*** PAUSED ***"
     read
 
-    #install_wine_c_vs_BuildTools
+    install_wine_c_vs_BuildTools
     #install_wine_c_visualcppbuildtools_full
     #install_wine_c_buildtools
-    install_wine_c_VisualStudioSetup
+    #install_wine_c_VisualStudioSetup
 
     find ~ -iname cmake.exe ; find ~ -iname nmake.exe
     read
@@ -244,16 +245,17 @@ function install_wine_c_VisualStudioSetup() {
     #downlaod "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=community&channel=stable&version=VS18&source=VSLandingPage&cid=2500:067eae3e75eb40fc8159e6389951b9c4" VisualStudioSetup.exe
 
     #install_exe VisualStudioSetup.exe --quiet
-    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine VisualStudioSetup.exe" > "${TANQ_DOWNLOAD_DIR}"/VisualStudioSetup.sh
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine VisualStudioSetup.exe &> VisualStudioSetup.log" > "${TANQ_DOWNLOAD_DIR}"/VisualStudioSetup.sh
     echo "bash ./VisualStudioSetup.sh"
     read
 }
 
 function install_wine_c_vs_BuildTools() {
-    download "https://download.visualstudio.microsoft.com/download/pr/6efb3484-905b-485c-8b5f-9d3a5f39e731/07908cd6d91e75b8ea4339d8f2cfa6e8d8bb4fd706af7b918ae391cd6fc2a066/vs_BuildTools.exe"
+    #download "https://download.visualstudio.microsoft.com/download/pr/6efb3484-905b-485c-8b5f-9d3a5f39e731/07908cd6d91e75b8ea4339d8f2cfa6e8d8bb4fd706af7b918ae391cd6fc2a066/vs_BuildTools.exe"
+    download "https://download.visualstudio.microsoft.com/download/pr/a80deb24-6a28-4d30-b99f-13b6e89c9727/5607a31b3fdb3436ba6d8ad26c1c67e4f7bdba79884daf45d59dc6be23801909/vs_BuildTools.exe"
 
     #install_exe vs_BuildTools.exe --quiet
-    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine vs_BuildTools.exe" > "${TANQ_DOWNLOAD_DIR}"/vs_BuildTools.sh
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine vs_BuildTools.exe &> vs_BuildTools.log" > "${TANQ_DOWNLOAD_DIR}"/vs_BuildTools.sh
     echo "bash ./vs_BuildTools.sh"
     read
 }
@@ -262,7 +264,8 @@ function install_wine_c_visualcppbuildtools_full() {
     download https://download.microsoft.com/download/5/F/7/5F7ACAEB-8363-451F-9425-68A90F98B238/visualcppbuildtools_full.exe
 
     #install_exe "visualcppbuildtools_full.exe" "/Full /Q /NoRefresh /NoRestart"
-    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine visualcppbuildtools_full.exe /Full /Passive /Log visualcppbuildtools_full.exe.log.txt" > "${TANQ_DOWNLOAD_DIR}"/visualcppbuildtools_full.sh
+    rm -f visualcppbuildtools_full.log &> /dev/null || true
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine visualcppbuildtools_full.exe /Full /Passive /Log visualcppbuildtools_full.log" > "${TANQ_DOWNLOAD_DIR}"/visualcppbuildtools_full.sh
     echo "bash ./visualcppbuildtools_full.sh"
     read
 }
@@ -270,7 +273,7 @@ function install_wine_c_visualcppbuildtools_full() {
 function install_wine_c_buildtools() {
     download https://download.microsoft.com/download/e/e/d/eedf18a8-4aed-4ce0-bebe-70a83094fc5a/BuildTools_Full.exe
 
-    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine BuildTools_Full.exe" > "${TANQ_DOWNLOAD_DIR}"/BuildTools_Full.sh
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine BuildTools_Full.exe &> BuildTools_Full.log" > "${TANQ_DOWNLOAD_DIR}"/BuildTools_Full.sh
     echo "bash ./BuildTools_Full.sh"
     read
 }

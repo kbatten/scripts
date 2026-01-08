@@ -235,7 +235,8 @@ function install_wine_c() {
     read
 
     #install_wine_c_vs_BuildTools
-    install_wine_c_visualcppbuildtools_full
+    #install_wine_c_visualcppbuildtools_full
+    install_wine_c_buildtools
 
     find ~ -iname cmake.exe ; find ~ -iname nmake.exe
     read
@@ -256,6 +257,14 @@ function install_wine_c_visualcppbuildtools_full() {
     #install_exe "visualcppbuildtools_full.exe" "/Full /Q /NoRefresh /NoRestart"
     echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine visualcppbuildtools_full.exe /Full /Passive /Log visualcppbuildtools_full.exe.log.txt" > "${TANQ_DOWNLOAD_DIR}"/visualcppbuildtools_full.sh
     echo "bash ./visualcppbuildtools_full.sh"
+    read
+}
+
+function install_wine_c_buildtools() {
+    download https://download.microsoft.com/download/e/e/d/eedf18a8-4aed-4ce0-bebe-70a83094fc5a/BuildTools_Full.exe
+
+    echo "export WINEARCH=$WINEARCH; export WINEPREFIX=$WINEPREFIX ; wine BuildTools_Full.exe" > "${TANQ_DOWNLOAD_DIR}"/BuildTools_Full.sh
+    echo "bash ./BuildTools_Full.sh"
     read
 }
 

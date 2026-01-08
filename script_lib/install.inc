@@ -218,22 +218,22 @@ function install_wine_c() {
     install_wine
     wineboot && sudo ls &> /dev/null
     xvfb-run winetricks -q corefonts vcrun2015
-    #xvfb-run winetricks -q msxml6
+    xvfb-run winetricks -q msxml6
     xvfb-run winetricks -q arial d3dcompiler_47 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet35 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet46 && sudo ls &> /dev/null
     xvfb-run winetricks -q dotnet472 && sudo ls &> /dev/null
     xxvfb-run winetricks -q dotnet48 && sudo ls &> /dev/null
-    #xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
+    xvfb-run winetricks -q dotnet8 --silent && sudo ls &> /dev/null
     xvfb-run winetricks -q vstools2019 && sudo ls &> /dev/null
     wine winecfg -v win10
 
     echo "*** PAUSED ***"
     read
 
-    #install_wine_c_vs_BuildTools
-    #install_wine_c_visualcppbuildtools_full
-    #install_wine_c_buildtools
+    install_wine_c_vs_BuildTools
+    install_wine_c_visualcppbuildtools_full
+    install_wine_c_buildtools
     install_wine_c_VisualStudioSetup
 
     find ~ -iname cmake.exe ; find ~ -iname nmake.exe

@@ -239,7 +239,7 @@ function install_wine_c() {
     read
 }
 
-function install_wine_c_VisualStudioSetup.exe() {
+function install_wine_c_VisualStudioSetup() {
     download "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=community&channel=stable&version=VS18&source=VSLandingPage&cid=2500:5b395c81dcbf47f8b547f64c9a340170" VisualStudioSetup.exe
     #downlaod "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=community&channel=stable&version=VS18&source=VSLandingPage&cid=2500:067eae3e75eb40fc8159e6389951b9c4" VisualStudioSetup.exe
 

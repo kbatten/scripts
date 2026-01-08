@@ -189,6 +189,7 @@ function install_wine()
     sudo apt-get install -y wine32
     sudo apt-get install -y winbind
     sudo apt-get install -y winetricks
+    wine winecfg -v win10
 }
 
 function install_wine_java8() {

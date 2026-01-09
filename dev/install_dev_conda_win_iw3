@@ -1,0 +1,39 @@
+#!/bin/bash
+
+CUDA=12.8
+
+./install_dev_conda_win
+
+mkdir -p ~/src/tryit &> /dev/null
+cd ~/src/tryit
+
+echo "name: iw3
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python >= 3.13
+  - numpy>=1.25
+  - pytorch>=2.0.1
+  - pytorch-cuda=${CUDA}
+  - cudatoolkit=${CUDA}
+  - pyinstaller" \
+     > environment.yml
+
+if [[ ! -e "trycuda.py" ]] ; then
+    echo 'import torch
+train_on_gpu = torch.cuda.is_available()
+if train_on_gpu:
+    print("CUDA is available, Training on GPU ...")
+else:
+    print("CUDA is not available! Training on CPU ...")' > trycuda.py
+fi
+
+wine conda env create -f environment.yml
+wine conda info
+wine conda env list
+
+
+echo "make sure to install nvidia cuda tools version ${CUDA}"
+echo "git clean -dfx && wine cmd /c conda activate iw3 \"&&\" pyinstaller --onefile <filename>.py"

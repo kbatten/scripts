@@ -125,6 +125,7 @@ function download_github() {
     pushd "$downloaddir"
     if [[ -e "$dirname" ]] ; then
         cd "$dirname"
+        git reset HEAD --hard
         git pull
     else
         git clone "$url"

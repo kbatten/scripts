@@ -20,10 +20,9 @@ sed -i.tmp 's/av==\(15.0.0\)$/--only-binary=:all: av==\1/g' requirements.txt
 rm -f requirements.txt.tmp
 python3-venv-win -c iw3 pip install -r requirements.txt
 
+python3-venv-win -c iw3 python -m iw3.download_models
+
 popd
 
-exit
-
-python -m iw3.download_models
 
 echo "finished $0"

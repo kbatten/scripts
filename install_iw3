@@ -15,6 +15,7 @@ python3-venv-win -c iw3 pip install --upgrade setuptools
 #download https://download.microsoft.com/download/5/F/7/5F7ACAEB-8363-451F-9425-68A90F98B238/visualcppbuildtools_full.exe
 
 pushd "${TANQ_DOWNLOAD_DIR}"/nunif
+python3-venv-win -c iw3 pip install --only-binary=:all: av
 python3-venv-win -c iw3 pip install -r requirements.txt
 popd
 exit

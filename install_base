@@ -22,6 +22,8 @@ link_bash_completion bsync
 
 link_bin upgrayedd
 
+upgrayedd -y
+
 if [[ -e ../profile_dirs ]] ; then
     link_bin_external ../profile_dirs/profile_dirs.py profile_dirs
 else

@@ -5,6 +5,7 @@ source ./script_lib/install.inc
 source ./script_lib/link.inc
 
 ./install_dev_python_win
+python3-venv-win -c iw3 python.exe -m pip install --upgrade pip
 
 download_github https://github.com/nagadomi/nunif
 
@@ -18,7 +19,7 @@ sed -i.tmp 's/av==\(15.0.0\)$/--only-binary=:all: av==\1/g' requirements.txt
 rm -f requirements.txt.tmp
 python3-venv-win -c iw3 pip install -r requirements.txt
 
-#python3-venv-win -c iw3 python -m iw3.download_models
+python3-venv-win -c iw3 pip install -r requirements-gui.txt
 
 popd
 

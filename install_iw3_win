@@ -26,6 +26,7 @@ python3-venv-win -c iw3 pip install -r requirements-gui.txt
 
 popd
 
+echo "pyinstaller-win --venv iw3 tmp/tryit.py"
 echo "pyinstaller-win --venv iw3 download_models.py"
 
 echo "finished $0"

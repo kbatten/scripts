@@ -5,7 +5,7 @@ source ./script_lib/install.inc
 source ./script_lib/link.inc
 
 ./install_dev_python_win
-xvfb-run winetricks -q win10 vcrun2019 cmd
+xvfb-run winetricks -q vcrun2019
 
 python3-venv-win -c iw3 python.exe -m pip install --upgrade pip
 

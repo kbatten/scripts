@@ -5,8 +5,11 @@ source ./script_lib/install.inc
 source ./script_lib/link.inc
 
 ./install_dev_python_win
+xvfb-run winetricks -q win10 vcrun2019 cmd
+
 python3-venv-win -c iw3 python.exe -m pip install --upgrade pip
 
+# c86aabe716017fe4d873d42d1c4254b862b16195
 download_github https://github.com/nagadomi/nunif
 
 python3-venv-win -c iw3 python.exe -m pip install --upgrade setuptools
@@ -23,5 +26,6 @@ python3-venv-win -c iw3 pip install -r requirements-gui.txt
 
 popd
 
+echo "pyinstaller-win --venv iw3 download_models.py"
 
 echo "finished $0"

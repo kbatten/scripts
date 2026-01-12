@@ -11,5 +11,5 @@ if [[ -e "$HOME/.wine/drive_c/users/$USER/.virtualenvs/ntfs/Lib/site-packages/nt
     apply_patch "ntfutils.patch" "$HOME/.wine/drive_c/users/$USER/.virtualenvs/ntfs/Lib/site-packages/"
 fi
 
-# pyinstaller-win --venv ntfs -- --uac-admin linkssd.py
-# pyinstaller-win --venv ntfs profile_dirs.py
+echo "pyinstaller-win --venv ntfs -- --uac-admin linkssd.py"
+echo "pyinstaller-win --venv ntfs profile_dirs.py"

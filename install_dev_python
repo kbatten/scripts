@@ -2,7 +2,7 @@
 
 source ./script_lib/link.inc
 
-sudo apt-get install -y python3-pip python3-venv binutils nfs-common net-tools ipython3 libfreetype6-dev libjpeg-dev python3-pillow
+sudo apt-get install -y python3-pip python3-venv binutils nfs-common net-tools ipython3 libfreetype6-dev libjpeg-dev python3-pillow pkg-config libgtk-3-dev
 
 link_bin python3-venv
 link_bin pyinstaller-linux

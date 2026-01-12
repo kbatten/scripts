@@ -21,8 +21,6 @@ export TMP=~/tmp
 
 python3-venv -c iw3 pip install -r requirements-torch.txt
 python3-venv -c iw3 pip install -r requirements.txt
-#sed -i.tmp 's/av==\(15.0.0\)$/--only-binary=:all: av==\1/g' requirements.txt
-#rm -f requirements.txt.tmp
 
 python3-venv -c iw3 pip install -r requirements-gui.txt
 

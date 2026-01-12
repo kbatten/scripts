@@ -1,0 +1,29 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+
+./install_dev_python
+
+python3-venv -c iw3 python -m pip install --upgrade pip
+
+# c86aabe716017fe4d873d42d1c4254b862b16195
+download_github https://github.com/nagadomi/nunif
+
+python3-venv -c iw3 python -m pip install --upgrade setuptools
+
+pushd "${TANQ_DOWNLOAD_DIR}"/nunif
+
+
+mkdir -p ~/tmp
+export TMP=~/tmp
+
+python3-venv -c iw3 pip install -r requirements-torch.txt
+python3-venv -c iw3 pip install -r requirements.txt
+
+python3-venv -c iw3 pip install -r requirements-gui.txt
+
+popd
+
+echo "finished $0"

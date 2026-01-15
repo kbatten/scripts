@@ -24,6 +24,10 @@ python3-venv-win -c iw3 pip install -r requirements.txt
 
 python3-venv-win -c iw3 pip install -r requirements-gui.txt
 
+sed  -e 's/^from \. /from iw3 /g' -e 's/from \.\([^ ]\)/from iw3.\1/g' iw3/download_models.py > iw3_download_models.py
+sed  -e 's/^from \. /from iw3 /g' -e 's/from \.\([^ ]\)/from iw3.\1/g' iw3/gui.py > iw3_gui.py
+sed  -e 's/^from \. /from iw3.desktop /g' -e 's/from \.\([^ ]\)/from iw3.desktop.\1/g' iw3/desktop/__main__.py > iw3_desktop.py
+
 popd
 
 echo "pyinstaller-win --venv iw3 tmp/tryit.py"

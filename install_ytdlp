@@ -14,7 +14,11 @@ dirname="$(rootname "${filename}")"
 download "${remote}" "${filename}"
 install_ytdlp ${filename}
 
-curl -fsSL https://deno.land/install.sh | sh
+mkdir ~/tmp &> /dev/null || true
+pushd ~/tmp
+curl -o deno.sh -fsSL https://deno.land/install.sh
+bash ./deno.sh -y
+popd
 
 link_bin_external "${HOME}/opt/${dirname}/yt-dlp_linux" "yt-dlp"
 

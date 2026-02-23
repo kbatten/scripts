@@ -1,9 +1,38 @@
 #!/bin/bash
 
-if [[ "$!" == "--onedir" ]] ; then
-    ARGS="--onedir"
-else
-    ARGS="--onefile"
-fi
+ARGS="--onefile"
+CMD=""
+PATHS=""
+PYINSTALLER="${HOME}/.virtualenvs/pyinstaller/bin/pyinstaller"
+METADATA=""
+for arg in "$@"; do
+    case "$arg" in
+        '--help')
+            echo "$0 [--onedir] [--venv <venv>]"
+            exit
+            ;;
+        '--onedir')
+            shift
+            ARGS="--onedir"
+            ;;
+        '--venv')
+            shift
+            python3-venv -c $1 ${HOME}/.virtualenvs/${1}/bin/pip install pyinstaller
+            PYINSTALLER="${HOME}/.virtualenvs/${1}/bin/python ${HOME}/.virtualenvs/${1}/bin/pyinstaller"
+            CMD="python3-venv -c $1"
+            PATHS="--paths $(ls -d ${HOME}/.virtualenvs/${1}/lib/*/site-packages)"
+            shift
+            ;;
+        '--metadata')
+            shift
+            METADATA="${METADATA} --copy-metadata $1 "
+            shift
+            ;;
+        '--')
+            shift
+            break
+            ;;
+    esac
+done
 
-python3-venv pyinstaller-linux ~/.virtualenvs/pyinstaller/bin/pyinstaller ${ARGS} $@
+${CMD} "${PYINSTALLER} ${METADATA} ${PATHS} ${ARGS} $@"

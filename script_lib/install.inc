@@ -184,6 +184,24 @@ function apply_patch() {
     popd
 }
 
+function install_wine_latest()
+{
+    sudo dpkg --add-architecture i386
+
+    download https://dl.winehq.org/wine-builds/winehq.key
+    sudo mkdir -pm755 /etc/apt/keyrings
+    sudo rm -f /etc/apt/keyrings/winehq-archive.key
+    sudo gpg -o /etc/apt/keyrings/winehq-archive.key --dearmor "${TANQ_DOWNLOAD_DIR}/winehq.key"
+
+    #sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/trixie/winehq-trixie.sources
+    local debian_version="$(cat /etc/apt/sources.list | grep "^deb" | head -n1 | awk '{print $3}')"
+    download "https://dl.winehq.org/wine-builds/debian/dists/${debian_version}/winehq-${debian_version}.sources"
+    sudo cp "${TANQ_DOWNLOAD_DIR}/winehq-${debian_version}.sources" /etc/apt/sources.list.d/
+
+    sudo apt update -y
+    sudo apt install winehq-stable --install-recommends -y
+}
+
 function install_wine()
 {
     sudo dpkg --add-architecture i386

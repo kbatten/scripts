@@ -3,6 +3,8 @@
 ARGS="--onefile"
 CMD="wine cmd /c"
 PATHS=""
+PYINSTALLER="pyinstaller"
+METADATA=""
 for arg in "$@"; do
     case "$arg" in
         '--help')
@@ -19,6 +21,11 @@ for arg in "$@"; do
             PATHS="set PYTHONPATH=%HomeDrive%%HomePath%\\.virtualenvs\\${1}\\Lib\\site-packages &&"
             shift
             ;;
+        '--metadata')
+            shift
+            METADATA="${METADATA} --copy-metadata $1 "
+            shift
+            ;;
         '--')
             shift
             break
@@ -26,4 +33,4 @@ for arg in "$@"; do
     esac
 done
 
-${CMD} "${PATHS} pyinstaller ${ARGS} $@"
+${CMD} "${PATHS} ${PYINSTALLER} ${METADATA} ${ARGS} $@"

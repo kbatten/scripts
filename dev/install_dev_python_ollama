@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+
+./install_dev_python
+
+python3-venv -c ollama pip install moviepy requests pillow
+
+echo "pyinstaller-linux --venv ollama --metadata imagio comic.py"

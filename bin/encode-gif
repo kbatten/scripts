@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# encode a gif from a video
+
+usage() {
+    local err=$1
+    local msg=$2
+
+    if [[ -n "$msg" ]] ; then
+        echo "ERROR: $msg"
+        echo
+    fi
+
+    echo "$0 [-h] <-s 0:0:0> <-t 0:0:0> <filename>"
+    echo
+    echo "-h  help"
+    echo "-s  start time"
+    echo "-t  end time"
+    echo
+
+    exit $err
+}
+
+while getopts "s:t:h" opt ; do
+    case $opt in
+        s)  START=${OPTARG} ;;
+        t)  TO=${OPTARG} ;;
+        h)  usage
+            ;;
+    esac
+done
+
+# Shift past all parsed options
+shift $((OPTIND - 1))
+
+FILENAME="$1"
+
+if [[ -z $START ]] ; then
+    usage 1 "requires start time"
+fi
+
+if [[ -z $TO ]] ; then
+    usage 1 "requires to time"
+fi
+
+if [[ -z "$FILENAME" ]] ; then
+    usage 1 "requires filename"
+fi
+
+FPS=30
+SIZE=600
+
+rm -f output.gif
+
+ffmpeg -ss "$START" -to "$TO" -i "$FILENAME" -f yuv4mpegpipe -vf "fps=$FPS,scale=$SIZE:-1:flags=lanczos" - | gifski -o output.gif -

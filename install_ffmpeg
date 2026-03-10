@@ -36,4 +36,6 @@ else
     link_bin_external "$HOME/opt/gifski/gifski"
 fi
 
+link_bin encode-gif
+
 echo "finished $0"

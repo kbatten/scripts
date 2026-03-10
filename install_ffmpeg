@@ -9,12 +9,12 @@ FROM_SOURCE=1
 if [[ $FROM_SOURCE -eq 0 ]] ; then
     sudo apt-get install -y ffmpeg
 else
-    sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential libvidstab-dev libssl-dev libopus-dev libaom-dev
+    sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential libvidstab-dev libssl-dev libopus-dev libaom-dev zlib1g-dev
 
     download_github git@github.com:FFmpeg/FFmpeg.git
     pushd "${TANQ_DOWNLOAD_DIR}/FFmpeg"
     export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH
-    ./configure --enable-gpl --enable-libx264 --enable-libx265 --enable-libvidstab --enable-openssl --enable-version3 --enable-libopus --enable-libaom --prefix="$HOME/opt/ffmpeg"
+    ./configure --enable-gpl --enable-libx264 --enable-libx265 --enable-libvidstab --enable-openssl --enable-version3 --enable-libopus --enable-libaom --enable-zlib --prefix="$HOME/opt/ffmpeg"
     make
     make install
     popd
@@ -35,5 +35,7 @@ else
 
     link_bin_external "$HOME/opt/gifski/gifski"
 fi
+
+link_bin encode-gif
 
 echo "finished $0"

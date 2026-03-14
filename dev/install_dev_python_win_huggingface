@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+
+./install_dev_python_win
+
+python3-venv-win -c hf pip install torch diffusers transformers accelerate Pillow hf_transfer
+
+echo "pyinstaller-win --venv hf --metadata requests --packages transformers main.py"

@@ -8,6 +8,8 @@ cMD="wine cmd /c"
 PATHS=""
 PYINSTALLER="pyinstaller"
 METADATA=""
+PACKAGES=""
+
 for arg in "$@"; do
     case "$arg" in
         '--help')
@@ -29,6 +31,11 @@ for arg in "$@"; do
             METADATA="${METADATA} --copy-metadata $1 "
             shift
             ;;
+        '--packages')
+            shift
+            PACKAGES="${PACKAGES} --collect-all $1 "
+            shift
+            ;;
         '--')
             shift
             break
@@ -36,4 +43,4 @@ for arg in "$@"; do
     esac
 done
 
-${CMD} "${PATHS} ${PYINSTALLER} ${METADATA} ${ARGS} $@"
+${CMD} "${PATHS} ${PYINSTALLER} ${METADATA} ${PACKAGES} ${ARGS} $@"

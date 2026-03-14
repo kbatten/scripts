@@ -41,8 +41,6 @@ link_bin image-deploy
 
 link_bin audiobook-decode
 
-install_wine
-
 bashrc_export_variable bash_editor EDITOR=vi
 
 

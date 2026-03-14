@@ -4,7 +4,7 @@ export KMP_AFFINITY=disabled
 export OMP_NUM_THREADS=1
 
 ARGS="--onefile"
-cMD="wine cmd /c"
+CMD="wine cmd /c"
 PATHS=""
 PYINSTALLER="pyinstaller"
 METADATA=""

@@ -7,4 +7,5 @@ source ./script_lib/install.inc
 
 python3-venv-win -c hf pip install --extra-index-url https://download.pytorch.org/whl/cpu --extra-index-url https://download.pytorch.org/whl/cu128 torch==2.7.1+cu128 diffusers transformers accelerate Pillow hf_transfer
 
-echo "pyinstaller-win --venv hf --metadata requests --packages transformers main.py"
+# --onedir is needed for transformers because the filesize gets too large
+echo "pyinstaller-win --venv hf --metadata requests --packages transformers --onedir main.py"

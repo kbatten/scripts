@@ -1,0 +1,70 @@
+#!/bin/bash
+
+usage() {
+    local err=$1
+    local msg=$2
+
+    if [[ -n "$msg" ]] ; then
+        echo "ERROR: $msg"
+        echo
+    fi
+
+    echo "$0 <delta>"
+    echo
+    echo "  Convert a delta timestamp to days, hours, minutes, seconds, and microseconds."
+    echo
+    echo "  <delta>  seconds as an integer or decimal (e.g. from date +%s or date +%s.%N)"
+    echo
+    echo "  Examples:"
+    echo "    START=\$(date +%s) ; sleep 5 ; END=\$(date +%s)"
+    echo "    $0 \$((END - START))"
+    echo
+    echo "    # with microsecond precision (Linux / gdate):"
+    echo "    START=\$(date +%s%6N) ; sleep 1 ; END=\$(date +%s%6N)"
+    echo "    $0 \$(echo \"scale=6; (\$END - \$START) / 1000000\" | bc)"
+    echo
+
+    exit $err
+}
+
+if [[ $# -eq 0 && -t 0 ]] ; then
+    usage 0
+fi
+
+if [[ $# -eq 0 ]] ; then
+    INPUT=$(cat)
+else
+    INPUT=$1
+fi
+
+if ! [[ "$INPUT" =~ ^-?[0-9]+(\.[0-9]+)?$ ]] ; then
+    usage 1 "delta must be a number, got: $INPUT"
+fi
+
+# handle negative
+SIGN=""
+if [[ "$INPUT" == -* ]] ; then
+    SIGN="-"
+    INPUT="${INPUT#-}"
+fi
+
+# split integer and fractional parts
+INT_PART="${INPUT%%.*}"
+FRAC_PART="0"
+if [[ "$INPUT" == *.* ]] ; then
+    FRAC_PART="${INPUT#*.}"
+    # pad or truncate to 6 digits for microseconds
+    FRAC_PART="${FRAC_PART}000000"
+    FRAC_PART="${FRAC_PART:0:6}"
+fi
+
+TOTAL=$INT_PART
+DAYS=$(( TOTAL / 86400 ))
+REMAINING=$(( TOTAL % 86400 ))
+HOURS=$(( REMAINING / 3600 ))
+REMAINING=$(( REMAINING % 3600 ))
+MINUTES=$(( REMAINING / 60 ))
+SECONDS=$(( REMAINING % 60 ))
+MICROSECONDS=$((10#$FRAC_PART))
+
+echo "${SIGN}${DAYS}d ${HOURS}h ${MINUTES}m ${SECONDS}s ${MICROSECONDS}us"

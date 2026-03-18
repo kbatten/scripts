@@ -41,6 +41,8 @@ link_bin image-deploy
 
 link_bin audiobook-decode
 
+link_bin delta2time
+
 bashrc_export_variable bash_editor EDITOR=vi
 
 

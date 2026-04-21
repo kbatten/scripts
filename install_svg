@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+source ./script_lib/link.inc
+source ./script_lib/install.inc
+
+sudo apt-get install -y ghostscript inkscape xvfb
+
+link_bin convert_eps_to_svg
+
+echo "finished $0"

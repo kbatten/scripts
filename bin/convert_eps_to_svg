@@ -1,0 +1,6 @@
+#!/bin/bash
+
+gs -dNOPAUSE -dBATCH -dEPSCrop -sDEVICE=pdfwrite -sOutputFile=temp.pdf "$1"
+xvfb-run inkscape temp.pdf --export-plain-svg --export-filename="$1.svg"
+
+rm -f temp.pdf

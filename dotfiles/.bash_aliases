@@ -13,7 +13,7 @@ alias diff='diff --color=always'
 alias git_reflog='git log --graph --oneline --reflog'
 
 
-if [[ $(uname | grep "Darwin" &> /dev/null ; then
+if $(uname | grep "Darwin" &> /dev/null) ; then
     alias claude-ollama-q35-27b='"ollama launch claude --model qwen3.5:27b -- '
     alias claude-ollama-q35-9b='ollama launch claude --model qwen3.5:9b -- '
     alias claude-ollama-g4-e4b='ollama launch claude --model gemma4:e4b -- '

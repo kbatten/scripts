@@ -1,16 +1,12 @@
 #!/bin/bash -e
 
+source ./script_lib/std.inc
 source ./script_lib/link.inc
 source ./script_lib/install.inc
 
 mkdir ~/bin &> /dev/null && true
 
-# update apt sources
-sudo sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /etc/apt/sources.list && \
-sudo rm -f /etc/apt/sources.list.tmp
-sudo apt-get update
-
-sudo apt-get install -y vim-nox rar mc nfs-common tmux git build-essential
+sudo apt-get install -y vim-nox unrar mc nfs-common tmux git build-essential
 
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig

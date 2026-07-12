@@ -89,7 +89,7 @@ function install_deb() {
     local packagename="$(dpkg --info ${filepath} | grep Package: | awk '{print $2}')"
     if ! dpkg -s "${packagename}" &> /dev/null ; then
         echo "  installing..."
-        sudo dpkg -i "$filepath"
+        $SUDO dpkg -i "$filepath"
     fi
 }
 
@@ -172,7 +172,7 @@ function run_sudo_bash() {
 
     local filepath="${downloaddir}${directory}/${filename}"
 
-    sudo bash ${filepath}
+    $SUDO bash ${filepath}
 }
 
 function apply_patch() {
@@ -186,31 +186,29 @@ function apply_patch() {
 
 function install_wine_latest()
 {
-    sudo dpkg --add-architecture i386
+    $SUDO dpkg --add-architecture i386
 
     download https://dl.winehq.org/wine-builds/winehq.key
-    sudo mkdir -pm755 /etc/apt/keyrings
-    sudo rm -f /etc/apt/keyrings/winehq-archive.key
-    sudo gpg -o /etc/apt/keyrings/winehq-archive.key --dearmor "${TANQ_DOWNLOAD_DIR}/winehq.key"
+    $SUDO mkdir -pm755 /etc/apt/keyrings
+    $SUDO rm -f /etc/apt/keyrings/winehq-archive.key
+    $SUDO gpg -o /etc/apt/keyrings/winehq-archive.key --dearmor "${TANQ_DOWNLOAD_DIR}/winehq.key"
 
-    #sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/trixie/winehq-trixie.sources
-    local debian_version="$(cat /etc/apt/sources.list | grep "^deb" | head -n1 | awk '{print $3}')"
-    download "https://dl.winehq.org/wine-builds/debian/dists/${debian_version}/winehq-${debian_version}.sources"
-    sudo cp "${TANQ_DOWNLOAD_DIR}/winehq-${debian_version}.sources" /etc/apt/sources.list.d/
+    download "https://dl.winehq.org/wine-builds/debian/dists/${debian_version}/winehq-$(get_debian_version).sources"
+    $SUDO cp "${TANQ_DOWNLOAD_DIR}/winehq-${debian_version}.sources" /etc/apt/sources.list.d/
 
-    sudo apt update -y
-    sudo apt install winehq-stable --install-recommends -y
+    $SUDO apt update -y
+    $SUDO apt install winehq-stable --install-recommends -y
 }
 
 function install_wine()
 {
-    sudo dpkg --add-architecture i386
-    sudo apt-get install -y wine
-    sudo apt-get install -y wine64
-    sudo apt-get update
-    sudo apt-get install -y wine32
-    sudo apt-get install -y winbind
-    sudo apt-get install -y winetricks
+    $SUDO dpkg --add-architecture i386
+    $SUDO apt-get install -y wine
+    $SUDO apt-get install -y wine64
+    $SUDO apt-get update
+    $SUDO apt-get install -y wine32
+    $SUDO apt-get install -y winbind
+    $SUDO apt-get install -y winetricks
 }
 
 function install_wine_java8() {
@@ -228,4 +226,18 @@ function install_wine_gecko() {
     install_msi wine-gecko-${GECKO_VERSION}-x86.msi
 }
 
-sudo apt-get install -y curl || true
+function get_debian_version() {
+    if [[ -e /etc/apt/sources.list ]] ; then
+        cat /etc/apt/sources.list | grep "^deb" | head -n1 | awk '{print $3}'
+    elif [[ -e /etc/apt/sources.list.d/debian.sources ]] ; then
+        cat /etc/apt/sources.list.d/debian.sources  | grep Suites | head -n1 | cut -f 2 -d " "
+    else
+        echo "unknown"
+    fi
+}
+
+function setup_install() {
+    $SUDO apt-get install -y curl || true
+}
+
+setup_install

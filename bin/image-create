@@ -15,19 +15,19 @@ imagename="$1"
 dev="$2"
 numpartitions="$3"
 
-mountdir="$(sudo mktemp -d)"
+mountdir="$($SUDO mktemp -d)"
 imagedir="/tmp/$imagename"
 
 for I in $(seq "$numpartitions") ; do
-    $DRYRUN sudo mount "$dev$I" "$mountdir"
+    $DRYRUN $SUDO mount "$dev$I" "$mountdir"
     $DRYRUN mkdir -p "$imagedir/partition$I/"
-    $DRYRUN sudo cp -rf --preserve=all "$mountdir/"* "$imagedir/partition$I/"
-    $DRYRUN sudo umount "$mountdir"
+    $DRYRUN $SUDO cp -rf --preserve=all "$mountdir/"* "$imagedir/partition$I/"
+    $DRYRUN $SUDO umount "$mountdir"
 done
-$DRYRUN sudo dd if="$dev" of="$imagedir/mbr.img" bs=446 count=1
+$DRYRUN $SUDO dd if="$dev" of="$imagedir/mbr.img" bs=446 count=1
 
-$DRYRUN sudo tar --directory=/tmp -czf $imagename.tgz $imagename
-$DRYRUN sudo chown $USER:$USER $imagename.tgz
-$DRYRUN sudo rm -rf /tmp/$imagename
+$DRYRUN $SUDO tar --directory=/tmp -czf $imagename.tgz $imagename
+$DRYRUN $SUDO chown $USER:$USER $imagename.tgz
+$DRYRUN $SUDO rm -rf /tmp/$imagename
 
-sudo rm -rf "$mountdir"
+$SUDO rm -rf "$mountdir"

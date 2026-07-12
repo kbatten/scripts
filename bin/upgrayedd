@@ -35,10 +35,10 @@ done
 
 DONE="echo done"
 if [[ $DODIST -eq 1 ]] ; then
-    DIST="sudo apt ${YES} ${EXTRAOPTS} dist-upgrade"
+    DIST="$SUDO apt ${YES} ${EXTRAOPTS} dist-upgrade"
     DONE="echo \"done with dist-upgrade\""
     shift
 fi
 
 
-sudo apt ${YES} ${EXTRAOPTS} update && sudo apt ${YES} ${EXTRAOPTS} upgrade && sudo apt ${YES} autoremove && ${DIST} && ${DONE}
+$SUDO apt ${YES} ${EXTRAOPTS} update && $SUDO apt ${YES} ${EXTRAOPTS} upgrade && $SUDO apt ${YES} autoremove && ${DIST} && ${DONE}

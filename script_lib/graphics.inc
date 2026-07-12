@@ -1,1 +1,1 @@
-sudo apt-get -y install xvfb
+$SUDO apt-get -y install xvfb

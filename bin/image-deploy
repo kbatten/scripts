@@ -15,20 +15,20 @@ imagename="$1"
 dev="$2"
 
 
-mountdir="$(sudo mktemp -d)"
-imagedirroot=$(sudo mktemp -d)
+mountdir="$($SUDO mktemp -d)"
+imagedirroot=$($SUDO mktemp -d)
 imagedir="$imagedirroot/$imagename"
 
-sudo tar --directory="$imagedirroot" -xzf "$imagename.tgz"
-sudo chown $USER:$USER "$imagedirroot" "$imagedir"
-numpartitions=$(sudo ls -d "$imagedir/partition"* | wc -l)
+$SUDO tar --directory="$imagedirroot" -xzf "$imagename.tgz"
+$SUDO chown $USER:$USER "$imagedirroot" "$imagedir"
+numpartitions=$($SUDO ls -d "$imagedir/partition"* | wc -l)
 
 for I in $(seq "$numpartitions") ; do
-    $DRYRUN sudo mount "$dev$I" "$mountdir"
-    $DRYRUN sudo cp -rf --preserve=all "$imagedir/partition$I/"* "$mountdir"
-    $DRYRUN sudo umount "$mountdir"
+    $DRYRUN $SUDO mount "$dev$I" "$mountdir"
+    $DRYRUN $SUDO cp -rf --preserve=all "$imagedir/partition$I/"* "$mountdir"
+    $DRYRUN $SUDO umount "$mountdir"
 done
-$DRYRUN sudo dd of="$dev" if="$imagedir/mbr.img" bs=446 count=1
+$DRYRUN $SUDO dd of="$dev" if="$imagedir/mbr.img" bs=446 count=1
 
-sudo rm -rf "$imagedirroot"
-sudo rm -rf "$mountdir"
+$SUDO rm -rf "$imagedirroot"
+$SUDO rm -rf "$mountdir"

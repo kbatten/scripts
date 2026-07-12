@@ -13,11 +13,11 @@ function sysctl_set() {
   local key=$1
   local value=$2
   local file="/etc/sysctl.d/99-sysctl.conf"
-  if sudo grep "^$key\W*=.*" "$file" &> /dev/null ; then
-    sudo sed -i 's/^'"$key"'\W*=.*$/'"$key"'='"$value"'/g' "$file"
+  if $SUDO grep "^$key\W*=.*" "$file" &> /dev/null ; then
+    $SUDO sed -i 's/^'"$key"'\W*=.*$/'"$key"'='"$value"'/g' "$file"
   else
-    echo "$key=$value" | sudo tee -a "$file" > /dev/null
+    echo "$key=$value" | $SUDO tee -a "$file" > /dev/null
   fi
-  sudo sysctl -p
+  $SUDO sysctl -p
 }
 

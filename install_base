@@ -23,6 +23,7 @@ link_bash_completion bsync
 
 link_bin upgrayedd
 
+export SUDO=$SUDO
 upgrayedd -y
 
 if [[ -e ../profile_dirs ]] ; then

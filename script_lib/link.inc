@@ -3,6 +3,7 @@ function bashrc_source_script() {
   local tag=$1
   shift
   grep "^source.*# $tag$" "$HOME/.bashrc" &> /dev/null || echo "source $@  # $tag" >> "$HOME/.bashrc"
+  source $HOME/.bashrc &> /dev/null
 }
 
 # modify .bashrc to add a variable
@@ -10,6 +11,7 @@ function bashrc_export_variable() {
   local tag=$1
   shift
   grep "^export.*# $tag$" "$HOME/.bashrc" &> /dev/null || echo "export $@  # $tag" >> "$HOME/.bashrc"
+  source $HOME/.bashrc &> /dev/null
 }
 
 # link basic dotfiles

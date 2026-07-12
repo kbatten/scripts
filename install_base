@@ -8,6 +8,11 @@ mkdir ~/bin &> /dev/null && true
 
 $SUDO apt-get install -y vim-nox unrar mc nfs-common tmux git build-essential
 
+bashrc_export_variable bash_editor EDITOR=vi
+bashrc_export_variable sudo SUDO=$SUDO
+bashrc_export_variable user_bin PATH=${HOME}/bin:\$PATH
+bashrc_source_script "link_bash_aliases" "$HOME/.bash_aliases"
+
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig
 link_dotfiles .gitignore
@@ -38,9 +43,6 @@ link_bin image-deploy
 link_bin audiobook-decode
 
 link_bin delta2time
-
-bashrc_export_variable bash_editor EDITOR=vi
-
 
 # personal git configurations, this is saved in .gitconfig, but here to show that it is being changed
 git config --global init.defaultBranch main

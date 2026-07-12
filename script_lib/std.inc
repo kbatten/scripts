@@ -63,7 +63,8 @@ function setup_std() {
         $SUDO apt-get update
     elif [[ -e /etc/apt/sources.list.d/debian.sources ]] ; then
         $SUDO sed -i.tmp '/Components:.*main/s/^.*$/Components: main non-free-firmware contrib non-free/g' /etc/apt/sources.list.d/debian.sources && \
-        $SUDO rm -f /etc/apt/sources.list.d/debian.sources
+        $SUDO rm -f /etc/apt/sources.list.d/debian.sources.tmp
+        $SUDO apt-get update
     fi
 }
 

@@ -165,7 +165,7 @@ function run_bash() {
     bash ${filepath}
 }
 
-function run_$SUDO_bash() {
+function run_sudo_bash() {
     local filename=${1}
     local directory=${2}
     local downloaddir="${TANQ_DOWNLOAD_DIR}"

@@ -201,6 +201,8 @@ function install_wine_latest()
 
     $SUDO apt update -y
     $SUDO apt install winehq-stable --install-recommends -y
+    $SUDO apt-get install -y winbind
+    $SUDO apt-get install -y winetricks
 }
 
 function install_wine()

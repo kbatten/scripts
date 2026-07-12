@@ -193,7 +193,8 @@ function install_wine_latest()
     $SUDO rm -f /etc/apt/keyrings/winehq-archive.key
     $SUDO gpg -o /etc/apt/keyrings/winehq-archive.key --dearmor "${TANQ_DOWNLOAD_DIR}/winehq.key"
 
-    download "https://dl.winehq.org/wine-builds/debian/dists/${debian_version}/winehq-$(get_debian_version).sources"
+    local debian_version=$(get_debian_version)
+    download "https://dl.winehq.org/wine-builds/debian/dists/${debian_version}/winehq-${debian_version}.sources"
     $SUDO cp "${TANQ_DOWNLOAD_DIR}/winehq-${debian_version}.sources" /etc/apt/sources.list.d/
 
     $SUDO apt update -y

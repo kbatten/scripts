@@ -41,3 +41,16 @@ function extract() {
             ;;
     esac
 }
+
+function setup_std() {
+    if [[ -e /etc/apt/sources.list ]] l then
+        SUDO=sudo
+        $SUDO sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /etc/apt/sources.list && \
+        $SUDO rm -f /etc/apt/sources.list.tmp
+        $SUDO apt-get update
+    elif [[ -e /etc/apt/sources.list.d/debian.sources
+        SUDO=
+    fi
+}
+
+setup_std

@@ -187,6 +187,8 @@ function apply_patch() {
 function install_wine_latest()
 {
     $SUDO dpkg --add-architecture i386
+    $SUDO apt-get remove -y wine
+    $SUDO apt-get -y autoremove
 
     download https://dl.winehq.org/wine-builds/winehq.key
     $SUDO mkdir -pm755 /etc/apt/keyrings

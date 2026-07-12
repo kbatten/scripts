@@ -57,7 +57,7 @@ function setup_std() {
         fi
     fi
 
-    if [[ -e /etc/apt/sources.list ]] l then
+    if [[ -e /etc/apt/sources.list ]] ; then
         $SUDO sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /etc/apt/sources.list && \
         $SUDO rm -f /etc/apt/sources.list.tmp
         $SUDO apt-get update

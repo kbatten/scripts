@@ -227,9 +227,9 @@ function install_wine_gecko() {
 }
 
 function get_debian_version() {
-    if [[ -e /etc/apt/sources.list ]] l then
+    if [[ -e /etc/apt/sources.list ]] ; then
         cat /etc/apt/sources.list | grep "^deb" | head -n1 | awk '{print $3}'
-    elif [[ -e /etc/apt/sources.list.d/debian.sources
+    elif [[ -e /etc/apt/sources.list.d/debian.sources ]] ; then
         cat /etc/apt/sources.list.d/debian.sources  | grep Suites | head -n1 | cut -f 2 -d " "
     else
         echo "unknown"

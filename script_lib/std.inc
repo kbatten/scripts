@@ -61,7 +61,7 @@ function setup_std() {
         $SUDO sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /etc/apt/sources.list && \
         $SUDO rm -f /etc/apt/sources.list.tmp
         $SUDO apt-get update
-    elif [[ -e /etc/apt/sources.list.d/debian.sources
+    elif [[ -e /etc/apt/sources.list.d/debian.sources ]] ; then
         $SUDO sed -i.tmp '/Components:.*main/s/^.*$/Components: main non-free-firmware contrib non-free/g' /etc/apt/sources.list.d/debian.sources && \
         $SUDO rm -f /etc/apt/sources.list.d/debian.sources
     fi

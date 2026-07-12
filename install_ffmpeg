@@ -7,9 +7,9 @@ source ./script_lib/link.inc
 FROM_SOURCE=1
 
 if [[ $FROM_SOURCE -eq 0 ]] ; then
-    sudo apt-get install -y ffmpeg
+    $SUDO apt-get install -y ffmpeg
 else
-    sudo apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential libvidstab-dev libssl-dev libopus-dev libaom-dev zlib1g-dev
+    $SUDO apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential libvidstab-dev libssl-dev libopus-dev libaom-dev zlib1g-dev
 
     download_github git@github.com:FFmpeg/FFmpeg.git
     pushd "${TANQ_DOWNLOAD_DIR}/FFmpeg"

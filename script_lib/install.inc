@@ -89,7 +89,7 @@ function install_deb() {
     local packagename="$(dpkg --info ${filepath} | grep Package: | awk '{print $2}')"
     if ! dpkg -s "${packagename}" &> /dev/null ; then
         echo "  installing..."
-        sudo dpkg -i "$filepath"
+        $SUDO dpkg -i "$filepath"
     fi
 }
 
@@ -165,14 +165,14 @@ function run_bash() {
     bash ${filepath}
 }
 
-function run_sudo_bash() {
+function run_$SUDO_bash() {
     local filename=${1}
     local directory=${2}
     local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     local filepath="${downloaddir}${directory}/${filename}"
 
-    sudo bash ${filepath}
+    $SUDO bash ${filepath}
 }
 
 function apply_patch() {
@@ -186,29 +186,29 @@ function apply_patch() {
 
 function install_wine_latest()
 {
-    sudo dpkg --add-architecture i386
+    $SUDO dpkg --add-architecture i386
 
     download https://dl.winehq.org/wine-builds/winehq.key
-    sudo mkdir -pm755 /etc/apt/keyrings
-    sudo rm -f /etc/apt/keyrings/winehq-archive.key
-    sudo gpg -o /etc/apt/keyrings/winehq-archive.key --dearmor "${TANQ_DOWNLOAD_DIR}/winehq.key"
+    $SUDO mkdir -pm755 /etc/apt/keyrings
+    $SUDO rm -f /etc/apt/keyrings/winehq-archive.key
+    $SUDO gpg -o /etc/apt/keyrings/winehq-archive.key --dearmor "${TANQ_DOWNLOAD_DIR}/winehq.key"
 
     download "https://dl.winehq.org/wine-builds/debian/dists/${debian_version}/winehq-$(get_debian_version).sources"
-    sudo cp "${TANQ_DOWNLOAD_DIR}/winehq-${debian_version}.sources" /etc/apt/sources.list.d/
+    $SUDO cp "${TANQ_DOWNLOAD_DIR}/winehq-${debian_version}.sources" /etc/apt/sources.list.d/
 
-    sudo apt update -y
-    sudo apt install winehq-stable --install-recommends -y
+    $SUDO apt update -y
+    $SUDO apt install winehq-stable --install-recommends -y
 }
 
 function install_wine()
 {
-    sudo dpkg --add-architecture i386
-    sudo apt-get install -y wine
-    sudo apt-get install -y wine64
-    sudo apt-get update
-    sudo apt-get install -y wine32
-    sudo apt-get install -y winbind
-    sudo apt-get install -y winetricks
+    $SUDO dpkg --add-architecture i386
+    $SUDO apt-get install -y wine
+    $SUDO apt-get install -y wine64
+    $SUDO apt-get update
+    $SUDO apt-get install -y wine32
+    $SUDO apt-get install -y winbind
+    $SUDO apt-get install -y winetricks
 }
 
 function install_wine_java8() {
@@ -237,7 +237,7 @@ function get_debian_version() {
 }
 
 function setup_install() {
-    sudo apt-get install -y curl || true
+    $SUDO apt-get install -y curl || true
 }
 
 setup_install

@@ -51,7 +51,7 @@ function setup_std() {
         fi
     elif $(uname | grep Darwin &> /dev/null) ; then
         if whence -p sudo &> /dev/null ; then
-            SUDO=sudo
+            SUDO=$SUDO
         else
             SUDO=
         fi

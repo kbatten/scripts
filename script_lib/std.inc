@@ -43,11 +43,27 @@ function extract() {
 }
 
 function setup_std() {
+    if $(uname | grep Linux &> /dev/null) ; then
+        if type -P sudo &> /dev/null ; then
+            SUDO=sudo
+        else
+            SUDO=
+        fi
+    elif $(uname | grep Darwin &> /dev/null) ; then
+        if whence -p sudo &> /dev/null ; then
+            SUDO=sudo
+        else
+            SUDO=
+        fi
+    fi
+
     if [[ -e /etc/apt/sources.list ]] l then
-        sudo sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /etc/apt/sources.list && \
-        sudo rm -f /etc/apt/sources.list.tmp
-        sudo apt-get update
+        $SUDO sed -i.tmp '/\bcontrib non-free\b/! s/\(^deb.*$\)/\1 contrib non-free/g' /etc/apt/sources.list && \
+        $SUDO rm -f /etc/apt/sources.list.tmp
+        $SUDO apt-get update
     elif [[ -e /etc/apt/sources.list.d/debian.sources
+        $SUDO sed -i.tmp '/Components:.*main/s/^.*$/Components: main non-free-firmware contrib non-free/g' /etc/apt/sources.list.d/debian.sources && \
+        $SUDO rm -f /etc/apt/sources.list.d/debian.sources
     fi
 }
 

@@ -186,6 +186,10 @@ function apply_patch() {
 
 function install_wine_latest()
 {
+    # not automatic, need to see which version needs to be installed
+    local wine_mono=10.4.0  # for wine11.0
+    local wine_gecko=2.37.4
+
     $SUDO dpkg --add-architecture i386
     $SUDO apt-get remove -y wine
     $SUDO apt-get -y autoremove
@@ -203,6 +207,16 @@ function install_wine_latest()
     $SUDO apt install winehq-stable --install-recommends -y
     $SUDO apt-get install -y winbind
     $SUDO apt-get install -y winetricks
+
+    download https://dl.winehq.org/wine/wine-mono/${wine_mono}/wine-mono-${wine_mono}-x86.msi
+    download https://dl.winehq.org/wine/wine-gecko/${wine_gecko}/wine-gecko-${wine_gecko}-x86_64.msi
+    download https://dl.winehq.org/wine/wine-gecko/${wine_gecko}/wine-gecko-${wine_gecko}-x86.msi
+    $SUDO mkdir -p mkdir -p /usr/share/wine/mono/
+    $SUDO mkdir -p mkdir -p /usr/share/wine/gecko/
+    $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"wine-mono-11.0.0-x86.msi /usr/share/wine/mono/
+    $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"{wine-gecko-2.47.4-x86_64.msi,wine-gecko-2.47.4-x86.msi} /usr/share/wine/gecko/
+    $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"wine-mono-${wine_mono}-x86.msi /usr/share/wine/mono/
+    $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"{wine-gecko-${wine_gecko}-x86_64.msi,wine-gecko-${wine_gecko}-x86.msi} /usr/share/wine/gecko/
 }
 
 function install_wine()

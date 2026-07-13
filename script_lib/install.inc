@@ -213,8 +213,6 @@ function install_wine_latest()
     download https://dl.winehq.org/wine/wine-gecko/${wine_gecko}/wine-gecko-${wine_gecko}-x86.msi
     $SUDO mkdir -p mkdir -p /usr/share/wine/mono/
     $SUDO mkdir -p mkdir -p /usr/share/wine/gecko/
-    $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"wine-mono-11.0.0-x86.msi /usr/share/wine/mono/
-    $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"{wine-gecko-2.47.4-x86_64.msi,wine-gecko-2.47.4-x86.msi} /usr/share/wine/gecko/
     $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"wine-mono-${wine_mono}-x86.msi /usr/share/wine/mono/
     $SUDO \cp "${TANQ_DOWNLOAD_DIR}/"{wine-gecko-${wine_gecko}-x86_64.msi,wine-gecko-${wine_gecko}-x86.msi} /usr/share/wine/gecko/
 }

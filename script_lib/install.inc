@@ -114,7 +114,7 @@ function install_rust() {
 }
 
 function download_github() {
-    local url="${1}"
+    local url="https://github.com/${1}"
     local downloaddir="${TANQ_DOWNLOAD_DIR}"
 
     local dirname="$(rootname $url)"

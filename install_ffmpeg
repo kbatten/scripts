@@ -11,7 +11,7 @@ if [[ $FROM_SOURCE -eq 0 ]] ; then
 else
     $SUDO apt-get install -y nasm pkg-config libx264-dev libx265-dev build-essential libvidstab-dev libssl-dev libopus-dev libaom-dev zlib1g-dev
 
-    download_github git@github.com:FFmpeg/FFmpeg.git
+    download_github FFmpeg/FFmpeg.git
     pushd "${TANQ_DOWNLOAD_DIR}/FFmpeg"
     export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig/:$PKG_CONFIG_PATH
     ./configure --enable-gpl --enable-libx264 --enable-libx265 --enable-libvidstab --enable-openssl --enable-version3 --enable-libopus --enable-libaom --enable-zlib --prefix="$HOME/opt/ffmpeg"
@@ -24,7 +24,7 @@ else
 
     install_rust
 
-    download_github git@github.com:ImageOptim/gifski.git
+    download_github ImageOptim/gifski.git
     pushd "${TANQ_DOWNLOAD_DIR}/gifski"
     cargo build --release
     if [[ -e "$HOME/opt/gifski" ]] ; then

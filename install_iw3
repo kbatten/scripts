@@ -9,7 +9,7 @@ source ./script_lib/link.inc
 python3-venv -c iw3 python -m pip install --upgrade pip
 
 # c86aabe716017fe4d873d42d1c4254b862b16195
-download_github https://github.com/nagadomi/nunif
+download_github nagadomi/nunif
 
 python3-venv -c iw3 python -m pip install --upgrade setuptools
 

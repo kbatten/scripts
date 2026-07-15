@@ -6,7 +6,7 @@ source ./script_lib/install.inc
 
 mkdir ~/bin &> /dev/null && true
 
-$SUDO apt-get install -y vim-nox unrar mc nfs-common tmux git build-essential gpg bc
+$SUDO apt-get install -y vim-nox unrar mc nfs-common tmux git build-essential gpg bc pkg-config
 
 bashrc_export_variable bash_editor EDITOR=vi
 bashrc_export_variable sudo SUDO=$SUDO

@@ -1,0 +1,348 @@
+#!/bin/bash -e
+
+# If wine/VuklanSDK install error, may need to run from XWindows first
+# If executable error, may need to reboot
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+source ./script_lib/link.inc
+source ./script_lib/graphics.inc
+
+if [[ -z "$VULKAN_DEV_NO_CLEAN" ]] ; then
+    VULKAN_DEV_NO_CLEAN=
+else
+    VULKAN_DEV_NO_CLEAN="#"
+fi
+
+if [[ -z "$VULCAN_DEV_QUICK_INSTALL" ]] ; then
+    VULKAN_FULL_INSTALL=true
+else
+    VULKAN_FULL_INSTALL=false
+fi
+
+SCRIPTNAME=mcvr_build
+
+if $VULKAN_FULL_INSTALL  ; then
+
+    $SUDO apt-get -y update
+    $SUDO apt-get install -y python3 msitools ca-certificates openjdk-25-jdk ninja-build binfmt-support
+
+    install_wine_latest
+    $SUDO apt-get install -y wine-binfmt
+    wineboot
+
+    download_github mstorsjo/msvc-wine.git
+    pushd "${TANQ_DOWNLOAD_DIR}/msvc-wine/"
+    OLD_TMPDIR="${TMPDIR}"
+    export TMPDIR="${HOME}/tmp-msvc"
+    mkdir "${TMPDIR}"
+    python3 vsdownload.py --accept-license --dest ~/msvc
+    ./install.sh ~/msvc
+    rm -rf ${TMPDIR}
+    export TMPDIR="${OLD_TMPDIR}"
+    popd
+
+    download_github microsoft/vcpkg.git
+    pushd "${TANQ_DOWNLOAD_DIR}/vcpkg/"
+    ./bootstrap-vcpkg.sh -disableMetrics
+    mkdir -p "${TANQ_DOWNLOAD_DIR}/vcpkg/my-triplets"
+    cat > "${TANQ_DOWNLOAD_DIR}/vcpkg/my-triplets/x64-windows.cmake" << 'EOF'
+set(VCPKG_TARGET_ARCHITECTURE x64)
+set(VCPKG_CRT_LINKAGE dynamic)
+set(VCPKG_LIBRARY_LINKAGE dynamic)
+set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE ${VCPKG_ROOT_DIR}/scripts/toolchains/windows.cmake)
+set(ENV{CC} cl.exe)
+set(ENV{CXX} cl.exe)
+set(ENV{PATH} "/home/keith/msvc/bin/x64:$ENV{PATH}")
+EOF
+
+fi  # VULKAN_FULL_INSTALL
+
+mkdir -p "${TANQ_DOWNLOAD_DIR}/vcpkg/toolchains"
+echo 'set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_C_COMPILER   '"${HOME}"'/msvc/bin/x64/cl)
+set(CMAKE_CXX_COMPILER '"${HOME}"'/msvc/bin/x64/cl)
+set(CMAKE_LINKER       '"${HOME}"'/msvc/bin/x64/link CACHE FILEPATH "" FORCE)
+set(CMAKE_AR           '"${HOME}"'/msvc/bin/x64/lib  CACHE FILEPATH "" FORCE)
+set(CMAKE_RC_COMPILER  '"${HOME}"'/msvc/bin/x64/rc   CACHE FILEPATH "" FORCE)' > "${TANQ_DOWNLOAD_DIR}/vcpkg/toolchains/msvc-toolchain.cmake"
+
+if $VULKAN_FULL_INSTALL  ; then
+
+    mkdir ~/tmp &> /dev/null && true
+    PATH="${HOME}/msvc/bin/x64:${TANQ_DOWNLOAD_DIR}/vcpkg/downloads/tools/cmake-4.3.3-linux/cmake-4.3.3-linux-x86_64/bin/:$PATH" ./vcpkg install vulkan-headers vulkan-loader shaderc --triplet x64-windows --overlay-triplets=my-triplets
+    popd
+
+fi  # VULKAN_FULL_INSTALL
+
+download https://aka.ms/download-jdk/microsoft-jdk-25.0.3-windows-x64.zip
+download https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.9.2602.24/dxc_2026_05_27.zip
+
+download https://sdk.lunarg.com/sdk/download/1.4.350.0/windows/vulkansdk-windows-X64-1.4.350.0.exe
+download https://github.com/unicode-org/icu/releases/download/release-78.3/icu4c-78.3-Win64-MSVC2022.zip
+
+if $VULKAN_FULL_INSTALL  ; then
+
+    cp "${TANQ_DOWNLOAD_DIR}/icu4c-78.3-Win64-MSVC2022/bin64/icuuc78.dll" "${HOME}/.wine/drive_c/windows/system32/icuuc.dll"
+    cp "${TANQ_DOWNLOAD_DIR}/icu4c-78.3-Win64-MSVC2022/bin64/icudt78.dll" "${HOME}/.wine/drive_c/windows/system32/icudt78.dll"
+    pushd "${TANQ_DOWNLOAD_DIR}"
+    xvfb-run wine vulkansdk-windows-X64-1.4.350.0.exe in --al -c --da || true
+    popd
+
+fi  # VULKAN_FULL_INSTALL
+
+function CMakeWorkaround() {
+    cat > "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround.patch" << 'EOF'
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 31ac883..3a6d7cc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -117,11 +117,21 @@ if(MCVR_ENABLE_NRD)
+     message(STATUS "NRD Denoiser Enabled")
+ 
+     set(NRD_STATIC_LIBRARY ON CACHE BOOL "Build NRD as a static library" FORCE)
+-    set(NRD_DISABLE_SHADER_COMPILATION ON CACHE BOOL "Disable NRD shader compilation" FORCE)
++    # NOTE: NRD v4.16.1 has no NRD_DISABLE_SHADER_COMPILATION option - it always
++    # compiles the shaders via ShaderMake. When cross-building for Windows on Linux
++    # this runs dxc.exe/fxc.exe under wine; extern/nrd/CMakeLists.txt wraps those
++    # compilers in winepath shims so their -I include dirs resolve (DXC #2669/#991).
+     set(NRD_SHADERS_PATH "${PROJECT_SOURCE_DIR}/extern/nrd/_Shaders" CACHE STRING "NRD shader headers path" FORCE)
+     set(NRD_NORMAL_ENCODING "2" CACHE STRING "Normal encoding variant (0-4, matches nrd::NormalEncoding)" FORCE)
+     set(NRD_ROUGHNESS_ENCODING "1" CACHE STRING "Roughness encoding variant (0-2, matches nrd::RoughnessEncoding)" FORCE)
+ 
++    # NRD defaults DXIL+DXBC embedding ON for WIN32 targets, but MCVR renders with Vulkan
++    # and only consumes the SPIRV blobs. DXBC additionally CANNOT be built here: NRD's
++    # shaders are Shader Model 6.0 (Shaders.cfg: -m 6_0) and FXC only supports up to SM 5.1
++    # (SM6.0+ requires DXC), so the fxc pass always fails. Disable DXBC embedding; DXIL
++    # still compiles fine via the wine dxc shim and is harmless to keep.
++    set(NRD_EMBEDS_DXBC_SHADERS OFF CACHE BOOL "MCVR is Vulkan; FXC can't build NRD's SM6.0 shaders" FORCE)
++
+     add_subdirectory(extern/nrd EXCLUDE_FROM_ALL)
+ 
+     set(NRD_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/nrd/Include)
+EOF
+    echo "git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround.patch\"" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+    cat > "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_shader.patch" << 'EOF'
+diff --git a/src/shader/CMakeLists.txt b/src/shader/CMakeLists.txt
+index e932cf8..787dad7 100644
+--- a/src/shader/CMakeLists.txt
++++ b/src/shader/CMakeLists.txt
+@@ -1,9 +1,22 @@
+ if(WIN32)
+     add_definitions(-DNOMINMAX)
++endif(WIN32)
++
++# glslangValidator runs at BUILD time (GLSL -> SPIR-V, which is platform-independent).
++# - Native Windows host: use glslangValidator.exe directly.
++# - Cross-building to Windows on a non-Windows host (msvc-wine): a native Linux
++#   glslangValidator may be absent or too old for --target-env vulkan1.4, so run the
++#   Windows glslangValidator.exe bundled with FidelityFX-SDK under wine. Its absolute
++#   forward-slash paths resolve via wine's Z: drive; glslang has no dxc-style -I bug.
++# - Otherwise (native non-Windows host): use native glslangValidator.
++if(CMAKE_HOST_WIN32)
+     set(GLSLVALIDATOR glslangValidator.exe)
+EOF
+    echo "+elseif(WIN32 AND EXISTS \"${HOME}/.wine/drive_c/VulkanSDK/1.4.350.0/Bin/glslangValidator.exe\")
++    set(GLSLVALIDATOR wine \"${HOME}/.wine/drive_c/VulkanSDK/1.4.350.0/Bin/glslangValidator.exe\")" >> "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_shader.patch"
+    cat >> "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_shader.patch" << 'EOF'
++    message(STATUS "MCVR shaders: using VulkanSDK glslangValidator.exe under wine")
+ else()
+     set(GLSLVALIDATOR glslangValidator)
+-endif(WIN32)
++endif()
+ 
+ file(GLOB_RECURSE GLSL_SHADERS CONFIGURE_DEPENDS "*.vert" "*.frag" "*.rgen" "*.rmiss" "*.rchit" "*.rahit" "*.comp")
+ list(FILTER GLSL_SHADERS EXCLUDE REGEX "world/ray_tracing/internal") # exclude world shaders
+EOF
+    echo "git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_shader.patch\"" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+    cat > "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_core.patch" << 'EOF'
+diff --git a/src/core/CMakeLists.txt b/src/core/CMakeLists.txt
+index 61b9eeb..dcebc5c 100644
+--- a/src/core/CMakeLists.txt
++++ b/src/core/CMakeLists.txt
+@@ -20,14 +20,32 @@ find_library(SHADERC_LIBRARY
+     HINTS
+     "${MCVR_VULKAN_SDK}/x86_64/lib"
+     "${MCVR_VULKAN_SDK}/lib"
++    # Some setups place a self-contained shaderc_combined.lib under lib/manual-link/.
++    PATH_SUFFIXES manual-link
+ )
+ 
+ if(NOT SHADERC_INCLUDE_DIR OR NOT SHADERC_LIBRARY)
+     message(FATAL_ERROR "shaderc was not found. Set VULKAN_SDK or install shaderc.")
+ endif()
+ 
++set(SHADERC_LIBRARIES ${SHADERC_LIBRARY})
++
++# shaderc_combined / shaderc_shared are self-contained. The thin shaderc.lib (this vcpkg
++# ships only that, with its deps as separate libs) needs shaderc_util + glslang +
++# SPIRV-Tools linked explicitly, or the link fails with unresolved shaderc_util::*,
++# spvBinaryDestroy, etc. Pull the deps from the directory shaderc.lib itself was found in.
++if(NOT SHADERC_LIBRARY MATCHES "shaderc_(combined|shared)")
++    get_filename_component(_shaderc_libdir "${SHADERC_LIBRARY}" DIRECTORY)
++    foreach(_dep IN ITEMS shaderc_util glslang MachineIndependent GenericCodeGen OSDependent SPIRV SPIRV-Tools-opt SPIRV-Tools)
++        find_library(SHADERC_DEP_${_dep} NAMES ${_dep} HINTS "${_shaderc_libdir}" NO_DEFAULT_PATH)
++        if(SHADERC_DEP_${_dep})
++            list(APPEND SHADERC_LIBRARIES "${SHADERC_DEP_${_dep}}")
++        endif()
++    endforeach()
++endif()
++
+ target_include_directories(core PUBLIC ${GENTOOL_OUTPUT_DIR} ${VOLK_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${VMA_INCLUDE_DIR} ${STB_INCLUDE_DIR} ${TINYEXPR_INCLUDE_DIR} ${JNI_INCLUDE_DIRS} ${GLM_INCLUDE_DIR} ${SHADERC_INCLUDE_DIR})
+-target_link_libraries(core PUBLIC ${SHADERC_LIBRARY})
++target_link_libraries(core PUBLIC ${SHADERC_LIBRARIES})
+ target_compile_definitions(core PUBLIC VK_NO_PROTOTYPES CORE_LIB)
+ if(USE_AMD)
+     target_compile_definitions(core PUBLIC USE_AMD)
+EOF
+    echo "git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_core.patch\"" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+    cat > "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_nrd.patch" << 'EOF'
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9a0292d..9a8426e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -360,6 +360,51 @@ else()
+     set(SHADERMAKE_FXC_PATH ${FXC_PATH})
+ endif()
+ 
++# When the shader compilers are the Windows dxc.exe/fxc.exe running under wine
++# (cross-compiling MCVR for Windows on Linux), ShaderMake hands them include dirs
++# and the source file as relative / forward-slash Unix paths. The Windows compilers
++# don't search -I paths given in that form (DXC issue #2669) and mis-resolve a
++# relative source for quoted #include (DXC issue #991), so headers like NRD.hlsli
++# come back "file not found". Wrap each compiler in a shim that rewrites the -I dirs
++# and the source path to native wine paths (winepath -w) before running the real
++# `wine <compiler>`. ShaderMake invokes the compiler as `$COMPILER <args>` via
++# /bin/sh, passing `-I <dir>` as two tokens and the source as a *.hlsl argument.
++if(CMAKE_HOST_UNIX)
++    macro(_nrd_wine_shim _var _tag)
++        if("${${_var}}" MATCHES "\\.exe$")
++            set(_shim "${CMAKE_CURRENT_BINARY_DIR}/wine-shadercompiler-${_tag}.sh")
++            file(WRITE "${_shim}" "#!/usr/bin/env bash\nreal='${${_var}}'\n")
++            file(APPEND "${_shim}" [==[
++set -eo pipefail
++# Translate a Unix path to an absolute native (wine) path. Absolutize first so the
++# result is absolute even when winepath is given a relative path (fixes DXC #991).
++w() {
++  local p="$1"
++  case "$p" in /*) ;; *) p="$PWD/$p" ;; esac
++  winepath -w "$p" 2>/dev/null || printf '%s' "$1"
++}
++args=(); expect=0
++for a in "$@"; do
++  if [ "$expect" = 1 ]; then args+=("$(w "$a")"); expect=0; continue; fi
++  case "$a" in
++    -I)             args+=("$a"); expect=1 ;;
++    -I?*)           args+=("-I$(w "${a#-I}")") ;;
++    *.hlsl|*.hlsli) args+=("$(w "$a")") ;;
++    *)              args+=("$a") ;;
++  esac
++done
++exec wine "$real" "${args[@]}"
++]==])
++            execute_process(COMMAND chmod 755 "${_shim}")
++            set(${_var} "${_shim}")
++            message(STATUS "NRD: wine shim for ${_tag} -> ${_shim}")
++        endif()
++    endmacro()
++    _nrd_wine_shim(SHADERMAKE_DXC_PATH dxc)
++    _nrd_wine_shim(SHADERMAKE_DXC_VK_PATH dxc-vk)
++    _nrd_wine_shim(SHADERMAKE_FXC_PATH fxc)
++endif()
++
+ # ShaderMake commands for each shader code container
+ set(SHADERMAKE_COMMANDS)
+ if(NRD_EMBEDS_DXIL_SHADERS)
+EOF
+    echo "cd extern/nrd
+${VULKAN_DEV_NO_CLEAN} git reset HEAD --hard && git clean -dfx
+git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_nrd.patch\"
+cd ../.." >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+    cat > "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_common.patch" << 'EOF'
+diff --git a/common.cmake b/common.cmake
+index 6f6f259..ac9be05 100644
+--- a/common.cmake
++++ b/common.cmake
+@@ -57,7 +57,7 @@ set(SUPPORT_RUNTIME_SHADER_RECOMPILE 0)
+ if (UNIX AND NOT WIN32)
+ 	set(FFX_SC_EXECUTABLE ${SDK_ROOT}/tools/ffx_shader_compiler/bin/FidelityFX_SC)
+ else()
+-	set(FFX_SC_EXECUTABLE ${SDK_ROOT}/tools/binary_store/FidelityFX_SC.exe)
++	set(FFX_SC_EXECUTABLE wine ${SDK_ROOT}/tools/binary_store/FidelityFX_SC.exe)
+ endif()
+ set(FFX_INCLUDE_PATH ${SDK_ROOT}/include)
+ set(FFX_LIB_PATH ${SDK_ROOT}/libs)
+EOF
+    cat > "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_toolchain.patch" << 'EOF'
+diff --git a/sdk/toolchain.cmake b/sdk/toolchain.cmake
+index 0aa3677..6ea2a13 100644
+--- a/sdk/toolchain.cmake
++++ b/sdk/toolchain.cmake
+@@ -54,8 +54,10 @@ if (FFX_API_BACKEND STREQUAL DX12_X64 OR
+ 		set(CMAKE_SYSTEM_NAME WINDOWS)
+ 		set(CMAKE_SYSTEM_VERSION 10.0)
+ 
+-		set(CMAKE_GENERATOR_PLATFORM "x64" CACHE STRING "" FORCE)
+-		set(CMAKE_VS_PLATFORM_NAME "x64" CACHE STRING "" FORCE)
++		if(CMAKE_GENERATOR MATCHES "Visual Studio" OR CMAKE_GENERATOR MATCHES "Xbox")
++			set(CMAKE_GENERATOR_PLATFORM "x64" CACHE STRING "" FORCE)
++			set(CMAKE_VS_PLATFORM_NAME "x64" CACHE STRING "" FORCE)
++		endif() # PATCH CMAKE_GENERATOR_PLATFORM CMAKE_VS_PLATFORM_NAME
+ 
+ 		# Ensure our platform toolset is x64
+ 		set(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE "x64" CACHE STRING "" FORCE)
+EOF
+    cat > "${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_cmakelists.patch" << 'EOF'
+diff --git a/sdk/CMakeLists.txt b/sdk/CMakeLists.txt
+index a35ea64..044a162 100644
+--- a/sdk/CMakeLists.txt
++++ b/sdk/CMakeLists.txt
+@@ -180,7 +180,7 @@ if (UNIX AND NOT WIN32)
+     # Point to the built executable in the build directory
+     set(FFX_SC_EXECUTABLE $<TARGET_FILE:FidelityFX_SC>)
+ else()
+-    set(FFX_SC_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/binary_store/FidelityFX_SC.exe)
++    set(FFX_SC_EXECUTABLE wine ${CMAKE_CURRENT_SOURCE_DIR}/tools/binary_store/FidelityFX_SC.exe)
+ endif()
+ set(FFX_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/include)
+ set(FFX_LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libs)
+EOF
+    echo "cd extern/FidelityFX-SDK
+${VULKAN_DEV_NO_CLEAN} git reset HEAD --hard && git clean -dfx
+git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_common.patch\"
+git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_toolchain.patch\"
+git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_cmakelists.patch\"
+cd ../.." >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+}
+
+echo "export PATH=${HOME}/msvc/bin/x64:${TANQ_DOWNLOAD_DIR}/vcpkg/downloads/tools/cmake-4.3.3-linux/cmake-4.3.3-linux-x86_64/bin:\$PATH
+mkdir -p ~/src && pushd ~/src && git clone https://github.com/kbatten/MCVR.git && git clone https://github.com/kbatten/Radiance.git && cd MCVR && git checkout main.26_2 && git submodule update --init --recursive && cd ../Radiance && git checkout main.26_2 && popd"
+echo
+echo "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+echo "#!/bin/bash -e
+# Radiance Release" > "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+chmod 755 "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+echo "cd ${HOME}/src/Radiance
+./gradlew compileJava
+cd ${HOME}/src/MCVR
+${VULKAN_DEV_NO_CLEAN} git reset HEAD --hard && git clean -dfx" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+CMakeWorkaround
+
+echo "chmod +x \"${HOME}/src/MCVR/extern/FidelityFX-SDK/sdk/tools/binary_store/FidelityFX_SC.exe\"
+chmod +x \"${TANQ_DOWNLOAD_DIR}/dxc_2026_05_27/bin/x64/dxc.exe\"
+${VULKAN_DEV_NO_CLEAN} rm -rf build && \\
+PATH=\"${HOME}/msvc/bin/x64:${TANQ_DOWNLOAD_DIR}/vcpkg/downloads/tools/cmake-4.3.3-linux/cmake-4.3.3-linux-x86_64/bin/:$PATH\" VULKAN_SDK=${TANQ_DOWNLOAD_DIR}/vcpkg/installed/x64-windows cmake -S . -B build -G Ninja -DCMAKE_SYSTEM_NAME=Windows  -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -DJAVA_PROJECT_ROOT_DIR=${HOME}/src/Radiance -DMCVR_ENABLE_NRD=ON -DUSE_AMD=ON -DJAVA_HOME=${TANQ_DOWNLOAD_DIR}/microsoft-jdk-25.0.3-windows-x64/jdk-25.0.3+9 -DCMAKE_TOOLCHAIN_FILE=${TANQ_DOWNLOAD_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${TANQ_DOWNLOAD_DIR}/vcpkg/toolchains/msvc-toolchain.cmake -DSHADERMAKE_FIND_DXC=OFF -DSHADERMAKE_FIND_DXC_VK=OFF -DSHADERMAKE_DXC_PATH=${TANQ_DOWNLOAD_DIR}/dxc_2026_05_27/bin/x64/dxc.exe -DSHADERMAKE_FXC_PATH=\"${HOME}/msvc/Windows Kits/10/bin/10.0.26100.0/x64/fxc.exe\" -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL -DSHADERMAKE_PATH=${HOME}/src/MCVR/build/_deps/shadermake-build/build/ShaderMake -DCMAKE_BUILD_TYPE=Release -DCMAKE_GENERATOR_PLATFORM= && PATH=\"${HOME}/msvc/bin/x64:${TANQ_DOWNLOAD_DIR}/vcpkg/downloads/tools/cmake-4.3.3-linux/cmake-4.3.3-linux-x86_64/bin/:$PATH\" cmake --build build -j && PATH=\"${HOME}/msvc/bin/x64:${TANQ_DOWNLOAD_DIR}/vcpkg/downloads/tools/cmake-4.3.3-linux/cmake-4.3.3-linux-x86_64/bin/:$PATH\" cmake --install build" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+echo "cd ../Radiance && ./gradlew build ; cd ../MCVR" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+
+sed 's/Release/RelWithDebInfo/g' "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release" > "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_debug"
+chmod 755 "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_debug"
+
+echo
+echo "finished $0"

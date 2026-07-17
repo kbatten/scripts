@@ -9,9 +9,13 @@ mkdir ~/bin &> /dev/null && true
 $SUDO apt-get install -y vim-nox unrar mc nfs-common tmux git build-essential gpg bc pkg-config
 
 bashrc_export_variable bash_editor EDITOR=vi
-bashrc_export_variable sudo SUDO=$SUDO
-bashrc_export_variable user_bin PATH=${HOME}/bin:\$PATH
+bashrc_export_variable user USER=${USER:-root}
 bashrc_source_script "link_bash_aliases" "$HOME/.bash_aliases"
+
+bashrc_export_variable sudo SUDO=$SUDO
+export SUDO=$SUDO
+bashrc_export_variable user_bin PATH=${HOME}/bin:\$PATH
+export USER=${USER:-root}
 
 link_dotfiles .bash_aliases
 link_dotfiles .gitconfig
@@ -23,7 +27,6 @@ link_bash_completion bsync
 
 link_bin upgrayedd
 
-export SUDO=$SUDO
 upgrayedd -y
 
 if [[ -e ../profile_dirs ]] ; then

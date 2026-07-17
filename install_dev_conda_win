@@ -1,16 +1,33 @@
-#!/bin/bash
+#!/bin/bash -e
 
 source ./script_lib/std.inc
 source ./script_lib/install.inc
 source ./script_lib/graphics.inc
 source ./script_lib/link.inc
 
+conda_version=313_26.1.1-1
+pyinstaller_version=6.19.0
+venv="$1"
 
-install_wine
+
+install_wine_latest
 wine wineboot
 xvfb-run winetricks -q win10 vcrun2019 cmd
 
-download https://repo.anaconda.com/miniconda/Miniconda3-py38_23.3.1-0-Windows-x86_64.exe
-install_exe Miniconda3-py38_23.3.1-0-Windows-x86_64.exe "/InstallationType=JustMe /AddToPath=1 /RegisterPython=1 /S"
+link_bin pyinstaller-win
+link_bin python3-venv-win
+
+download https://repo.anaconda.com/miniconda/Miniconda3-py${conda_version}-Windows-x86_64.exe
+install_exe Miniconda3-py${conda_version}-Windows-x86_64.exe "/InstallationType=JustMe /AddToPath=1 /RegisterPython=1 /S" || true
+
+if [[ -z "${venv}" ]] ; then
+    wine python -m pip install --upgrade pip
+    wine python -m pip install --upgrade setuptools
+    wine python -m pip install pyinstaller==${pyinstaller_version}
+else
+    python3-venv-win -c ${venv} python -m pip install --upgrade pip
+    python3-venv-win -c ${venv} python -m pip install --upgrade setuptools
+    python3-venv-win -c ${venv} python -m pip install pyinstaller==${pyinstaller_version}
+fi
 
 echo "finished $0"

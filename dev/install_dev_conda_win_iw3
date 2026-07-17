@@ -1,0 +1,24 @@
+#!/bin/bash -e
+
+source ./script_lib/std.inc
+source ./script_lib/install.inc
+
+./install_dev_conda_win iw3
+
+download_github kbatten/nunif
+pushd "${TANQ_DOWNLOAD_DIR}/nunif"
+python3-venv-win -c iw3 pip install -r requirements-torch.txt
+python3-venv-win -c iw3 pip install -r requirements.txt
+python3-venv-win -c iw3 pip install -r requirements-gui.txt
+popd
+
+sleep 1
+echo "# build iw3"
+echo
+echo "sed  -e 's/^from \. /from iw3 /g' -e 's/from \.\([^ ]\)/from iw3.\1/g' iw3/download_models.py > iw3_download_models.py
+sed  -e 's/^from \. /from iw3 /g' -e 's/from \.\([^ ]\)/from iw3.\1/g' iw3/gui.py > iw3_gui.py
+sed  -e 's/^from \. /from iw3.desktop /g' -e 's/from \.\([^ ]\)/from iw3.desktop.\1/g' iw3/desktop/__main__.py > iw3_desktop.py"
+echo
+echo "pyinstaller-win --venv iw3 --noconfirm --collect-submodules torch --collect-submodules timm --onefile iw3_download_models.py"
+echo "pyinstaller-win --venv iw3 --noconfirm --collect-submodules torch --collect-submodules timm --add-data iw3/locales:iw3/locales --add-data nunif/rc:nunif/rc --add-data iw3/icon.ico:. --onefile iw3_gui.py"
+echo "pyinstaller-win --venv iw3 --noconfirm --collect-submodules torch --collect-submodules timm --add-data iw3/desktop/views:iw3/desktop/views --onefile iw3_desktop.py"

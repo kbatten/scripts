@@ -53,8 +53,8 @@ set(VCPKG_LIBRARY_LINKAGE dynamic)
 set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE ${VCPKG_ROOT_DIR}/scripts/toolchains/windows.cmake)
 set(ENV{CC} cl.exe)
 set(ENV{CXX} cl.exe)
-set(ENV{PATH} "/home/keith/msvc/bin/x64:$ENV{PATH}")
 EOF
+echo "set(ENV{PATH} \"${HOME}/msvc/bin/x64:$ENV{PATH}\")" >> "${TANQ_DOWNLOAD_DIR}/vcpkg/my-triplets/x64-windows.cmake"
 
 fi  # VULKAN_FULL_INSTALL
 

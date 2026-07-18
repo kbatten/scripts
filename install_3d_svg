@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+source ./script_lib/link.inc
+source ./script_lib/install.inc
+
+$SUDO apt-get install -y ghostscript inkscape xvfb potrace
+
+link_bin 3d_image_to_svg
+link_bin 3d_svg_to_blender
+
+echo "finished $0"

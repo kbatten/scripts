@@ -1,0 +1,100 @@
+#!/bin/bash
+
+if [[ -z "$2" ]] ; then
+    echo "$0 <filename> <colors> [hint_colors]"
+    echo "$0 3d_image_to_svg image.webp \"white,black,#28619a,#fcdd77\" \"#d1911c,#0f3065,#453d27\""
+    echo
+    exit 1
+fi
+
+filename=${1}
+
+extension="${filename##*.}"
+name="${filename%.*}"
+
+colors=$(echo $2 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
+hints=$(echo $3 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
+
+filter="box"
+resize="200%"
+
+case "${extension}" in
+    "eps")
+        gs -dNOPAUSE -dBATCH -dEPSCrop -sDEVICE=pdfwrite -sOutputFile=temp.pdf "${filename}"
+        if [[ "$resize" == "100%" ]] ; then
+            convert temp.pdf temp.png
+        else
+            convert temp.pdf -filter ${filter} -resize ${resize} temp.png
+        fi
+        rm -f temp.pdf
+        ;;
+    *)
+        if [[ "$resize" == "100%" ]] ; then
+            convert "${filename}" temp_png.png
+        else
+            convert "${filename}" -filter ${filter} -resize ${resize} temp_png.png
+        fi
+        ;;
+esac
+
+# convert input image to "colors"
+convert $colors $hints +append -colorspace sRGB palette.png
+convert temp_png.png -colorspace sRGB +dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_hints.png
+convert $colors +append -colorspace sRGB palette.png
+convert temp_hints.png -colorspace sRGB +dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_colors.png
+
+# get image dimensions for the final SVG canvas
+read -r WIDTH HEIGHT <<< $(identify -format "%w %h" "temp_colors.png")
+
+# start the merged SVG file
+cat > "${name}.svg" <<EOF
+<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
+EOF
+
+#for each color, build a mask, trace it, extract just the <path> and append
+i=0
+for color in $(echo $2 | sed 's/,/ /g') ; do
+    i=$((i+1))
+
+    if [[ $(echo "$color" | head -c 1) != "#" ]] ; then
+        hex=$(convert xc:"$color" -format "#%[hex:p{0,0}]" info: | cut -c1-7)
+    else
+        hex="$color"
+    fi
+
+    # set our non-white mask color, could be made more robust
+    dummy="#123456"
+    if [[ "$hex" == "${dummy}" ]] ; then
+        dummy="#654321"
+    fi
+    if [[ "$hex" == "${dummy}" ]] ; then
+        echo "ERROR: hit mask colors of #123456 and #654321"
+        exit 1
+    fi
+
+    mask="mask_$i.png"
+    pnm="mask_$i.pnm"
+    svg="${name}_$i.svg"
+
+    # isolate this color as white, everything else black
+    convert "temp_colors.png" -fuzz 0% -fill "${dummy}" -opaque "$hex" -fill black +opaque "${dummy}" -fill white -opaque "${dummy}" -negate "$mask"
+    convert "$mask" -fill black -draw "rectangle $((WIDTH-10)),0 $((WIDTH-1)),9" -draw "rectangle 0,$((HEIGHT-10)) 9,$((HEIGHT-1))" "$mask"
+    convert "$mask" "$pnm"
+
+    # trace, filling the path with the actual color
+    potrace "$pnm" -s -k 0.5 -a 1 -O 0.2 -t 0 -C"$hex" -o "$svg"
+
+    # extract the full <g ...>...</g> block (keeps transform + fill together)
+    sed -n '/<g /,/<\/g>/p' "$svg" >> "${name}.svg" || true
+done
+
+echo "</svg>" >> "${name}.svg"
+
+rm -f mask_*.png mask_*.pnm palette.png temp_colors.png temp_hints.png temp_png.png
+
+echo
+echo "load the individual color layer svgs into program"
+echo "resize all layers and center"
+echo "remove any areas that need to be blank"
+echo "remove guide squares (first and last path on each layer"
+echo

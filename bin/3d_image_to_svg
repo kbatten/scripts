@@ -17,16 +17,23 @@ hints=$(echo $3 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
 
 filter="box"
 resize="200%"
+dither="+dither"  # set to "" to enable dither
 
 case "${extension}" in
     "eps")
         gs -dNOPAUSE -dBATCH -dEPSCrop -sDEVICE=pdfwrite -sOutputFile=temp.pdf "${filename}"
         if [[ "$resize" == "100%" ]] ; then
-            convert temp.pdf temp.png
+            convert temp.pdf temp_png.png
         else
-            convert temp.pdf -filter ${filter} -resize ${resize} temp.png
+            convert temp.pdf -filter ${filter} -resize ${resize} temp_png.png
         fi
-        rm -f temp.pdf
+        ;;
+    "pdf")
+        if [[ "$resize" == "100%" ]] ; then
+            convert "${filename}" temp_png.png
+        else
+            convert "${filename}" -filter ${filter} -resize ${resize} temp_png.png
+        fi
         ;;
     *)
         if [[ "$resize" == "100%" ]] ; then
@@ -39,9 +46,9 @@ esac
 
 # convert input image to "colors"
 convert $colors $hints +append -colorspace sRGB palette.png
-convert temp_png.png -colorspace sRGB +dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_hints.png
+convert temp_png.png -colorspace sRGB $dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_hints.png
 convert $colors +append -colorspace sRGB palette.png
-convert temp_hints.png -colorspace sRGB +dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_colors.png
+convert temp_hints.png -colorspace sRGB $dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_colors.png
 
 # get image dimensions for the final SVG canvas
 read -r WIDTH HEIGHT <<< $(identify -format "%w %h" "temp_colors.png")
@@ -90,7 +97,7 @@ done
 
 echo "</svg>" >> "${name}.svg"
 
-rm -f mask_*.png mask_*.pnm palette.png temp_colors.png temp_hints.png temp_png.png
+rm -f mask_*.png mask_*.pnm palette.png temp_colors.png temp_hints.png temp_png.png temp.pdf
 
 echo
 echo "load the individual color layer svgs into program"

@@ -1,23 +1,49 @@
 #!/bin/bash
 
-if [[ -z "$2" ]] ; then
-    echo "$0 <filename> <colors> [hint_colors]"
+usage() {
+    local err=$1
+    local msg=$2
+
+    if [[ -n "$msg" ]] ; then
+        echo "ERROR: $msg"
+        echo
+    fi
+
+    echo "$0 [-d (dither)] [-p (pixel-perfect)] [-s <percent> (scale)] <filename> <colors> [hint_colors]"
     echo "$0 3d_image_to_svg image.webp \"white,black,#28619a,#fcdd77\" \"#d1911c,#0f3065,#453d27\""
     echo
-    exit 1
-fi
 
-filename=${1}
-
-extension="${filename##*.}"
-name="${filename%.*}"
-
-colors=$(echo $2 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
-hints=$(echo $3 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
+    exit $err
+}
 
 filter="box"
 resize="200%"
 dither="+dither"  # set to "" to enable dither
+smoothing="-a 1"
+
+while getopts "dps:h" opt ; do
+    case $opt in
+        d) dither="" ;;
+        p) smoothing="-a 0 --flat" ;;
+        s) resize=$OPTARG ;;
+        h) usage ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+if [[ -z "$1" ]] ; then
+    usage 1 "missing filename and colors"
+fi
+if [[ -z "$2" ]] ; then
+    usage 1 "missing colors"
+fi
+
+filename=${1}
+colors=$(echo $2 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
+hints=$(echo $3 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
+
+extension="${filename##*.}"
+name="${filename%.*}"
 
 case "${extension}" in
     "eps")
@@ -89,7 +115,7 @@ for color in $(echo $2 | sed 's/,/ /g') ; do
     convert "$mask" "$pnm"
 
     # trace, filling the path with the actual color
-    potrace "$pnm" -s -k 0.5 -a 1 -O 0.2 -t 0 -C"$hex" -o "$svg"
+    potrace "$pnm" -s -k 0.5 $smoothing -O 0.2 -t 0 -C"$hex" -o "$svg"
 
     # extract the full <g ...>...</g> block (keeps transform + fill together)
     sed -n '/<g /,/<\/g>/p' "$svg" >> "${name}.svg" || true

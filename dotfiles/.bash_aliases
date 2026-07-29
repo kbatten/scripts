@@ -23,8 +23,8 @@ if $(uname | grep "Darwin" &> /dev/null) ; then
     #alias claude-ollama-q-agentworld-30b-xl='ollama launch claude --model frob/qwen-agentworld:35b-a3b-ud-q6_K_XL -- '
 
 
-    alias claude-ollama-remote-q36-35b-a3b='CLAUDE_CODE_PROVIDER=ollama OLLAMA_HOST=http://ysera.local:11434 ollama launch claude --model qwen3.6:35b-a3b -- '
-    alias claude-ollama-remote-q-agentworld-30b-xl='CLAUDE_CODE_PROVIDER=ollama OLLAMA_HOST=http://ysera.local:11434 ollama launch claude --model kbatten/qwen-agentworld:35b-a3b-ud-q6_K_XL -- '
+    alias claude-ollama-remote-q36-35b-a3b='OPENAI_API_KEY=ollama OPENAI_BASE_URL=ttp://ysera.local:11434/v1 npx @anthropic-ai/claude-code --model qwen3.6:35b-a3b -- '
+    alias claude-ollama-remote-q-agentworld-30b-xl='OPENAI_API_KEY=ollama OPENAI_BASE_URL=ttp://ysera.local:11434/v1 npx @anthropic-ai/claude-code --model kbatten/qwen-agentworld:35b-a3b-ud-q6_K_XL -- '
 
     #alias claude='echo "tell app \"Terminal\" to set current settings of first window to settings set \"Claude\"" | osascript && claude '
     #alias claude-ollama-q35-27b='echo "tell app \"Terminal\" to set current settings of first window to settings set \"CLQ35-27b\"" | osascript && ollama launch claude --model qwen3.5:27b -- '

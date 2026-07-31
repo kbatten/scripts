@@ -257,7 +257,8 @@ index 9a0292d..9a8426e 100644
  if(NRD_EMBEDS_DXIL_SHADERS)
 EOF
     echo "cd extern/nrd
-${VULKAN_DEV_NO_CLEAN} git reset HEAD --hard && git clean -dfx
+git reset HEAD --hard
+${VULKAN_DEV_NO_CLEAN} git clean -dfx
 git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_nrd.patch\"
 cd ../.." >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
 
@@ -311,7 +312,8 @@ index a35ea64..044a162 100644
  set(FFX_LIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libs)
 EOF
     echo "cd extern/FidelityFX-SDK
-${VULKAN_DEV_NO_CLEAN} git reset HEAD --hard && git clean -dfx
+git reset HEAD --hard
+${VULKAN_DEV_NO_CLEAN} git clean -dfx
 git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_common.patch\"
 git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_toolchain.patch\"
 git apply \"${TANQ_DOWNLOAD_DIR}/vulkan_cmake_workaround_fidelityfx_cmakelists.patch\"
@@ -330,7 +332,8 @@ chmod 755 "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
 echo "cd ${HOME}/src/Radiance
 ./gradlew compileJava
 cd ${HOME}/src/MCVR
-${VULKAN_DEV_NO_CLEAN} git reset HEAD --hard && git clean -dfx" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
+git reset HEAD --hard
+${VULKAN_DEV_NO_CLEAN} git clean -dfx" >> "${TANQ_DOWNLOAD_DIR}/${SCRIPTNAME}_release"
 
 CMakeWorkaround
 

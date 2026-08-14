@@ -12,8 +12,8 @@ python3-venv-win -c llama-setup pip install -r requirements-boogu-server.txt
 popd
 
 echo "# build zimageturbo-server.py"
-echo "pyinstaller-win --venv llama-setup --metadata requests --collect-all transformers --collect-submodules torch --collect-all scipy --add-data \"gallery.html;.\" --add-data \"gallery-common.js;.\" --add-data \"gallery-stream.js;.\" zimageturbo-server.py"
+echo "pyinstaller-win --venv llama-setup --metadata requests --collect-all transformers --collect-submodules torch --collect-all scipy --add-data \"gallery;gallery\" zimageturbo-server.py"
 echo
 echo "# build boogu-server.py"
 echo "ln -s ../Boogu-Image/boogu ."
-echo "pyinstaller-win --venv llama-setup --metadata requests --collect-all transformers --collect-submodules torch --collect-all scipy --add-data \"gallery.html;.\" --add-data \"gallery-common.js;.\" --add-data \"gallery-stream.js;.\" --add-data \"boogu;boogu\" boogu-server.py"
+echo "pyinstaller-win --venv llama-setup --metadata requests --collect-all transformers --collect-submodules torch --collect-all scipy --add-data \"gallery;gallery\" \"boogu;boogu\" boogu-server.py"

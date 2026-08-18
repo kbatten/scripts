@@ -10,6 +10,7 @@ alias gcp='git cherry-pick'
 alias json='python3 -m json.tool'
 alias diff='diff --color=always'
 alias git_reflog='git log --graph --oneline --reflog'
+alias claude='claude --permission-mode acceptEdits'
 
 
 if $(uname | grep "Darwin" &> /dev/null) ; then

@@ -12,20 +12,21 @@ alias diff='diff --color=always'
 alias git_reflog='git log --graph --oneline --reflog'
 alias claude='claude --permission-mode acceptEdits'
 
-
 if $(uname | grep "Darwin" &> /dev/null) ; then
-    alias claude-ollama-q35-27b='"ollama launch claude --model qwen3.5:27b -- '
-    alias claude-ollama-q35-9b='ollama launch claude --model qwen3.5:9b -- '
-    alias claude-ollama-g4-e4b='ollama launch claude --model gemma4:e4b -- '
-    alias claude-ollama-q3-coder-30b='ollama launch claude --model qwen3-coder:30b -- '
-    alias claude-ollama-q36-35b-a3b='ollama launch claude --model qwen3.6:35b-a3b -- '
-    alias claude-ollama-q36-27b='ollama launch claude --model qwen3.6:27b -- '
+    alias claude-local='ANTHROPIC_MODEL="local" ANTHROPIC_BASE_URL=http://127.0.0.1:8080 claude'
+    alias claude-remote='CLAUDE_CODE_MAX_CONTEXT_TOKENS=70000 CLAUDE_CODE_MAX_OUTPUT_TOKENS=70000 ANTHROPIC_MODEL="local" ANTHROPIC_BASE_URL=http://ysera.local:8080 claude'
+    #alias claude-ollama-q35-27b='ollama launch claude --model qwen3.5:27b -- '
+    #alias claude-ollama-q35-9b='ollama launch claude --model qwen3.5:9b -- '
+    #alias claude-ollama-g4-e4b='ollama launch claude --model gemma4:e4b -- '
+    #alias claude-ollama-q3-coder-30b='ollama launch claude --model qwen3-coder:30b -- '
+    #alias claude-ollama-q36-35b-a3b='ollama launch claude --model qwen3.6:35b-a3b -- '
+    #alias claude-ollama-q36-27b='ollama launch claude --model qwen3.6:27b -- '
     #alias claude-ollama-q-agentworld-30b-m='ollama launch claude --model frob/qwen-agentworld:35b-a3b-ud-q4_K_M -- '
     #alias claude-ollama-q-agentworld-30b-xl='ollama launch claude --model frob/qwen-agentworld:35b-a3b-ud-q6_K_XL -- '
 
 
-    alias claude-ollama-remote-q36-35b-a3b='CLAUDE_CODE_PROVIDER=ollama OLLAMA_HOST=http://ysera.local:11434 ollama launch claude --model qwen3.6:35b-a3b -- '
-    alias claude-ollama-remote-q-agentworld-30b-xl='CLAUDE_CODE_PROVIDER=ollama OLLAMA_HOST=http://ysera.local:11434 ollama launch claude --model kbatten/qwen-agentworld:35b-a3b-ud-q6_K_XL -- '
+    #alias claude-ollama-remote-q36-35b-a3b='CLAUDE_CODE_PROVIDER=ollama OLLAMA_HOST=http://ysera.local:11434 ollama launch claude --model qwen3.6:35b-a3b -- '
+    #alias claude-ollama-remote-q-agentworld-30b-xl='CLAUDE_CODE_PROVIDER=ollama OLLAMA_HOST=http://ysera.local:11434 ollama launch claude --model kbatten/qwen-agentworld:35b-a3b-ud-q6_K_XL -- '
 
     #alias claude='echo "tell app \"Terminal\" to set current settings of first window to settings set \"Claude\"" | osascript && claude '
     #alias claude-ollama-q35-27b='echo "tell app \"Terminal\" to set current settings of first window to settings set \"CLQ35-27b\"" | osascript && ollama launch claude --model qwen3.5:27b -- '

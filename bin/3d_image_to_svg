@@ -9,7 +9,7 @@ usage() {
         echo
     fi
 
-    echo "$0 [-d (dither)] [-p (pixel-perfect)] [-s <percent> (scale)] <filename> <colors> [hint_colors]"
+    echo "$0 [-d (dither)] [-p (pixel-perfect)] [-a (alignment dots)] [-s <percent> (scale)] <filename> <colors> [hint_colors]"
     echo "$0 3d_image_to_svg image.webp \"white,black,#28619a,#fcdd77\" \"#d1911c,#0f3065,#453d27\""
     echo "$0 3d_image_to_svg image.webp \"white,black,#28619a,#fcdd77\" \"#d1911c=#28619a,#0f3065=black,#453d27\""
     echo
@@ -17,6 +17,9 @@ usage() {
     echo "image; the final svg is still limited to <colors>. A hint written as color=target"
     echo "is explicitly mapped onto one of the main <colors> instead of being collapsed by"
     echo "nearest-color remap, giving you direct control over how it converts."
+    echo
+    echo "-a adds small black alignment/registration squares to opposite corners of each"
+    echo "color layer, useful for lining up layers when assembling physically. Off by default."
     echo
 
     exit $err
@@ -26,9 +29,11 @@ filter="box"
 resize="200%"
 dither="+dither"  # set to "" to enable dither
 smoothing="-a 1"
+align_dots=0  # set to 1 (via -a) to draw alignment/registration squares
 
-while getopts "dps:h" opt ; do
+while getopts "adps:h" opt ; do
     case $opt in
+        a) align_dots=1 ;;
         d) dither="" ;;
         p) smoothing="-a 0 --flat" ;;
         s) resize=$OPTARG ;;
@@ -145,8 +150,10 @@ for color in $(echo $2 | sed 's/,/ /g') ; do
 
     # isolate this color as white, everything else black
     convert "temp_colors.png" -fuzz 0% -fill "${dummy}" -opaque "$hex" -fill black +opaque "${dummy}" -fill white -opaque "${dummy}" -negate "$mask"
-    # add alignment dots
-    convert "$mask" -fill black -draw "rectangle $((WIDTH-10)),0 $((WIDTH-1)),9" -draw "rectangle 0,$((HEIGHT-10)) 9,$((HEIGHT-1))" "$mask"
+    if [[ "$align_dots" == 1 ]] ; then
+        # add alignment/registration squares
+        convert "$mask" -fill black -draw "rectangle $((WIDTH-10)),0 $((WIDTH-1)),9" -draw "rectangle 0,$((HEIGHT-10)) 9,$((HEIGHT-1))" "$mask"
+    fi
 
     convert "$mask" "$pnm"
 
@@ -165,5 +172,7 @@ echo
 echo "load the individual color layer svgs into program"
 echo "resize all layers and center"
 echo "remove any areas that need to be blank"
-echo "remove guide squares (first and last path on each layer"
+if [[ "$align_dots" == 1 ]] ; then
+    echo "remove guide squares (first and last path on each layer)"
+fi
 echo

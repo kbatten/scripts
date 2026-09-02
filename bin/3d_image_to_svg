@@ -9,8 +9,17 @@ usage() {
         echo
     fi
 
-    echo "$0 [-d (dither)] [-p (pixel-perfect)] [-s <percent> (scale)] <filename> <colors> [hint_colors]"
+    echo "$0 [-d (dither)] [-p (pixel-perfect)] [-a (alignment dots)] [-s <percent> (scale)] <filename> <colors> [hint_colors]"
     echo "$0 3d_image_to_svg image.webp \"white,black,#28619a,#fcdd77\" \"#d1911c,#0f3065,#453d27\""
+    echo "$0 3d_image_to_svg image.webp \"white,black,#28619a,#fcdd77\" \"#d1911c=#28619a,#0f3065=black,#453d27\""
+    echo
+    echo "hint_colors are extra colors used only to improve quantization against the source"
+    echo "image; the final svg is still limited to <colors>. A hint written as color=target"
+    echo "is explicitly mapped onto one of the main <colors> instead of being collapsed by"
+    echo "nearest-color remap, giving you direct control over how it converts."
+    echo
+    echo "-a adds small black alignment/registration squares to opposite corners of each"
+    echo "color layer, useful for lining up layers when assembling physically. Off by default."
     echo
 
     exit $err
@@ -20,9 +29,11 @@ filter="box"
 resize="200%"
 dither="+dither"  # set to "" to enable dither
 smoothing="-a 1"
+align_dots=0  # set to 1 (via -a) to draw alignment/registration squares
 
-while getopts "dps:h" opt ; do
+while getopts "adps:h" opt ; do
     case $opt in
+        a) align_dots=1 ;;
         d) dither="" ;;
         p) smoothing="-a 0 --flat" ;;
         s) resize=$OPTARG ;;
@@ -40,7 +51,29 @@ fi
 
 filename=${1}
 colors=$(echo $2 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
-hints=$(echo $3 | sed -E 's/,/ /g; s/([^ ]+)/xc:\1/g')
+
+# hint_colors entries may be "color" (used only to improve quantization, then
+# collapsed onto the nearest main color) or "color=target" (explicitly mapped
+# onto one of the main <colors> instead of relying on nearest-color remap)
+hint_map_from=()
+hint_map_to=()
+hint_colors_list=()
+if [[ -n "$3" ]] ; then
+    IFS=',' read -ra hint_entries <<< "$3"
+    for entry in "${hint_entries[@]}" ; do
+        if [[ "$entry" == *"="* ]] ; then
+            hint_map_from+=("${entry%%=*}")
+            hint_map_to+=("${entry#*=}")
+            hint_colors_list+=("${entry%%=*}")
+        else
+            hint_colors_list+=("$entry")
+        fi
+    done
+fi
+hints=""
+for hint_color in "${hint_colors_list[@]}" ; do
+    hints="$hints xc:$hint_color"
+done
 
 extension="${filename##*.}"
 name="${filename%.*}"
@@ -73,6 +106,12 @@ esac
 # convert input image to "colors"
 convert $colors $hints +append -colorspace sRGB palette.png
 convert temp_png.png -colorspace sRGB $dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_hints.png
+
+# apply explicit color mappings ("color=target") before collapsing onto main colors
+for idx in "${!hint_map_from[@]}" ; do
+    convert temp_hints.png -fuzz 0% -fill "${hint_map_to[$idx]}" -opaque "${hint_map_from[$idx]}" temp_hints.png
+done
+
 convert $colors +append -colorspace sRGB palette.png
 convert temp_hints.png -colorspace sRGB $dither -remap palette.png -colorspace sRGB -type Palette PNG8:temp_colors.png
 
@@ -111,7 +150,11 @@ for color in $(echo $2 | sed 's/,/ /g') ; do
 
     # isolate this color as white, everything else black
     convert "temp_colors.png" -fuzz 0% -fill "${dummy}" -opaque "$hex" -fill black +opaque "${dummy}" -fill white -opaque "${dummy}" -negate "$mask"
-    convert "$mask" -fill black -draw "rectangle $((WIDTH-10)),0 $((WIDTH-1)),9" -draw "rectangle 0,$((HEIGHT-10)) 9,$((HEIGHT-1))" "$mask"
+    if [[ "$align_dots" == 1 ]] ; then
+        # add alignment/registration squares
+        convert "$mask" -fill black -draw "rectangle $((WIDTH-10)),0 $((WIDTH-1)),9" -draw "rectangle 0,$((HEIGHT-10)) 9,$((HEIGHT-1))" "$mask"
+    fi
+
     convert "$mask" "$pnm"
 
     # trace, filling the path with the actual color
@@ -129,5 +172,7 @@ echo
 echo "load the individual color layer svgs into program"
 echo "resize all layers and center"
 echo "remove any areas that need to be blank"
-echo "remove guide squares (first and last path on each layer"
+if [[ "$align_dots" == 1 ]] ; then
+    echo "remove guide squares (first and last path on each layer)"
+fi
 echo

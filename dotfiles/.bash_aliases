@@ -13,8 +13,8 @@ alias git_reflog='git log --graph --oneline --reflog'
 alias claude='claude --permission-mode acceptEdits'
 
 if $(uname | grep "Darwin" &> /dev/null) ; then
-    alias claude-local='ANTHROPIC_MODEL="local" ANTHROPIC_BASE_URL=http://127.0.0.1:8080 claude'
-    alias claude-remote='CLAUDE_CODE_MAX_CONTEXT_TOKENS=70000 CLAUDE_CODE_MAX_OUTPUT_TOKENS=70000 ANTHROPIC_MODEL="local" ANTHROPIC_BASE_URL=http://ysera.local:8080 claude'
+    alias claude-local='CLAUDE_CODE_MAX_CONTEXT_TOKENS=100000 CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000 ANTHROPIC_MODEL="local" ANTHROPIC_BASE_URL=http://127.0.0.1:8080 claude'
+    alias claude-remote='CLAUDE_CODE_MAX_CONTEXT_TOKENS=100000 CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000 ANTHROPIC_MODEL="local" ANTHROPIC_BASE_URL=http://ysera.local:8080 claude'
     #alias claude-ollama-q35-27b='ollama launch claude --model qwen3.5:27b -- '
     #alias claude-ollama-q35-9b='ollama launch claude --model qwen3.5:9b -- '
     #alias claude-ollama-g4-e4b='ollama launch claude --model gemma4:e4b -- '

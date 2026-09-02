@@ -6,15 +6,15 @@ usage() {
     echo "  -a  set activation_bytes"
     echo "  -f  automatically get activation_bytes from ~/.activation_bytes"
     echo "         echo -n \"activation_bytes\" > ~/.activation_bytes"
-    echo "  -c  codec (default: copy)"
+    echo "  -r  reencode audio"
     echo
     exit
 }
 
 ACTIVATION_BYTES=
-CODEC=copy
+CODEC="-codec copy"
 
-while getopts "a:fc:h" opt ; do
+while getopts "a:frh" opt ; do
     case $opt in
         a)
             ACTIVATION_BYTES="$OPTARG"
@@ -22,8 +22,8 @@ while getopts "a:fc:h" opt ; do
         f)
             ACTIVATION_BYTES="$(cat "$HOME/.activation_bytes")"
             ;;
-        c)
-            CODEC="$OPTARG"
+        r)
+            CODEC="-c:a aac -b:a 64k -c:v copy"
             ;;
         h)
             usage
@@ -44,4 +44,4 @@ fi
 INFILE="$1"
 OUTFILE="${INFILE%.*}.m4b"
 
-ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" -codec $CODEC "$OUTFILE"
+ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" $CODEC "$OUTFILE"

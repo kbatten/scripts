@@ -48,8 +48,8 @@ if [[ $FIX -eq 0 ]] ; then
     ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" -codec copy "$OUTFILE"
 else
     rm -f cover.jpg ; rm -f audio.m4b
-    ffmpeg -i "$INFILE" -an -map 0:2 cover.jpg
+    ffmpeg -i "$INFILE" -an -map 0:v -c copy -update 1 -frames:v 1 cover.jpg
     ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" -map 0:a -c:a copy "audio.m4b"
-    ffmpeg -i "audio.m4b" -i cover.jpg -map 0 -map 1 -c copy -disposition:v attached_pic "$OUTFILE"
+    ffmpeg -i "audio.m4b" -i cover.jpg -map 0:a -map 1:v -c copy -disposition:v attached_pic "$OUTFILE"
     rm -f cover.jpg ; rm -f audio.m4b
 fi

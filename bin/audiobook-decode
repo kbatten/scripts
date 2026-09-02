@@ -4,21 +4,26 @@ usage() {
     echo "$0 <-a <activation_bytes> | -f> <aax input>"
     echo
     echo "  -a  set activation_bytes"
-    echo "  -f  automatically get activation_bytes from ~/.activation_bytes"
+    echo "  -b  automatically get activation_bytes from ~/.activation_bytes"
     echo "         echo -n \"activation_bytes\" > ~/.activation_bytes"
+    echo "  -f  fix broken cover art"
     echo
     exit
 }
 
 ACTIVATION_BYTES=
+FIX=0
 
-while getopts "a:fh" opt ; do
+while getopts "a:bfh" opt ; do
     case $opt in
         a)
             ACTIVATION_BYTES="$OPTARG"
             ;;
-        f)
+        b)
             ACTIVATION_BYTES="$(cat "$HOME/.activation_bytes")"
+            ;;
+        f)
+            FIX=1
             ;;
         h)
             usage
@@ -39,4 +44,12 @@ fi
 INFILE="$1"
 OUTFILE="${INFILE%.*}.m4b"
 
-ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" -codec copy "$OUTFILE"
+if [[ $FIX -eq 0 ]] ; then
+    ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" -codec copy "$OUTFILE"
+else
+    rm -f cover.jpg ; rm -f audio.m4b
+    ffmpeg -i "$INFILE" -an -map 0:v -c copy -update 1 -frames:v 1 cover.jpg
+    ffmpeg -activation_bytes $ACTIVATION_BYTES -i "$INFILE" -map 0:a -c:a copy "audio.m4b"
+    ffmpeg -i "audio.m4b" -i cover.jpg -map 0:a -map 1:v -c copy -disposition:v attached_pic "$OUTFILE"
+    rm -f cover.jpg ; rm -f audio.m4b
+fi

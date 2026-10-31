@@ -20,6 +20,9 @@ link_bin python3-venv-win
 download https://repo.anaconda.com/miniconda/Miniconda3-py${conda_version}-Windows-x86_64.exe
 install_exe Miniconda3-py${conda_version}-Windows-x86_64.exe "/InstallationType=JustMe /AddToPath=1 /RegisterPython=1 /S" || true
 
+download https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda_12.8.0_571.96_windows.exe
+install_exe cuda_12.8.0_571.96_windows.exe -s
+
 if [[ -z "${venv}" ]] ; then
     wine python -m pip install --upgrade pip
     wine python -m pip install --upgrade setuptools

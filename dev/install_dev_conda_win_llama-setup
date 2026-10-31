@@ -8,7 +8,6 @@ source ./script_lib/install.inc
 download_github kbatten/llama-setup
 pushd "${TANQ_DOWNLOAD_DIR}/llama-setup"
 python3-venv-win -c llama-setup pip install -r requirements.txt
-python3-venv-win -c llama-setup pip install -r requirements-boogu-server.txt
 popd
 
 echo "# build zimageturbo-server.py"

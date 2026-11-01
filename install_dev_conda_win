@@ -24,7 +24,7 @@ download https://developer.download.nvidia.com/compute/cuda/12.8.0/local_install
 install_exe cuda_12.8.0_571.96_windows.exe "-s nvcc_12.8 cudart_12.8"
 
 # install vscc (TODO: move to library)
-# export WINEPATH=$(find ~/msvc -name cl.exe)
+# export WINEPATH=<path of> # find ~/msvc2022 -name cl.exe | head -n1
 # export MSSdk=1
 $SUDO apt-get -y update
 $SUDO apt-get install -y python3 msitools ca-certificates binfmt-support wine-binfmt

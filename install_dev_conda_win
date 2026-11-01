@@ -29,13 +29,13 @@ install_exe cuda_12.8.0_571.96_windows.exe "-s nvcc_12.8 cudart_12.8"
 $SUDO apt-get -y update
 $SUDO apt-get install -y python3 msitools ca-certificates binfmt-support wine-binfmt
 download_github mstorsjo/msvc-wine.git
-if [[ ! -e ~/msvc ]] ; then
+if [[ ! -e ~/msvc2022 ]] ; then
     pushd "${TANQ_DOWNLOAD_DIR}/msvc-wine/"
     OLD_TMPDIR="${TMPDIR}"
     export TMPDIR="${HOME}/tmp-msvc"
     mkdir "${TMPDIR}"
-    python3 vsdownload.py --accept-license --major 17 --msvc-version 17.12 --dest ~/msvc
-    ./install.sh ~/msvc
+    python3 vsdownload.py --accept-license --major 17 --msvc-version 17.12 --dest ~/msvc2022
+    ./install.sh ~/msvc2022
     rm -rf ${TMPDIR}
     export TMPDIR="${OLD_TMPDIR}"
     popd

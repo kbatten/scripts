@@ -34,7 +34,7 @@ if [[ ! -e ~/msvc ]] ; then
     OLD_TMPDIR="${TMPDIR}"
     export TMPDIR="${HOME}/tmp-msvc"
     mkdir "${TMPDIR}"
-    python3 vsdownload.py --accept-license --dest ~/msvc
+    python3 vsdownload.py --accept-license --major 17 --msvc-version 17.12 --dest ~/msvc
     ./install.sh ~/msvc
     rm -rf ${TMPDIR}
     export TMPDIR="${OLD_TMPDIR}"

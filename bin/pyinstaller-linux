@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ARGS="--onefile"
+ARGS=""
 CMD=""
 PATHS=""
 PYINSTALLER="${HOME}/.virtualenvs/pyinstaller/bin/pyinstaller"
@@ -10,6 +10,10 @@ for arg in "$@"; do
         '--help')
             echo "$0 [--onedir] [--venv <venv>]"
             exit
+            ;;
+        '--onefile')
+            shift
+            ARGS="--onefile"
             ;;
         '--onedir')
             shift

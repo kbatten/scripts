@@ -3,7 +3,7 @@
 export KMP_AFFINITY=disabled
 export OMP_NUM_THREADS=1
 
-ARGS="--onefile"
+ARGS=""
 CMD="wine cmd /c"
 PATHS=""
 PYINSTALLER="pyinstaller"
@@ -15,6 +15,10 @@ for arg in "$@"; do
         '--help')
             echo "$0 [--onedir] [--venv <venv>]"
             exit
+            ;;
+        '--onefile')
+            shift
+            ARGS="--onefile"
             ;;
         '--onedir')
             shift
